@@ -43,6 +43,19 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Reorder burger menu + drop Klinik
+
+**What changed:**
+- `hl-dentistry-v9.html:4314` — burger menu reordered per user request and the Klinik item removed. Final order:
+  1. **Wochenplan** — `S.adminMode=false; S.screen='home'`
+  2. **Management** — `S.adminMode=false; S.screen='manager'; S.mgrTab='Übersicht'`
+  3. **Verwaltung** — `S.adminMode=true; S.adminPage_2='uebersicht'`
+  4. **Abmelden** (divider) — `closeMenu_2(); doLogout()`
+
+**Note:** Klinik was the only item that explicitly cleared `S.adminMode` without navigating anywhere, so its function is now covered by the three navigation items (each of them explicitly sets `S.adminMode` as appropriate).
+
+---
+
 ### 2026-04-10 — Add "Management" item to burger menu
 
 **Why:** User wants a direct path back to the Manager screen (`renderManager`, `S.screen='manager'`) from the burger menu. Previously a Dashboard item existed for this; it was removed on user request, then re-requested under a new name.
