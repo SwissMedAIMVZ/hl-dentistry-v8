@@ -43,6 +43,14 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Rename "Übersicht" menu item to "Verwaltung"
+
+**What changed:**
+- `hl-dentistry-v9.html:4316` — the third burger menu entry's label is now **Verwaltung** instead of Übersicht. Only the visible label changed; the onclick still routes to `S.adminMode=true; S.adminPage_2='uebersicht'` so the destination (the Verwaltung → Übersicht tab) is unchanged.
+- Final menu: **Klinik / Wochenplan / Verwaltung / Abmelden**.
+
+---
+
 ### 2026-04-10 — Trim burger menu to Klinik / Wochenplan / Übersicht / Abmelden
 
 **Why:** User wants a leaner menu — removed Dashboard, Einverständnis and Abrechnung per direct request.
