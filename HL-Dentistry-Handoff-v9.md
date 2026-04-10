@@ -43,6 +43,19 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Add demo user c.weigert@mvz-arzt.de
+
+**Why:** New tester needs access to the v9 mockup.
+
+**What changed:**
+- `hl-dentistry-v9.html:820` — `USERS` array — appended `{email:"c.weigert@mvz-arzt.de", pw:"admin", name:"C. Weigert", role:"ceo"}`. Role defaulted to `ceo` because the requested password ("admin") implies admin-level access, and `ceo` routes to the manager dashboard on login (see `doLogin` at `hl-dentistry-v9.html:1028`).
+
+**Follow-ups:**
+- Confirm with user whether `ceo` is the intended role, or if it should be `verwaltung` / `behandler` instead. Swap the `role` field (and add `bId` if `behandler`) if so.
+- The `name` is a placeholder derived from the email local-part — update if the real full name (e.g. "Dr. C. Weigert") is known.
+
+---
+
 ### 2026-04-10 — Initialize v9 from v8
 
 **Why:** Kick off the v9 iteration cycle. We want a clean file to layer new changes onto while keeping v8 frozen as a reference.
