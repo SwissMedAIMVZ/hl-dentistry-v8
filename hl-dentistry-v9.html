@@ -1203,6 +1203,54 @@ function markTaskDone(k){if(!S.doneTaskIds)S.doneTaskIds={};S.doneTaskIds[k]=tru
 function markTaskUndone(k){if(S.doneTaskIds)delete S.doneTaskIds[k];render()}
 function rescheduleTask(k){if(!S.rescheduledTaskIds)S.rescheduledTaskIds={};S.rescheduledTaskIds[k]=true;showToast('Aufgabe neu geplant','var(--navy)')}
 
+/* Home route — distance matrix & nearest-neighbor renderer for the 4 home HEIME */
+var HOME_HEIM_T={
+  "Alexa Lichtenrade":       {"Alexa Lichtenrade":0,"Haus am Weigandufer":25,"Vitanas M\u00e4rkisches V.":30,"Senterra Alloheim":35},
+  "Haus am Weigandufer":     {"Alexa Lichtenrade":25,"Haus am Weigandufer":0, "Vitanas M\u00e4rkisches V.":20,"Senterra Alloheim":50},
+  "Vitanas M\u00e4rkisches V.": {"Alexa Lichtenrade":30,"Haus am Weigandufer":20,"Vitanas M\u00e4rkisches V.":0, "Senterra Alloheim":25},
+  "Senterra Alloheim":       {"Alexa Lichtenrade":35,"Haus am Weigandufer":50,"Vitanas M\u00e4rkisches V.":25,"Senterra Alloheim":0}
+};
+function homeRouteTime(a,b){return(HOME_HEIM_T[a]&&HOME_HEIM_T[a][b]!==undefined)?HOME_HEIM_T[a][b]:null}
+function renderHomeRoute(names){
+  var uniq=[];names.forEach(function(n){if(uniq.indexOf(n)===-1)uniq.push(n)});
+  if(uniq.length===0)return'';
+  /* nearest-neighbor ordering */
+  var rem=uniq.slice(),ordered=[rem.shift()];
+  while(rem.length){
+    var last=ordered[ordered.length-1],bi=0;
+    for(var i=1;i<rem.length;i++){
+      var da=homeRouteTime(last,rem[i]),db=homeRouteTime(last,rem[bi]);
+      if((da==null?999:da)<(db==null?999:db))bi=i;
+    }
+    ordered.push(rem.splice(bi,1)[0]);
+  }
+  var total=0;
+  for(var j=0;j<ordered.length-1;j++){var m=homeRouteTime(ordered[j],ordered[j+1]);if(typeof m==='number')total+=m}
+  var h='<div class="route-box" style="margin:0 0 12px">'
+    +'<div class="route-header">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>'
+      +'Vorgeschlagene Route'
+      +(total>0?'<span class="route-total">~'+total+' Min. gesamt</span>':'')
+    +'</div>'
+    +'<div class="route-stops">';
+  ordered.forEach(function(name,i){
+    var hm=HEIME.find(function(x){return x.name===name});
+    var addr=hm?hm.addr:'';
+    var next=i<ordered.length-1?ordered[i+1]:null;
+    var t=next?homeRouteTime(name,next):null;
+    h+='<div class="route-stop">'
+      +'<div class="route-stop-left"><div class="route-dot"></div>'+(next?'<div class="route-line"></div>':'')+'</div>'
+      +'<div class="route-stop-body">'
+        +'<div class="route-stop-name">'+name+'</div>'
+        +(addr?'<div class="route-stop-addr">'+addr+'</div>':'')
+        +(next?'<div class="route-stop-time"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> '+(t!=null?t+' Min. weiter':'\u2014')+'</div>':'')
+      +'</div>'
+    +'</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
 function renderHome(){
   var homeTab=S.homeTab||'heute';
   var rawTasks=getTodayTasks();
@@ -1243,6 +1291,12 @@ function renderHome(){
       +'<button class="filter-btn'+(f==="todo"?" f-offen":"")+'" onclick="S.taskFilter=\'todo\';render()"><span class="filter-dot dot-o"></span>Offen<span class="f-count '+(f==="todo"?"fc-o":"fc-n")+'">'+nOffen+'</span></button>'
       +'<button class="filter-btn'+(f==="done"?" f-erledigt":"")+'" onclick="S.taskFilter=\'done\';render()"><span class="filter-dot dot-e"></span>Erledigt<span class="f-count '+(f==="done"?"fc-e":"fc-n")+'">'+nErledigt+'</span></button>'
     +'</div>';
+    /* Vorgeschlagene Route — one per day across all of today's tasks, like the v2 Behandler Aufgaben route */
+    if(tasks.length>0){
+      var todayHeims=[];
+      tasks.forEach(function(t){if(todayHeims.indexOf(t.heim)===-1)todayHeims.push(t.heim)});
+      h+=renderHomeRoute(todayHeims);
+    }
     if(shown.length===0)h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">'+(f==="todo"?"Alles erledigt \u2014 gut gemacht!":"Noch keine erledigten Aufgaben")+'</div>';
     shown.forEach(function(t){
       var key=taskKey(t);

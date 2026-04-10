@@ -43,6 +43,28 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Vorgeschlagene Route on Heute tab
+
+**Why:** User wants the same "suggested route" feature that lives in Verwaltung → Behandler Aufgaben to appear on the Heute tab, scoped to today's tasks for the logged-in user.
+
+**What changed:**
+- `hl-dentistry-v9.html:1206` — new constant `HOME_HEIM_T`: a 4×4 drive-time matrix for the four home `HEIME` names (`Alexa Lichtenrade`, `Haus am Weigandufer`, `Vitanas Märkisches V.`, `Senterra Alloheim`). Values are plausible Berlin drive times (20–50 min). A separate matrix was needed because the existing `HEIM_T` (at line 2772) only knows the four *Verwaltung* heim names (`Haus am Waldsee`, `Vitanas Lankwitz`, `Senterra Tempelhof` — different heims), so reusing `renderRouteHeims()` would have produced `'-'` for every leg and missing addresses for 3 of 4 stops.
+- `hl-dentistry-v9.html:1207` — `homeRouteTime(a,b)` helper.
+- `hl-dentistry-v9.html:1208` — `renderHomeRoute(names)` function. Same visual DNA as the v2 `renderRouteHeims()` (reuses the shared `.route-box` / `.route-header` / `.route-stops` / `.route-dot` / `.route-line` / `.route-stop-*` / `.route-total` CSS classes defined at lines 725–736) but:
+  - dedupes the heim names
+  - orders them via nearest-neighbor on `HOME_HEIM_T`
+  - reads the address from each home HEIM's `.addr` field (`"Berlin Lichterfelde"` etc.) instead of going through `heimAddr()` → `PFLEGEHEIME`, which is a different dataset that only partially overlaps
+  - labels the box **"Vorgeschlagene Route"** per user request (the v2 version says "Empfohlene Route"; I kept the user's wording)
+  - overrides `margin:0 0 12px` so the route-box aligns with the rest of the home content (the v2 default `margin:10px 16px 4px` is tuned for the `.task-list` context inside `.bh-body`)
+- `hl-dentistry-v9.html:1260` — wired into `renderHome()` immediately after the `Meine Aufgaben` filter-bar and before the task list. Collects distinct heim names from **all** of today's (non-rescheduled) tasks — not filtered by Offen/Erledigt — so the route stays stable when toggling the filter pill, matching v2 behavior where the route sits on the day header regardless of status.
+
+**Follow-ups:**
+- `HOME_HEIM_T` values are rough estimates. If the user has real drive times they want displayed, swap them in the matrix.
+- If you want the route to recompute based on the *current filter* (only Offen tasks, shrinking as you tick them done), change `tasks.forEach(...)` to `shown.forEach(...)` in the block at line 1260 — one-liner.
+- Nächste Woche tab does not show a route. Say the word if you want one there too (would need per-day routes like the v2 bhSection does).
+
+---
+
 ### 2026-04-10 — Meine Aufgaben rename + Erledigt / Neu planen actions
 
 **Why:** User wants each task card on the Heute tab to expose direct "Erledigt" (done) and "Neu planen" (reschedule) actions, and wants the section header to speak from the logged-in user's perspective.
