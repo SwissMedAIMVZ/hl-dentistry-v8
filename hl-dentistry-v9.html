@@ -145,7 +145,20 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
 .sync-bar svg{width:14px;height:14px;color:var(--emerald)}
 
 /* ===== ODONTOGRAM ===== */
-.odo-wrap{padding:16px;background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-card)}
+.odo-wrap{padding:16px;background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-card);position:relative}
+.odo-zoom-btn{position:absolute;bottom:12px;right:12px;width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s;padding:0;font-family:inherit}
+.odo-zoom-btn:hover{background:var(--blue-50);color:var(--navy);border-color:var(--blue)}
+.odo-zoom-overlay{position:absolute;inset:0;background:rgba(15,23,42,0.92);z-index:200;backdrop-filter:blur(4px)}
+.odo-zoom-close{position:absolute;top:14px;right:14px;z-index:202;width:36px;height:36px;border-radius:var(--r-full);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;line-height:1}
+.odo-zoom-close:hover{background:rgba(255,255,255,0.25)}
+.odo-zoom-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center;width:780px;background:var(--white);border-radius:var(--r-lg);padding:22px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.4);z-index:201}
+.odo-zoom-inner .odo-teeth-grid,.odo-zoom-inner .odo-num-row{grid-template-columns:repeat(8,1fr) 18px repeat(8,1fr);gap:5px}
+.odo-zoom-inner .odo-teeth-grid .ot{font-size:15px;padding:14px 0;border-radius:8px;letter-spacing:0}
+.odo-zoom-inner .odo-num-row{font-size:13px}
+.odo-zoom-inner .odo-qbar{margin:8px 0;grid-template-columns:1fr 18px 1fr}
+.odo-zoom-inner .odo-qbar-l,.odo-zoom-inner .odo-qbar-r{height:28px;font-size:14px}
+.odo-zoom-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:14px;text-align:center;letter-spacing:0.3px}
+.odo-zoom-sub{font-size:12px;color:var(--text-3);text-align:center;margin-bottom:10px;font-weight:500}
 .odo-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .odo-title{font-size:13px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px}
 .odo-grid{display:flex;gap:3px;justify-content:center;align-items:center}
@@ -1116,7 +1129,63 @@ function renderOdo(o,patId){
     var labItems=LAB_ITEMS.filter(function(l){return l.patId===patId});if(labItems.length>0){h+='<div style="'+(pat.pa?'margin-top:8px':'margin-top:12px;padding-top:12px;border-top:1px solid var(--border)')+'"><div style="display:flex;flex-wrap:wrap;gap:6px">';labItems.forEach(function(li){h+='<span class="lab-patient-badge" onclick="showLabDetail('+li.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 3h6v5.586a1 1 0 0 0 .293.707l4.414 4.414A2 2 0 0 1 21 15.121V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3.879a2 2 0 0 1 .586-1.414L8 9.293A1 1 0 0 0 9 8.586V3z"/></svg> '+li.prothType+' ('+li.jaw+'): <span style="font-weight:700;color:'+LAB_COLORS[li.stage]+'">'+LAB_STAGES[li.stage]+'</span>'+(li.vita?' \u2014 VITA '+li.vita:'')+'</span>'});h+='</div></div>'}
   }
   if(S.odoRef){h+='<div style="margin-top:12px;padding:12px;background:var(--surface);border-radius:var(--r-md);border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Zahnstatus-Katalog (16 Codes)</div><div style="font-size:10px;color:var(--text-3);line-height:1.7"><strong>Status:</strong> E=ersetzt, Ex=Extraktion, F=fehlend, F\u00fc=F\u00fcllung, G=gesund, C=kari\u00f6s, Kr=Krone, B=Br\u00fccke, I=Implantat, T=Teleskop, Wr=Wurzelrest, Z=zerst\u00f6rt, st=Stift, ph=Halteelement, rt=retiniert<br><strong>Modifikatoren:</strong> (+)=Vitalit\u00e4t positiv, (\u2212)=Vitalit\u00e4t negativ<br><strong>Kombiniert:</strong> C+Kr=kari\u00f6se Krone, st+Kr=Stift+Krone, T+E=Teleskop unter Prothese</div></div>'}
+  /* Magnifying-glass zoom button — opens the horizontal (rotated) odontogram overlay */
+  h+='<button class="odo-zoom-btn" onclick="openOdoZoom()" title="Horizontal anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>';
   h+='</div>';return h;
+}
+
+/* ===== ODONTOGRAM HORIZONTAL ZOOM OVERLAY ===== */
+function openOdoZoom(){S.odoZoom=true;render()}
+function closeOdoZoom(){S.odoZoom=false;render()}
+function renderOdoZoom(){
+  var pat=PATIENTS.find(function(x){return x.id===S.patId});
+  if(!pat||!pat.odo){return ''}
+  var o=pat.odo;
+  function zoomTooth(arr,start,dir,i){
+    var x=arr[i];var n=toothNrFromArr(arr,start,dir,i);var bg=odoToothColor(x);var lbl=odoLabel(x);
+    var isFehlt=odoIsFehlt(x);var mod=odoHasModifier(x);
+    var style='background:'+bg;
+    if(isFehlt)style+=';color:var(--text-4);border:1px dashed var(--border-2);box-shadow:none';
+    var html='<div class="ot" style="'+style+'" title="'+n+': '+(x||'fehlt')+'">';
+    html+=lbl;
+    if(mod)html+='<span class="mod-badge">'+mod+'</span>';
+    html+='</div>';return html;
+  }
+  var h='<div class="odo-zoom-overlay" onclick="closeOdoZoom()">'
+    +'<button class="odo-zoom-close" onclick="event.stopPropagation();closeOdoZoom()">\u00d7</button>'
+    +'<div class="odo-zoom-inner" onclick="event.stopPropagation()">'
+      +'<div class="odo-zoom-title">Odontogramm (FDI)</div>'
+      +'<div class="odo-zoom-sub">'+pat.name+'</div>'
+      /* upper numbers */
+      +'<div class="odo-num-row">';
+  for(var i=0;i<8;i++)h+='<div>'+(18-i)+'</div>';
+  h+='<div class="odo-gap"></div>';
+  for(var i=0;i<8;i++)h+='<div>'+(21+i)+'</div>';
+  h+='</div>'
+    /* upper teeth */
+    +'<div class="odo-teeth-grid">';
+  for(var i=0;i<8;i++)h+=zoomTooth(o.tl,18,-1,i);
+  h+='<div class="odo-gap"></div>';
+  for(var i=0;i<8;i++)h+=zoomTooth(o.tr,21,1,i);
+  h+='</div>'
+    /* quadrant bars */
+    +'<div class="odo-qbar"><div class="odo-qbar-l">1</div><div></div><div class="odo-qbar-r">2</div></div>'
+    +'<div class="odo-qbar"><div class="odo-qbar-l">4</div><div></div><div class="odo-qbar-r">3</div></div>'
+    /* lower teeth */
+    +'<div class="odo-teeth-grid">';
+  for(var i=0;i<8;i++)h+=zoomTooth(o.bl,48,-1,i);
+  h+='<div class="odo-gap"></div>';
+  for(var i=0;i<8;i++)h+=zoomTooth(o.br,31,1,i);
+  h+='</div>'
+    /* lower numbers */
+    +'<div class="odo-num-row">';
+  for(var i=0;i<8;i++)h+='<div>'+(48-i)+'</div>';
+  h+='<div class="odo-gap"></div>';
+  for(var i=0;i<8;i++)h+='<div>'+(31+i)+'</div>';
+  h+='</div>'
+    +'</div>'
+  +'</div>';
+  return h;
 }
 
 /* ===== ODONTOGRAM BEHANDLUNG TAB ===== */
@@ -2281,6 +2350,8 @@ function render(){
   if(S.toast)html+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
   /* Home task reschedule modal */
   if(S.rescheduleModal)html+=renderRescheduleModal();
+  /* Horizontal odontogram zoom overlay */
+  if(S.odoZoom)html+=renderOdoZoom();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */
   if(S.showMenu_2)html+=renderMenu_2();
   app.innerHTML=html;

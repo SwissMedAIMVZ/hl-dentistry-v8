@@ -43,6 +43,37 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Odontogram magnifying-glass button + horizontal zoom overlay
+
+**Why:** User wants a way to view the odontogram larger / horizontally without leaving the patient screen. A magnifying-glass icon in the bottom-right corner of the widget opens a full-screen rotated overlay so the teeth are easier to read.
+
+**What changed:**
+- `hl-dentistry-v9.html:148` — `.odo-wrap` now has `position:relative` so the magnifying-glass button can sit absolutely in its bottom-right corner. Added new CSS rules for `.odo-zoom-btn`, `.odo-zoom-overlay`, `.odo-zoom-close`, `.odo-zoom-inner`, plus descendant overrides (`.odo-zoom-inner .odo-teeth-grid`, `.ot`, `.odo-num-row`, `.odo-qbar`) to enlarge the teeth grid inside the zoom view, plus `.odo-zoom-title` / `.odo-zoom-sub`.
+- `hl-dentistry-v9.html:1132` — appended the magnifying-glass button inside `renderOdo()` right before the `.odo-wrap` close. Icon is the same circle-and-handle SVG the rest of the app uses for search, so it fits the existing icon language. `onclick="openOdoZoom()"`.
+- `hl-dentistry-v9.html:1137` — new helpers `openOdoZoom()` / `closeOdoZoom()` that just flip `S.odoZoom` and re-render.
+- `hl-dentistry-v9.html:1140` — new `renderOdoZoom()` function. Looks up the patient via `S.patId`, re-renders the four tooth grids (Q1/Q2 upper, Q4/Q3 lower) with number rows and quadrant bars inside a `.odo-zoom-inner` that is:
+  - `position:absolute; top:50%; left:50%`
+  - `transform: translate(-50%,-50%) rotate(90deg)`
+  - pre-rotation `width:780px` with natural block height (~340 px)
+  - → after the 90° rotation, the visual bounding box is ~340 × 780 px, which fits comfortably inside the 393 × 852 px phone frame
+  - teeth grid cells scale via `grid-template-columns:repeat(8,1fr)` so the larger container produces larger cells (~46 px wide with 15 px label text)
+  - the inner uses its own `zoomTooth()` helper (no tx/174a overlays — just colour + label + modifier badge), so the zoom view stays focused on status
+- `hl-dentistry-v9.html:2284` — main `render()` now appends `if(S.odoZoom)html+=renderOdoZoom();` right before the hamburger overlay, so the zoom shows over any screen but stays inside the phone frame.
+- The overlay dismisses via:
+  - backdrop click (`onclick="closeOdoZoom()"` on `.odo-zoom-overlay`)
+  - the **×** button in the top-right (with `event.stopPropagation()` so backdrop click isn't double-triggered)
+  - the inner itself swallows clicks via `event.stopPropagation()` so accidentally tapping a tooth doesn't dismiss the overlay
+
+**Design constraints preserved:**
+- The zoom view shows a status-only snapshot. Treatment planning, PA-Blatt, editing, and history are not replicated — the user is expected to close the zoom and interact with the normal odontogram for those actions. If any of that is needed inside the zoom, say so.
+- No changes to `renderOdoBehandlung()`, `renderOdoPaBlatt()`, or `renderOdoEditor()`.
+
+**Follow-ups:**
+- The `.odo-wrap` padding is 16 px and the zoom button sits at `bottom:12px; right:12px` — so it overlaps the very bottom of the wrap's inner content area. If you find it visually crowds the last row of teeth / legend on specific tabs, I can either bump the bottom padding or hide the button when the tab is "behandlung" or "pa_blatt" (currently it's visible on all three tabs).
+- The rotation is 90° clockwise. If you'd rather have the crown of the uppers point left instead of right, change `rotate(90deg)` to `rotate(-90deg)` in the `.odo-zoom-inner` rule.
+
+---
+
 ### 2026-04-10 — Remove Verwaltung from bottom nav everywhere
 
 **Why:** User extended the previous change — Verwaltung should be removed from the bottom nav for all roles, not just on the Management screen.
