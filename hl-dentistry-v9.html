@@ -1198,6 +1198,7 @@ function getTodayTasks(){
   return tasks;
 }
 function renderHome(){
+  var homeTab=S.homeTab||'heute';
   var tasks=getTodayTasks();var f=S.taskFilter||"todo";var shown=f==="todo"?tasks.filter(function(t){return!t.done}):tasks.filter(function(t){return t.done});
   var zeC=PATIENTS.filter(function(p){return p.ze}).length,paC=PATIENTS.filter(function(p){return p.pa}).length;
   var nOffen=tasks.filter(function(t){return!t.done}).length;
@@ -1208,32 +1209,63 @@ function renderHome(){
     +'<div><h1>Hallo, '+S.user.name.split(" ")[0]+'!</h1><div class="sub">'+dateLong+'</div></div>'
     +'<button class="logout-btn" onclick="doLogout()">Abmelden</button>'
   +'</div></div>';
-  h+='<div class="content">';
-  /* Heute section label + summary (or empty state) */
-  h+='<div class="sec-label" style="margin:-16px -20px 12px">Heute</div>';
-  if(tasks.length===0){
-    h+='<div style="text-align:center;padding:24px;background:var(--blue-25);border-radius:var(--r-md);margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--navy)">Keine Aufgaben f\u00fcr heute</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">'+fmtDate(Date.now())+'</div></div>';
-  } else {
-    h+='<div class="card" style="cursor:default;margin-bottom:12px">'
-      +'<div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:26px;font-weight:800;color:var(--navy);line-height:1">'+nOffen+'</div><div style="font-size:12px;color:var(--text-3);font-weight:500">Aufgaben</div></div>'
-      +'<div style="display:flex;gap:8px;margin-top:10px"><span class="badge" style="background:var(--blue-50);color:var(--navy)">'+zeC+' ZE</span><span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+paC+' PA</span></div>'
-    +'</div>';
-  }
-  /* Behandler Aufgaben — sec-label + filter-bar (matches Verwaltung Übersicht) */
-  h+='<div class="sec-label" style="margin:4px -20px 0">Behandler Aufgaben</div>';
-  h+='<div class="filter-bar" style="margin:0 -20px 12px">'
-    +'<button class="filter-btn'+(f==="todo"?" f-offen":"")+'" onclick="S.taskFilter=\'todo\';render()"><span class="filter-dot dot-o"></span>Offen<span class="f-count '+(f==="todo"?"fc-o":"fc-n")+'">'+nOffen+'</span></button>'
-    +'<button class="filter-btn'+(f==="done"?" f-erledigt":"")+'" onclick="S.taskFilter=\'done\';render()"><span class="filter-dot dot-e"></span>Erledigt<span class="f-count '+(f==="done"?"fc-e":"fc-n")+'">'+nErledigt+'</span></button>'
+  /* Tab bar — Heute / Nächste Woche */
+  h+='<div class="tab-bar">'
+    +'<button class="tab-btn'+(homeTab==='heute'?' active':'')+'" onclick="S.homeTab=\'heute\';render()">Heute</button>'
+    +'<button class="tab-btn'+(homeTab==='woche'?' active':'')+'" onclick="S.homeTab=\'woche\';render()">N\u00e4chste Woche</button>'
   +'</div>';
-  if(shown.length===0)h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">'+(f==="todo"?"Alles erledigt \u2014 gut gemacht!":"Noch keine erledigten Aufgaben")+'</div>';
-  shown.forEach(function(t){
-    h+='<div class="task-card'+(t.done?" done":"")+'" onclick="goPat('+t.patId+')"><div class="task-check'+(t.done?" checked":"")+'">'+( t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.pat+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.heim+'</div></div><div style="text-align:right"><div>'+badge(t.type,t.label)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.sub+'</div></div></div>';
-  });
-  /* Heime section */
-  h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
-  HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});
-    h+='<div class="card" onclick="goHeim('+hm.id+')"><div class="card-row"><div><div class="card-title">'+hm.name+'</div><div class="card-sub">'+hm.addr+' \u2014 '+pts.length+' Pat.</div></div><span class="chevron">'+ICO.arrow+'</span></div></div>'});
-  h+='</div>';
+
+  if(homeTab==='heute'){
+    h+='<div class="content">';
+    /* Heute section label + summary (or empty state) */
+    h+='<div class="sec-label" style="margin:-16px -20px 12px">Heute</div>';
+    if(tasks.length===0){
+      h+='<div style="text-align:center;padding:24px;background:var(--blue-25);border-radius:var(--r-md);margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--navy)">Keine Aufgaben f\u00fcr heute</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">'+fmtDate(Date.now())+'</div></div>';
+    } else {
+      h+='<div class="card" style="cursor:default;margin-bottom:12px">'
+        +'<div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:26px;font-weight:800;color:var(--navy);line-height:1">'+nOffen+'</div><div style="font-size:12px;color:var(--text-3);font-weight:500">Aufgaben</div></div>'
+        +'<div style="display:flex;gap:8px;margin-top:10px"><span class="badge" style="background:var(--blue-50);color:var(--navy)">'+zeC+' ZE</span><span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+paC+' PA</span></div>'
+      +'</div>';
+    }
+    /* Behandler Aufgaben — sec-label + filter-bar (matches Verwaltung Übersicht) */
+    h+='<div class="sec-label" style="margin:4px -20px 0">Behandler Aufgaben</div>';
+    h+='<div class="filter-bar" style="margin:0 -20px 12px">'
+      +'<button class="filter-btn'+(f==="todo"?" f-offen":"")+'" onclick="S.taskFilter=\'todo\';render()"><span class="filter-dot dot-o"></span>Offen<span class="f-count '+(f==="todo"?"fc-o":"fc-n")+'">'+nOffen+'</span></button>'
+      +'<button class="filter-btn'+(f==="done"?" f-erledigt":"")+'" onclick="S.taskFilter=\'done\';render()"><span class="filter-dot dot-e"></span>Erledigt<span class="f-count '+(f==="done"?"fc-e":"fc-n")+'">'+nErledigt+'</span></button>'
+    +'</div>';
+    if(shown.length===0)h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">'+(f==="todo"?"Alles erledigt \u2014 gut gemacht!":"Noch keine erledigten Aufgaben")+'</div>';
+    shown.forEach(function(t){
+      h+='<div class="task-card'+(t.done?" done":"")+'" onclick="goPat('+t.patId+')"><div class="task-check'+(t.done?" checked":"")+'">'+( t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.pat+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.heim+'</div></div><div style="text-align:right"><div>'+badge(t.type,t.label)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.sub+'</div></div></div>';
+    });
+    /* Heime section */
+    h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
+    HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});
+      h+='<div class="card" onclick="goHeim('+hm.id+')"><div class="card-row"><div><div class="card-title">'+hm.name+'</div><div class="card-sub">'+hm.addr+' \u2014 '+pts.length+' Pat.</div></div><span class="chevron">'+ICO.arrow+'</span></div></div>'});
+    h+='</div>';
+  } else {
+    /* Nächste Woche tab — tasks assigned to the logged-in behandler */
+    h+='<div class="week-label">'+weekRange(nextMonday())+'</div>';
+    h+='<div class="content">';
+    var bId=S.user&&S.user.bId;
+    var nextTasks=bId?TASKS.filter(function(t){return t.bh===bId&&t.week==='next';}):[];
+    if(!bId){
+      h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">Keine Behandler-Zuordnung f\u00fcr diesen Benutzer</div>';
+    } else if(nextTasks.length===0){
+      h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">Keine Aufgaben f\u00fcr n\u00e4chste Woche</div>';
+    } else {
+      /* group by date, same pattern as bhSection */
+      var dateMap={};
+      nextTasks.forEach(function(t){if(!dateMap[t.date])dateMap[t.date]=[];dateMap[t.date].push(t);});
+      var dates=Object.keys(dateMap).sort(function(a,b){return dateStrToSortKey(a)-dateStrToSortKey(b);});
+      dates.forEach(function(d){
+        h+='<div class="day-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+d+'</div>';
+        var sorted=dateMap[d].slice().sort(function(a,b){return a.heim.localeCompare(b.heim,'de');});
+        sorted.forEach(function(t){h+=taskCard(t);});
+      });
+    }
+    h+='</div>';
+  }
+
   if(S.offlineMode){h+='<div class="sync-bar offline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg> Offline \u2014 3 \u00c4nderungen ausstehend <button style="margin-left:8px;padding:2px 8px;background:rgba(217,119,6,0.15);border:1px solid rgba(217,119,6,0.3);border-radius:var(--r-full);font-size:9px;font-weight:600;color:var(--amber);cursor:pointer;font-family:inherit" onclick="S.offlineMode=false;render()">Verbinden</button></div>'}
   else{h+='<div class="sync-bar">'+ICO.check+' Z1 Pro Sync: Verbunden <button style="margin-left:8px;padding:2px 8px;background:rgba(8,42,153,0.08);border:1px solid rgba(8,42,153,0.12);border-radius:var(--r-full);font-size:9px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit" onclick="S.offlineMode=true;render()">Demo: Offline</button></div>'}
   return h;

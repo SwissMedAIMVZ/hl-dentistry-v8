@@ -43,6 +43,33 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Add "Nächste Woche" tab to home screen
+
+**Why:** Users (behandlers) should be able to see their own upcoming-week tasks from the home screen, matching the Verwaltung Übersicht/Nächste Woche tab pattern but scoped to the logged-in person only.
+
+**What changed:**
+- `hl-dentistry-v9.html:1200` — `renderHome()` now branches on `S.homeTab` (`'heute'` | `'woche'`, default `'heute'`).
+- **Tab bar:** new `.tab-bar` + `.tab-btn` between the header and `.content` (same classes as the v2 Verwaltung tab-bar at line 2591). Two tabs: "Heute" and "Nächste Woche". State var is `S.homeTab`, toggled inline from the buttons. No state-init change needed — the `||'heute'` default handles first render.
+- **Heute tab:** unchanged from previous entry (summary card + Behandler Aufgaben filter + tasks + Heime).
+- **Nächste Woche tab:**
+  - `.week-label` band (same class as `renderHome_2()` at line 2626) showing `weekRange(nextMonday())`.
+  - Filters the global `TASKS` array by `t.bh === S.user.bId && t.week === 'next'` — this is the "assigned to that specific person" scoping the user asked for. `bId` is already present on the behandler user records (`hFeld`, `hHess`; see `USERS` at line 815).
+  - Tasks are grouped by date with `.day-label` dividers and rendered via the existing `taskCard(t)` helper (line 2520) — same card visuals as Verwaltung Übersicht. Date grouping logic mirrors `bhSection()` at line 2539.
+  - Empty states: "Keine Behandler-Zuordnung für diesen Benutzer" when the logged-in user has no `bId` (e.g. ceo / verwaltung / laborant that somehow lands on home), and "Keine Aufgaben für nächste Woche" when the filter returns nothing.
+- **Sync bar:** unchanged, still rendered once at the bottom on both tabs.
+
+**Data source note:**
+- The "Heute" tab uses `getTodayTasks()` which *generates* tasks from `PATIENTS` (ZE urgency, PA dates, treatment plans) — it does NOT read from the `TASKS` array.
+- The new "Nächste Woche" tab reads directly from the `TASKS` array (line 2502) which has pre-seeded `week:'next'` entries for `hFeld` (2), `hHess` (2) and `hGomez` (1).
+- This intentional split preserves the existing "Heute" behavior byte-for-byte and matches how Verwaltung Übersicht itself sources its data. We did NOT try to unify the two task models — the user said design only, not data.
+
+**Follow-ups:**
+- If the user wants "Heute" to also be scoped by `S.user.bId` (currently it shows tasks for ALL patients regardless of which doctor logs in), that's a separate data change — flag and ask.
+- Dr. Feld has 2 next-week tasks seeded (`id:10,11` at line 2512–2513), Dr. Hess has 2, Dr. Gomez has 1 — use these logins for demo.
+- `goHome()` at line 2103 doesn't reset `S.homeTab`, so the tab selection persists across navigations. If the user wants it to snap back to "Heute" on every visit, add `S.homeTab='heute'` there.
+
+---
+
 ### 2026-04-10 — Home screen redesign to match Verwaltung Übersicht
 
 **Why:** User wants the Behandler "Heute" home screen to share the visual language of the Verwaltung → Übersicht → "Behandler Aufgaben" section. Design only — data shown stays the same.
