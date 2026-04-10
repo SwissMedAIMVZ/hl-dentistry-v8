@@ -43,6 +43,22 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Actually fix scroll on Verwaltung Übersicht (wrap entire tab body in one .content)
+
+**Why:** The earlier `min-height:0` patch was a symptom fix that didn't actually solve the problem. The Behandler Aufgaben section was still below the fold and unreachable.
+
+**Real root cause:** `renderHome_2()` had the wrong structural layout. It was emitting `renderMeineAufgaben()` (which contains `.sec-label`, `.mein-tabs`, `.mein-content`), then a bare `.sec-label`, then a bare `.filter-bar`, and *then* a `.content` wrapper. All of those leading elements were direct flex children of `.phone`, each with `flex-shrink:0` (mein-tabs / filter-bar) or intrinsic block heights (sec-labels, mein-content). They combined to take ~450–550 px before `.content` ever got a chance, so on a 852 px phone the `.content` was either invisible or microscopic, and the Behandler Aufgaben section rendered inside it was pushed off-screen with no scrollable parent to reach it from.
+
+**What changed:**
+- `hl-dentistry-v9.html:2710` — `renderHome_2()` restructured so a **single** `<div class="content" style="padding:0">` wraps the entire tab body. Everything now lives inside that one scrollable container: `renderMeineAufgaben()` output, the "Behandler Aufgaben" sec-label, the filter-bar, and all the `bhSection()` output for both Übersicht and Nächste Woche tabs. The leading padding is set to 0 inline because every inner band (sec-label, mein-tabs, filter-bar, week-label, bh-header) already brings its own padding.
+- Flex layout is now the simple canonical pattern: `.header` (auto) → `.tab-bar` (auto) → `.content` (flex:1, scrolls internally) → `.fab` (fixed) → `.bottom-nav` (auto). No more surprise middle children competing with `.content` for vertical space.
+- The `min-height:0` from the previous patch is kept on the shared `.content` rule — it's still the right default for any flex scroll pattern, just wasn't the actual bottleneck here.
+
+**Trade-off:**
+- `mein-tabs` and `filter-bar` now scroll with the rest of the content instead of sticking at the top. That's the same behavior the home screen already has and matches the rest of v9. If you'd rather have sticky bands at the top, we'd have to either pull them back out as `.phone` children (which is what broke scrolling) or add `position:sticky;top:0` to their CSS. Say the word if you want the sticky version.
+
+---
+
 ### 2026-04-10 — Fix scroll on Verwaltung Übersicht (flexbox min-height gotcha)
 
 **Why:** The Verwaltung → Übersicht screen could not be scrolled. Expanding a Behandler accordion in "Behandler Aufgaben" pushed content off the bottom of the phone frame with no way to reach it.

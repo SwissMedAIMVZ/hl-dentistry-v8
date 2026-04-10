@@ -2707,6 +2707,11 @@ function renderHome_2(){
     +'<button class="tab-btn'+(tab==='woche'?' active':'')+'" onclick="setTab(\'woche\')">N\u00e4chste Woche</button>'
   +'</div>';
 
+  /* ONE scrollable container for all tab body content.
+     Previously mein-tabs / sec-label / filter-bar sat directly inside .phone as flex children,
+     eating vertical space and pushing .content below the fold with no way to scroll. */
+  h+='<div class="content" style="padding:0">';
+
   /* Übersicht tab */
   if(tab==='uebersicht'){
     h+=renderMeineAufgaben();
@@ -2723,14 +2728,12 @@ function renderHome_2(){
           +'<span class="f-count '+(f==='erledigt'?'fc-e':'fc-n')+'">'+nE+'</span>'
         +'</button>'
       +'</div>';
-      h+='<div class="content">';
       BEHANDLER.forEach(function(bh){
         var tasks=TASKS.filter(function(t){return t.bh===bh.id&&t.date===todayStr&&t.status===f});
         var bc=tasks.length===0?'bc-n':(f==='offen'?'bc-o':'bc-e');
         var bl=tasks.length+(f==='offen'?' offen':' erledigt');
         h+=bhSection(bh,tasks,bc,bl,'current');
       });
-      h+='</div>';
     }
   }
 
@@ -2738,15 +2741,15 @@ function renderHome_2(){
   if(tab==='woche'){
     var nm=nextMonday();
     h+='<div class="week-label">'+weekRange(nm)+'</div>';
-    h+='<div class="content">';
     BEHANDLER.forEach(function(bh){
       var tasks=TASKS.filter(function(t){return t.bh===bh.id&&t.week==='next'});
       var bc=tasks.length===0?'bc-n':'bc-all';
       var bl=tasks.length+(tasks.length===1?' Aufgabe':' Aufgaben');
       h+=bhSection(bh,tasks,bc,bl,'next');
     });
-    h+='</div>';
   }
+
+  h+='</div>'; /* close single .content */
 
   /* FAB */
   h+='<button class="fab" onclick="openAdd()">+</button>';
