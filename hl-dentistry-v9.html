@@ -1201,7 +1201,60 @@ function getTodayTasks(){
 function taskKey(t){return t.patId+'|'+t.type+'|'+t.label}
 function markTaskDone(k){if(!S.doneTaskIds)S.doneTaskIds={};S.doneTaskIds[k]=true;showToast('Aufgabe erledigt','var(--emerald)')}
 function markTaskUndone(k){if(S.doneTaskIds)delete S.doneTaskIds[k];render()}
-function rescheduleTask(k){if(!S.rescheduledTaskIds)S.rescheduledTaskIds={};S.rescheduledTaskIds[k]=true;showToast('Aufgabe neu geplant','var(--navy)')}
+/* Reschedule flow: click "Neu planen" on a task card → openRescheduleModal → modal with date picker + behandler select → saveRescheduleModal commits it */
+function openRescheduleModal(k){
+  var parts=k.split('|');var patId=parseInt(parts[0],10);
+  var p=PATIENTS.find(function(x){return x.id===patId});
+  if(!p)return;
+  var curBh=(p.ze&&p.ze.bh)||(p.pa&&p.pa.behandler)||'hFeld';
+  var tomorrow=new Date(TODAY.getTime()+D);
+  var iso=tomorrow.getFullYear()+'-'+String(tomorrow.getMonth()+1).padStart(2,'0')+'-'+String(tomorrow.getDate()).padStart(2,'0');
+  S.rescheduleModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
+  S.rescheduleForm={date:iso,bh:curBh};
+  render();
+}
+function closeRescheduleModal(){S.rescheduleModal=null;render()}
+function saveRescheduleModal(){
+  var m=S.rescheduleModal,f=S.rescheduleForm;
+  if(!m||!f)return;
+  var di=document.getElementById('rschDate');
+  var bi=document.getElementById('rschBh');
+  var date=di?di.value:f.date;
+  var bh=bi?bi.value:f.bh;
+  if(!date||!bh){showToast('Datum und Behandler w\u00e4hlen','var(--crimson)');return}
+  if(!S.rescheduledTaskIds)S.rescheduledTaskIds={};
+  S.rescheduledTaskIds[m.key]=true;
+  if(!S.rescheduleMeta)S.rescheduleMeta={};
+  S.rescheduleMeta[m.key]={date:date,bh:bh};
+  var parts=date.split('-');var prettyDate=parts[2]+'.'+parts[1]+'.'+parts[0];
+  S.rescheduleModal=null;
+  showToast(m.patName+': '+prettyDate+' \u2014 '+bhdlName(bh),'var(--navy)');
+}
+function renderRescheduleModal(){
+  var m=S.rescheduleModal;if(!m)return'';
+  var f=S.rescheduleForm||{date:'',bh:''};
+  var h='<div class="overlay-bg" onclick="closeRescheduleModal()">'
+    +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+      +'<div class="overlay-header">'
+        +'<div class="overlay-title">Aufgabe neu planen</div>'
+        +'<button class="overlay-close" onclick="closeRescheduleModal()">\u00d7</button>'
+      +'</div>'
+      +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px">'
+        +'<div style="font-size:14px;font-weight:700;color:var(--text)">'+m.patName+'</div>'
+        +'<div style="font-size:12px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+m.heim+'</div>'
+        +'<div style="font-size:11px;color:var(--navy);margin-top:6px;font-weight:600">'+m.label+'</div>'
+      +'</div>'
+      +'<label class="form-label">Neues Datum</label>'
+      +'<input type="date" class="form-input" id="rschDate" value="'+f.date+'" oninput="S.rescheduleForm.date=this.value">'
+      +'<label class="form-label">Behandler</label>'
+      +'<select class="form-select" id="rschBh" onchange="S.rescheduleForm.bh=this.value">'
+        +BEHANDLER.map(function(b){return'<option value="'+b.id+'"'+(f.bh===b.id?' selected':'')+'>'+b.name+'</option>';}).join('')
+      +'</select>'
+      +'<button class="save-btn" onclick="saveRescheduleModal()">Neu planen</button>'
+    +'</div>'
+  +'</div>';
+  return h;
+}
 
 /* Home route — distance matrix & nearest-neighbor renderer for the 4 home HEIME */
 var HOME_HEIM_T={
@@ -1303,7 +1356,7 @@ function renderHome(){
       var actions=t.done
         ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
         :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="markTaskDone(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
-         +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="rescheduleTask(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
+         +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openRescheduleModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
       h+='<div class="task-card'+(t.done?" done":"")+'" style="flex-direction:column;align-items:stretch;gap:10px" onclick="goPat('+t.patId+')">'
         +'<div style="display:flex;align-items:center;gap:10px">'
           +'<div class="task-check'+(t.done?" checked":"")+'">'+(t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
@@ -2226,6 +2279,8 @@ function render(){
   if(S.duplicateWarning){html+='<div style="position:absolute;inset:0;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;z-index:115;backdrop-filter:blur(4px)"><div style="width:85%;background:var(--white);border-radius:var(--r-xl);padding:28px;box-shadow:var(--sh-xl);text-align:center"><div style="width:48px;height:48px;background:var(--crimson-bg);border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--crimson)" stroke-width="2" width="22" height="22"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--crimson);margin-bottom:6px">M\u00f6gliches Duplikat</div><div style="font-size:12px;color:var(--text-2);margin-bottom:20px;line-height:1.5">Patient <strong>'+S.duplicateWarning.name+'</strong> existiert bereits in <strong>'+S.duplicateWarning.heim+'</strong>.</div><div style="display:flex;gap:8px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-2);border:none;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="cancelDuplicate()">Abbrechen</button><button style="flex:1;padding:12px;background:var(--crimson);color:#fff;border:none;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="confirmDuplicate()">Ist ein anderer Patient</button></div></div></div>'}
   /* v6: Toast notification */
   if(S.toast)html+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
+  /* Home task reschedule modal */
+  if(S.rescheduleModal)html+=renderRescheduleModal();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */
   if(S.showMenu_2)html+=renderMenu_2();
   app.innerHTML=html;

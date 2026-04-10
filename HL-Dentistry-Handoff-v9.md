@@ -43,6 +43,31 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — "Neu planen" button now opens reschedule modal
+
+**Why:** The previous reschedule action was a one-click stub that just hid the task and fired a toast. User wants a real modal with a date picker and a behandler dropdown.
+
+**What changed:**
+- `hl-dentistry-v9.html:1204` — removed the old `rescheduleTask(k)` one-liner and replaced it with a full flow:
+  - `openRescheduleModal(k)` — parses the task key (format `patId|type|label`), looks up the patient in `PATIENTS`, pre-fills `S.rescheduleModal = {key, patId, patName, heim, label}` and `S.rescheduleForm = {date:<tomorrow ISO>, bh:<patient's current behandler>}`, then re-renders. Tomorrow's date is built from `new Date(TODAY.getTime()+D)` formatted as YYYY-MM-DD to feed an `<input type="date">`. The current behandler is read from `patient.ze.bh || patient.pa.behandler || 'hFeld'`.
+  - `closeRescheduleModal()` — clears `S.rescheduleModal` and re-renders.
+  - `saveRescheduleModal()` — reads the live DOM values from `#rschDate` and `#rschBh` (falls back to state), validates both are set, marks the task as rescheduled in `S.rescheduledTaskIds[key]` (so the existing "hide from today" path still works), stores the metadata in a new `S.rescheduleMeta[key] = {date, bh}` map for future extension, closes the modal and fires a toast in the form `"Müller, Hans: 11.04.2026 — Dr. Feld"`.
+  - `renderRescheduleModal()` — builds the overlay markup using the existing `.overlay-bg` / `.overlay-sheet` / `.overlay-header` / `.form-label` / `.form-input` / `.form-select` / `.save-btn` classes shared with `renderReassign()` (line 3167). Inside the sheet: a patient info card (name + heim + task label), a native `<input type="date">` for the new date, and a `<select>` populated from the `BEHANDLER` array for the Dr. Feld / Dr. Hess / Dr. Gomez choice. Single "Neu planen" primary button at the bottom; header × closes without saving.
+- `hl-dentistry-v9.html:1359` — task card "Neu planen" button onclick changed from `rescheduleTask('<key>')` to `openRescheduleModal('<key>')`. No other behavior touched.
+- `hl-dentistry-v9.html:2232` — main `render()` now appends `if(S.rescheduleModal)html+=renderRescheduleModal();` right before the hamburger overlay, so the modal renders over any home screen.
+
+**Data model invariants preserved:**
+- `S.rescheduledTaskIds[key]` is still the truth source for "hide from today's list" — `renderHome()` keeps filtering against it at line 1204 (unchanged).
+- `S.doneTaskIds[key]` is untouched — Erledigt toggling still works independently.
+- `S.rescheduleMeta[key]` is new and lazy-initialised. Nothing reads from it yet, but it carries the date + bh so a future pass could surface rescheduled tasks on the Nächste Woche tab or on a matching future "today".
+
+**Follow-ups:**
+- The rescheduled task currently just disappears from today. If you want it to actually **show up on the target date** (e.g. if you pick a date within next week, it should appear in the Nächste Woche tab under the chosen behandler), that's a separate enhancement — `renderHome()`'s "woche" branch would need to merge entries from `S.rescheduleMeta` whose date falls in next week, and the `taskCard` render would need to cope with mini-task objects rather than full `TASKS` records. Ask before building it.
+- The toast uses `navy` color. If you want a success-green for reschedule too, say so.
+- The modal has no "Notiz" field. Happy to add one.
+
+---
+
 ### 2026-04-10 — Reorder burger menu + drop Klinik
 
 **What changed:**
