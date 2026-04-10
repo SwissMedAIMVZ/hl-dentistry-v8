@@ -43,6 +43,34 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Meine Aufgaben rename + Erledigt / Neu planen actions
+
+**Why:** User wants each task card on the Heute tab to expose direct "Erledigt" (done) and "Neu planen" (reschedule) actions, and wants the section header to speak from the logged-in user's perspective.
+
+**What changed:**
+- `hl-dentistry-v9.html:1231` — `.sec-label` text renamed from "Behandler Aufgaben" → "Meine Aufgaben".
+- `hl-dentistry-v9.html:1200` — Four new module-level helpers added right above `renderHome()`:
+  - `taskKey(t)` — stable composite key `patId|type|label` used to index into the state maps below.
+  - `markTaskDone(k)` — flips the task to done and fires a green toast ("Aufgabe erledigt").
+  - `markTaskUndone(k)` — reverts a done task. Wired to the "Zurück zu Offen" button shown on done cards.
+  - `rescheduleTask(k)` — moves the task out of today's list entirely and fires a navy toast ("Aufgabe neu geplant").
+- `hl-dentistry-v9.html:1202` — `renderHome()` now reads `S.doneTaskIds` / `S.rescheduledTaskIds` (lazy-initialised; no state-init change needed), filters out rescheduled tasks, and stamps `t.done=true` on any task whose key is in `doneTaskIds` *before* computing `nOffen` / `nErledigt` / the `shown` list. That way the filter-bar counts and the Offen/Erledigt filter results both react immediately to a click.
+- **Task card restructure** (Heute tab only; v2's `taskCard()` helper used on Nächste Woche is untouched): each card is now a flex-column with two rows — the original check/name/badge row on top, and a new action row below separated by a 1-px border. The action row uses `event.stopPropagation()` so button clicks don't also trigger `goPat()`.
+  - Offen state: emerald-tinted "Erledigt" button + outlined "Neu planen" button with a refresh icon.
+  - Done state (visible when filter = Erledigt): single grey "Zurück zu Offen" button to undo completion.
+- **Inline `style="flex-direction:column;align-items:stretch;gap:10px"`** on the card overrides the default `.task-card` flex-row layout without touching the shared CSS rule (which is still used by `taskCard()` on the Nächste Woche tab).
+
+**Data-model note:**
+- `getTodayTasks()` generates tasks on the fly from `PATIENTS` each render, so there's nowhere on the task itself to persist a done/rescheduled flag. The two `S.*TaskIds` maps are the canonical source; the generated tasks get the `done` flag applied during render based on key lookup. This means completion/reschedule state is lost when the user logs out (`S` is rebuilt on reload), which is fine for a mockup.
+- `taskKey()` assumes labels don't contain `|` or single quotes. Verified: labels are one of the hardcoded strings in `getTodayTasks()` ("HKP abgelaufen", "HKP-Frist <30d", "PA: "+PA_STEPS[...].label, or an uppercased treatment code). None contain quotes or pipes.
+
+**Follow-ups:**
+- "Neu planen" is currently a one-click "remove from today" stub that just fires a toast. A real reschedule flow would open a date picker — mention if you want that next.
+- If you want the done/rescheduled state to persist across logouts or page reloads, we'd need localStorage wiring — separate task.
+- On the Nächste Woche tab, tasks still render with the v2 `taskCard()` helper (no action buttons). Let me know if you want the same Erledigt/Neu planen treatment there too.
+
+---
+
 ### 2026-04-10 — Add "Nächste Woche" tab to home screen
 
 **Why:** Users (behandlers) should be able to see their own upcoming-week tasks from the home screen, matching the Verwaltung Übersicht/Nächste Woche tab pattern but scoped to the logged-in person only.

@@ -1197,9 +1197,19 @@ function getTodayTasks(){
   });
   return tasks;
 }
+/* Home-task state helpers — track done/rescheduled flags on the on-the-fly tasks from getTodayTasks() */
+function taskKey(t){return t.patId+'|'+t.type+'|'+t.label}
+function markTaskDone(k){if(!S.doneTaskIds)S.doneTaskIds={};S.doneTaskIds[k]=true;showToast('Aufgabe erledigt','var(--emerald)')}
+function markTaskUndone(k){if(S.doneTaskIds)delete S.doneTaskIds[k];render()}
+function rescheduleTask(k){if(!S.rescheduledTaskIds)S.rescheduledTaskIds={};S.rescheduledTaskIds[k]=true;showToast('Aufgabe neu geplant','var(--navy)')}
+
 function renderHome(){
   var homeTab=S.homeTab||'heute';
-  var tasks=getTodayTasks();var f=S.taskFilter||"todo";var shown=f==="todo"?tasks.filter(function(t){return!t.done}):tasks.filter(function(t){return t.done});
+  var rawTasks=getTodayTasks();
+  var doneSet=S.doneTaskIds||{},rescheduledSet=S.rescheduledTaskIds||{};
+  var tasks=rawTasks.filter(function(t){return!rescheduledSet[taskKey(t)]});
+  tasks.forEach(function(t){if(doneSet[taskKey(t)])t.done=true});
+  var f=S.taskFilter||"todo";var shown=f==="todo"?tasks.filter(function(t){return!t.done}):tasks.filter(function(t){return t.done});
   var zeC=PATIENTS.filter(function(p){return p.ze}).length,paC=PATIENTS.filter(function(p){return p.pa}).length;
   var nOffen=tasks.filter(function(t){return!t.done}).length;
   var nErledigt=tasks.filter(function(t){return t.done}).length;
@@ -1227,15 +1237,27 @@ function renderHome(){
         +'<div style="display:flex;gap:8px;margin-top:10px"><span class="badge" style="background:var(--blue-50);color:var(--navy)">'+zeC+' ZE</span><span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+paC+' PA</span></div>'
       +'</div>';
     }
-    /* Behandler Aufgaben — sec-label + filter-bar (matches Verwaltung Übersicht) */
-    h+='<div class="sec-label" style="margin:4px -20px 0">Behandler Aufgaben</div>';
+    /* Meine Aufgaben — sec-label + filter-bar (matches Verwaltung Übersicht) */
+    h+='<div class="sec-label" style="margin:4px -20px 0">Meine Aufgaben</div>';
     h+='<div class="filter-bar" style="margin:0 -20px 12px">'
       +'<button class="filter-btn'+(f==="todo"?" f-offen":"")+'" onclick="S.taskFilter=\'todo\';render()"><span class="filter-dot dot-o"></span>Offen<span class="f-count '+(f==="todo"?"fc-o":"fc-n")+'">'+nOffen+'</span></button>'
       +'<button class="filter-btn'+(f==="done"?" f-erledigt":"")+'" onclick="S.taskFilter=\'done\';render()"><span class="filter-dot dot-e"></span>Erledigt<span class="f-count '+(f==="done"?"fc-e":"fc-n")+'">'+nErledigt+'</span></button>'
     +'</div>';
     if(shown.length===0)h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">'+(f==="todo"?"Alles erledigt \u2014 gut gemacht!":"Noch keine erledigten Aufgaben")+'</div>';
     shown.forEach(function(t){
-      h+='<div class="task-card'+(t.done?" done":"")+'" onclick="goPat('+t.patId+')"><div class="task-check'+(t.done?" checked":"")+'">'+( t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.pat+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.heim+'</div></div><div style="text-align:right"><div>'+badge(t.type,t.label)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.sub+'</div></div></div>';
+      var key=taskKey(t);
+      var actions=t.done
+        ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
+        :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="markTaskDone(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
+         +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="rescheduleTask(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
+      h+='<div class="task-card'+(t.done?" done":"")+'" style="flex-direction:column;align-items:stretch;gap:10px" onclick="goPat('+t.patId+')">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div class="task-check'+(t.done?" checked":"")+'">'+(t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+          +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.pat+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.heim+'</div></div>'
+          +'<div style="text-align:right"><div>'+badge(t.type,t.label)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.sub+'</div></div>'
+        +'</div>'
+        +'<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">'+actions+'</div>'
+      +'</div>';
     });
     /* Heime section */
     h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
