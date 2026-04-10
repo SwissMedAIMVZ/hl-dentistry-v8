@@ -43,6 +43,17 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Remove Verwaltung from bottom nav everywhere
+
+**Why:** User extended the previous change — Verwaltung should be removed from the bottom nav for all roles, not just on the Management screen.
+
+**What changed:**
+- `hl-dentistry-v9.html:2258` — re-merged the two branches I had split last turn back into one shared condition (`s==="manager" || ((role==="ceo"||role==="verwaltung") && s==="messages")`) and dropped the Verwaltung button from it. The messages-screen nav for ceo/verwaltung now also shows only Dashboard / Labor / Nachr / Suche.
+- No other `navBtn(..."Verwaltung"...)` call remains anywhere in the file — verified with grep.
+- The burger menu still has the Verwaltung item (#3), so every role still reaches it from any screen with one tap on the ☰.
+
+---
+
 ### 2026-04-10 — Remove Verwaltung from Management bottom nav
 
 **What changed:**
