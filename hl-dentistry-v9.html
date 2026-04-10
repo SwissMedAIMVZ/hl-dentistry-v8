@@ -3585,8 +3585,6 @@ function renderBehandler_2(){
     +MENU_BTN_2
   +'</div></div>';
   h+='<div class="content">';
-  /* Add Behandler button */
-  h+='<button style="width:100%;padding:13px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:6px" onclick="openAddBehandler()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Behandler hinzuf\u00fcgen</button>';
   BEHANDLER.forEach(function(b){
     var parts=b.name.split(' ');
     var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();
@@ -3608,6 +3606,8 @@ function renderBehandler_2(){
     +'</div>';
   });
   h+='</div>';
+  /* Floating "+" button — lower-right, stays visible when the list scrolls */
+  h+='<button class="fab" onclick="openAddBehandler()" title="Behandler hinzuf\u00fcgen">+</button>';
   h+=renderAdminBottomNav_2('behandler');
   return h;
 }

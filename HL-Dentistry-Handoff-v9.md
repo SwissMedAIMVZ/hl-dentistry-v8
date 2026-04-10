@@ -56,6 +56,21 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Behandler add button → floating "+" FAB
+
+**Why:** User wants the add button out of the card list header. The list can grow, so a fixed lower-right "+" FAB is the cleanest solution — always visible, doesn't crowd the list, standard mobile pattern.
+
+**What changed:**
+- `hl-dentistry-v9.html:3590` — removed the full-width primary "Behandler hinzufügen" button from the top of `.content` in `renderBehandler_2()`.
+- `hl-dentistry-v9.html:3610` — appended `'<button class="fab" onclick="openAddBehandler()" title="Behandler hinzufügen">+</button>'` right after `.content` closes and before `renderAdminBottomNav_2`. Reuses the existing shared `.fab` class (line 677) that is already used by `renderHome_2` and `renderEinverstaendnis`: navy→blue gradient circle, 52×52 px, fixed at bottom-right of the phone frame with `z-index:90` so it floats above the scroll area but below modals and the bottom nav.
+
+**Behavior:**
+- Single tap on the `+` FAB opens the same `renderAddBehandlerModal` (email / full name / first password) from the previous edit.
+- The FAB stays visible as you scroll through the Behandler list because it uses `position:fixed`.
+- No layout reflow of the card list; the header and bottom nav are unchanged.
+
+---
+
 ### 2026-04-10 — Click existing Behandler → edit modal (email / password / role)
 
 **Why:** User wants to be able to edit each existing Behandler's login credentials and role by tapping their card. Name stays fixed.
