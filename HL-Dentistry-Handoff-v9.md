@@ -56,6 +56,32 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Click existing Behandler → edit modal (email / password / role)
+
+**Why:** User wants to be able to edit each existing Behandler's login credentials and role by tapping their card. Name stays fixed.
+
+**What changed:**
+- `hl-dentistry-v9.html:3600` — Behandler cards are now clickable: `cursor:default` → `cursor:pointer` and `onclick="openEditBehandler('<bh.id>')"` attached to the outer card div.
+- `hl-dentistry-v9.html:3682` — new quartet of helpers for the edit flow:
+  - `openEditBehandler(bhId)` — finds the `BEHANDLER` entry by id, looks up the matching `USERS` record via `u.bId === bhId`, and seeds `S.editBehandler = {bhId, bhName}` + `S.editBehandlerForm = {email, pw, role}` with the current values (or empty strings + `role:'behandler'` if no user account exists).
+  - `closeEditBehandler()` — clears `S.editBehandler`.
+  - `saveEditBehandler()` — reads `#ebEmail / #ebPw / #ebRole`, validates all three are non-empty, rejects email collisions with *other* users (the existing user's own email is allowed to stay), then mutates the matching `USERS` record in-place (`email`, `pw`, `role` updated). If the Behandler had no user account (e.g. Dr. Gomez), a new `USERS` entry is pushed with the same `bId`. Green success toast on save.
+  - `renderEditBehandlerModal()` — overlay using the shared `.overlay-bg` / `.overlay-sheet` / `.form-label` / `.form-input` / `.form-select` / `.save-btn` classes. Top of the sheet shows the Behandler's name in a surface-2 info block with a "Name wird vom Profil gesetzt" note (so it's clear the name isn't editable here). Three required fields with red `*` labels: **E-Mail-Adresse**, **Passwort** (type="password"), **Rolle** (select: Behandler / Verwaltung / Laborant).
+- `hl-dentistry-v9.html:4525` — `renderAdminPortal_2()` overlay section now appends `if(S.editBehandler) html+=renderEditBehandlerModal();` right after the add-behandler modal so both modals render in the admin context.
+
+**What it can do:**
+- Change the email (rejected if another user already owns it)
+- Set a new password (plain-text in the mockup `USERS` array, same as everywhere else)
+- Promote / demote role between Behandler / Verwaltung / Laborant (login semantics change accordingly; if you switch Dr. Feld to verwaltung, he'll land on the Manager Dashboard on next login)
+- Create a user account for a Behandler that never had one (Dr. Gomez), by filling the form — the `USERS` push uses the Behandler's stored name and the card's `bId`
+
+**Known limitations (flag if you want them addressed):**
+- Name is not editable here — it's displayed in a read-only info block. Rename would require touching `BEHANDLER.name` + maybe propagating to stat/task references.
+- No "Löschen" button on the edit modal. Removing a Behandler isn't implemented yet.
+- Password field is pre-filled with the current plain-text password so it can be edited in place — the user can clear it and type a new one, or leave it unchanged.
+
+---
+
 ### 2026-04-10 — Add-Behandler modal: email / full name / first password, all mandatory
 
 **Why:** User wants the add modal to collect a real initial password (not use the hardcoded `'demo'`) and to drop the role picker. All three inputs are required.

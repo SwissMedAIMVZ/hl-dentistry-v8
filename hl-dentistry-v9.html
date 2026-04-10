@@ -3596,7 +3596,7 @@ function renderBehandler_2(){
     var roleBadge=role
       ?'<span class="badge" style="background:var(--blue-50);color:var(--navy);flex-shrink:0">'+roleLabel(role)+'</span>'
       :'<span class="badge" style="background:var(--surface-2);color:var(--text-4);flex-shrink:0">Kein Zugang</span>';
-    h+='<div class="card" style="cursor:default;margin-bottom:10px">'
+    h+='<div class="card" style="cursor:pointer;margin-bottom:10px" onclick="openEditBehandler(\''+b.id+'\')">'
       +'<div style="display:flex;align-items:center;gap:12px">'
         +'<div style="width:44px;height:44px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0">'+initials+'</div>'
         +'<div style="flex:1;min-width:0">'
@@ -3653,6 +3653,74 @@ function renderAddBehandlerModal(){
       +'<input type="password" class="form-input" id="abPw" required placeholder="Initiales Passwort" value="'+(f.pw||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.pw=this.value">'
       +'<div style="font-size:10px;color:var(--text-3);margin-top:6px">Alle Felder sind Pflichtfelder.</div>'
       +'<button class="save-btn" onclick="saveAddBehandler()">Hinzuf\u00fcgen</button>'
+    +'</div>'
+  +'</div>';
+}
+
+/* === EDIT BEHANDLER MODAL === */
+function openEditBehandler(bhId){
+  var b=BEHANDLER.find(function(x){return x.id===bhId});
+  if(!b)return;
+  var user=USERS.find(function(u){return u.bId===bhId});
+  S.editBehandler={bhId:bhId,bhName:b.name};
+  S.editBehandlerForm={
+    email:user?user.email:'',
+    pw:user?user.pw:'',
+    role:user?user.role:'behandler'
+  };
+  render();
+}
+function closeEditBehandler(){S.editBehandler=null;render()}
+function saveEditBehandler(){
+  var e=S.editBehandler;
+  if(!e)return;
+  var emailEl=document.getElementById('ebEmail');
+  var pwEl=document.getElementById('ebPw');
+  var roleEl=document.getElementById('ebRole');
+  var email=(emailEl?emailEl.value:'').trim().toLowerCase();
+  var pw=(pwEl?pwEl.value:'');
+  var role=(roleEl?roleEl.value:'behandler');
+  if(!email||!pw||!role){showToast('Alle Felder sind Pflichtfelder','var(--crimson)');return}
+  /* Email must not clash with a DIFFERENT user */
+  var dup=USERS.find(function(u){return u.email===email&&u.bId!==e.bhId});
+  if(dup){showToast('E-Mail bereits vergeben','var(--crimson)');return}
+  var user=USERS.find(function(u){return u.bId===e.bhId});
+  if(user){
+    user.email=email;
+    user.pw=pw;
+    user.role=role;
+  } else {
+    /* No user account yet for this Behandler — create one */
+    USERS.push({email:email,pw:pw,name:e.bhName,role:role,bId:e.bhId});
+  }
+  S.editBehandler=null;
+  showToast(e.bhName+' aktualisiert','var(--emerald)');
+}
+function renderEditBehandlerModal(){
+  if(!S.editBehandler)return'';
+  var e=S.editBehandler;
+  var f=S.editBehandlerForm||{email:'',pw:'',role:'behandler'};
+  return '<div class="overlay-bg" onclick="closeEditBehandler()">'
+    +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+      +'<div class="overlay-header">'
+        +'<div class="overlay-title">Behandler bearbeiten</div>'
+        +'<button class="overlay-close" onclick="closeEditBehandler()">\u00d7</button>'
+      +'</div>'
+      +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px">'
+        +'<div style="font-size:14px;font-weight:700;color:var(--text)">'+e.bhName+'</div>'
+        +'<div style="font-size:11px;color:var(--text-3);margin-top:3px">Name wird vom Profil gesetzt</div>'
+      +'</div>'
+      +'<label class="form-label">E-Mail-Adresse <span style="color:var(--crimson)">*</span></label>'
+      +'<input type="email" class="form-input" id="ebEmail" required value="'+(f.email||'').replace(/"/g,'&quot;')+'" oninput="S.editBehandlerForm.email=this.value">'
+      +'<label class="form-label">Passwort <span style="color:var(--crimson)">*</span></label>'
+      +'<input type="password" class="form-input" id="ebPw" required value="'+(f.pw||'').replace(/"/g,'&quot;')+'" oninput="S.editBehandlerForm.pw=this.value">'
+      +'<label class="form-label">Rolle <span style="color:var(--crimson)">*</span></label>'
+      +'<select class="form-select" id="ebRole" onchange="S.editBehandlerForm.role=this.value">'
+        +'<option value="behandler"'+(f.role==='behandler'?' selected':'')+'>Behandler</option>'
+        +'<option value="verwaltung"'+(f.role==='verwaltung'?' selected':'')+'>Verwaltung</option>'
+        +'<option value="laborant"'+(f.role==='laborant'?' selected':'')+'>Laborant</option>'
+      +'</select>'
+      +'<button class="save-btn" onclick="saveEditBehandler()">Speichern</button>'
     +'</div>'
   +'</div>';
 }
@@ -4508,6 +4576,7 @@ function renderAdminPortal_2(){
   if(S.zugestimmtPopup_2!==null) html+=renderZugestimmtPopup();
   if(S.customPricePop_2) html+=renderCustomPricePopup();
   if(S.showAddBehandler) html+=renderAddBehandlerModal();
+  if(S.editBehandler) html+=renderEditBehandlerModal();
   if(S.labCreate_2) html+=renderLabCreate_2();
   if(S.labDetail_2!==null&&!S.labCreate_2) html+=renderLabDetail_2();
   app.innerHTML=html;
