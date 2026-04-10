@@ -43,6 +43,14 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Remove Verwaltung from Management bottom nav
+
+**What changed:**
+- `hl-dentistry-v9.html:2258` — split the shared bottom-nav branch. The `s==="manager"` branch no longer includes the Verwaltung button (Dashboard, Labor, Nachr, Suche — four items). The `(ceo||verwaltung) && s==="messages"` branch is kept as-is with Verwaltung still present, since the messages screen is still a top-level landing for those roles and the shortcut stays useful there.
+- Verwaltung is still reachable from the Management screen via the burger menu (item #3), so removing it from the bottom nav doesn't strand anyone.
+
+---
+
 ### 2026-04-10 — "Neu planen" button now opens reschedule modal
 
 **Why:** The previous reschedule action was a one-click stub that just hid the task and fired a toast. User wants a real modal with a date picker and a behandler dropdown.
