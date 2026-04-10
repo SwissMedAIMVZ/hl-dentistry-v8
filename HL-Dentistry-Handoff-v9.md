@@ -43,6 +43,35 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Shared burger menu across Home, Labor and Verwaltung + Wochenplan item
+
+**Why:** User wants one unified hamburger menu on the Home tab, Labor tab and Verwaltung — same placement (top-right of the header), same items everywhere — plus a new "Wochenplan" entry that jumps to the home screen from wherever you are.
+
+**What changed:**
+- `hl-dentistry-v9.html:4308` — `renderMenu_2()` extended with a new **Wochenplan** item between Klinik and Übersicht. Its onclick is `closeMenu_2();S.adminMode=false;S.screen='home';render()`, so it exits admin mode if necessary and routes to the home screen (whichever `S.homeTab` is active).
+- `hl-dentistry-v9.html:4308` — the existing **Übersicht / Einverständnis / Abrechnung** items now also explicitly set `S.adminMode=true` (previously they only set `S.adminPage_2`, which was fine when the menu only existed inside admin mode but breaks when a behandler opens the menu from home/lab). This makes the menu work identically from any screen.
+- `hl-dentistry-v9.html:4308` — the **Abmelden** item now calls `closeMenu_2()` before `doLogout()` so the dropdown isn't still open behind the logout-confirm modal.
+- `hl-dentistry-v9.html:2228` — in the non-admin `render()` path, appended `if(S.showMenu_2)html+=renderMenu_2();` right before `app.innerHTML=html`. Previously `renderMenu_2()` was only called from `renderAdminPortal_2()`, so the menu dropdown never rendered outside Verwaltung even if `S.showMenu_2` was true.
+- `hl-dentistry-v9.html:1207` — `renderHome()` header: replaced the standalone `<button class="logout-btn">Abmelden</button>` with `MENU_BTN_2`. The menu now lives in the same top-right slot Verwaltung uses, and logout has moved into the menu.
+- `hl-dentistry-v9.html:1835` — `renderLab()` header: replaced the top-right `<button class="logout-btn">Abmelden</button>` with `MENU_BTN_2`. The "Neu" button stays next to it exactly as before.
+- The admin `renderLab_2()` already rendered `MENU_BTN_2` (line 3316), so it just inherits the updated menu contents automatically.
+
+**Menu items (unified across all three tabs):**
+
+1. **Klinik** — `S.adminMode=false`
+2. **Wochenplan** — `S.adminMode=false; S.screen='home'` *(new)*
+3. **Übersicht** — `S.adminMode=true; S.adminPage_2='uebersicht'`
+4. **Einverständnis** — `S.adminMode=true; S.adminPage_2='einverstaendnis'`
+5. **Abrechnung** — `S.adminMode=true; S.adminPage_2='abrechnung'`
+6. **Abmelden** (divider)
+
+**Follow-ups:**
+- The Wochenplan item takes the user to `S.screen='home'` without forcing a specific tab. If you'd rather have it land on the **Nächste Woche** tab (since "Wochenplan" implies a weekly plan), add `S.homeTab='woche';` to its onclick — one-line change.
+- Non-admin roles (behandler) can now technically reach Übersicht / Einverständnis / Abrechnung via the menu. The admin pages will render for them — which matches the mockup's permissive role model, but if you want to hide those items from behandlers specifically, the onclick conditions would need a role check.
+- The menu dropdown uses the existing `.menu-dropdown` CSS (line 615) with `position:absolute;top:60px;right:14px` — it sits consistently across all three header designs without extra styling.
+
+---
+
 ### 2026-04-10 — Sync Weiterführend sub-tab with Labor tab data
 
 **Why:** The Weiterführend sub-tab under Meine Aufgaben was rendering its own hardcoded `WEITERFUEHREND_PAT` array with different patients, different heim names, and different step sequences from what the Labor tab showed. The user wants Weiterführend to mirror the actual lab progress.
