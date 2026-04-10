@@ -45,13 +45,13 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ### 2026-04-10 — Add demo user c.weigert@mvz-arzt.de
 
-**Why:** New tester needs access to the v9 mockup.
+**Why:** New tester needs access to the v9 mockup with full admin rights.
 
 **What changed:**
-- `hl-dentistry-v9.html:820` — `USERS` array — appended `{email:"c.weigert@mvz-arzt.de", pw:"admin", name:"C. Weigert", role:"ceo"}`. Role defaulted to `ceo` because the requested password ("admin") implies admin-level access, and `ceo` routes to the manager dashboard on login (see `doLogin` at `hl-dentistry-v9.html:1028`).
+- `hl-dentistry-v9.html:820` — `USERS` array — appended `{email:"c.weigert@mvz-arzt.de", pw:"admin", name:"C. Weigert", role:"verwaltung"}`. Role set to `verwaltung` per user request ("for now put it in as verwaltung but with all rights").
+- **Role audit:** `ceo` and `verwaltung` are treated identically in every permission gate (`doLogin` at line 1029, advanced-search gates at 1606/1610, manager-nav gate at 2075, message targeting at 840/844/848/2337). The only user-visible difference is the header subtitle at line 1627 which shows "CEO" vs "Verwaltung". So `verwaltung` already carries all admin rights — no additional changes needed.
 
 **Follow-ups:**
-- Confirm with user whether `ceo` is the intended role, or if it should be `verwaltung` / `behandler` instead. Swap the `role` field (and add `bId` if `behandler`) if so.
 - The `name` is a placeholder derived from the email local-part — update if the real full name (e.g. "Dr. C. Weigert") is known.
 
 ---
