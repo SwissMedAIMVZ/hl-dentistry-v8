@@ -56,6 +56,18 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Behandler item added to burger menu for all roles
+
+**Why:** User wants every role to reach the new Behandler admin page directly, not only via Verwaltung → bottom nav.
+
+**What changed:**
+- `hl-dentistry-v9.html:4482` — new **Behandler** item inserted into `renderMenu_2()` between **Verwaltung** and **Abmelden**. Onclick is `closeMenu_2();S.adminMode=true;S.adminPage_2='behandler';render()` — same admin-mode pattern the Verwaltung item uses, but pointing at the new `behandler` page. Icon is the same "users" SVG used by the Verwaltung bottom-nav button so the visual language stays consistent.
+- Final menu order: **Wochenplan / Management / Verwaltung / Behandler / Abmelden**.
+
+Because `renderMenu_2()` has no role gates and the burger itself is attached to every top-level header, this single edit gives behandler / laborant / ceo / verwaltung a one-tap path to the Behandler overview from Home, Lab, Messages, Search, Manager, and every admin subpage.
+
+---
+
 ### 2026-04-10 — New "Behandler" tab in Verwaltung (after Archiv)
 
 **Why:** User wants a dedicated Behandler overview page inside the admin area, reachable from a new tab in the admin bottom-nav placed after Archiv.
