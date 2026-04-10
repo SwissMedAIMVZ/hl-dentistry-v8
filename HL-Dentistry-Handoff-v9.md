@@ -56,6 +56,32 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — New "Behandler" tab in Verwaltung (after Archiv)
+
+**Why:** User wants a dedicated Behandler overview page inside the admin area, reachable from a new tab in the admin bottom-nav placed after Archiv.
+
+**What changed:**
+- `hl-dentistry-v9.html:3565` — `renderAdminBottomNav_2()` now emits a 5th button after `archiv`, routing to `S.adminPage_2='behandler'`. Icon is an inline "users" SVG (two people) sized 22×22 to match the other nav icons. The icon is declared as a local variable inside the function so it doesn't pollute the global `ICO` registry.
+- `hl-dentistry-v9.html:3580` — new function `renderBehandler_2()`. It renders:
+  - a standard `.header` + `.header-inner` with `MENU_BTN_2` (burger menu is included)
+  - one `.card` per entry in the `BEHANDLER` array, containing:
+    - gradient-circle avatar with the Behandler's initials
+    - name + case volume + average days per case (same numbers `renderManager()`'s Behandler tab uses)
+    - progress bar of `done/cases` with % label
+    - three coloured badges: `N abgeschlossen` (blue), `N Aufgaben` (amber — count of all TASKS for this bh), `N nächste Woche` (violet — TASKS with `week:'next'`)
+  - the shared `renderAdminBottomNav_2('behandler')` at the bottom so the active tab highlights correctly
+- `hl-dentistry-v9.html:4416` — `renderAdminPortal_2()` dispatcher adds `else if(page==='behandler') html=renderBehandler_2();` between `archiv` and `abrechnung`.
+
+**Data source:** the page reads from the existing `BEHANDLER` array (line 802) and the synced `TASKS` array. No new data structures were introduced.
+
+**Layout note:** the admin bottom nav now has 5 items instead of 4. The labels fit because `.nav-btn` uses `flex-direction:column` with no `white-space:nowrap`, so "Einverständnis" and "Behandler" will wrap if needed. The 5-item row is still comfortable inside the 393 px phone frame with `justify-content:space-around`.
+
+**Follow-ups:**
+- Tapping a Behandler card is currently a no-op (`cursor:default`). If you want a drill-in to a Behandler detail view (e.g. their task list, their heim assignments, their weekly schedule), that's a new screen — ask before building.
+- The "X Aufgaben" badge counts **all** TASKS for the behandler (current + next week, offen + erledigt). If you want it to reflect only today's offen count or some other slice, say so.
+
+---
+
 ### 2026-04-10 — Odontogram magnifying-glass button + horizontal zoom overlay
 
 **Why:** User wants a way to view the odontogram larger / horizontally without leaving the patient screen. A magnifying-glass icon in the bottom-right corner of the widget opens a full-screen rotated overlay so the teeth are easier to read.

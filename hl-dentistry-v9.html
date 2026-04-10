@@ -3568,12 +3568,50 @@ function renderAdminBottomNav_2(active){
     var onclick=a?'':'onclick="S.adminPage_2=\''+page+'\';render()"';
     return '<button class="nav-btn'+(a?' active':'')+'" '+onclick+'>'+icon+'<span class="lbl">'+label+'</span></button>';
   }
+  var usersIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
   return '<div class="bottom-nav">'
     +btn('uebersicht', ICO.chart,   '\u00dcbersicht')
     +btn('labor',      ICO.lab,     'Labor')
     +btn('einverstaendnis', ICO.doc, 'Einverst\u00e4ndnis')
     +btn('archiv', ICO.archive, 'Archiv')
+    +btn('behandler', usersIcon, 'Behandler')
   +'</div>';
+}
+/* === BEHANDLER OVERVIEW (Verwaltung > Behandler tab) === */
+function renderBehandler_2(){
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Behandler</h1><div class="sub">'+BEHANDLER.length+' aktive Behandler</div></div>'
+    +MENU_BTN_2
+  +'</div></div>';
+  h+='<div class="content">';
+  BEHANDLER.forEach(function(b){
+    var r=b.cases>0?Math.round(b.done/b.cases*100):0;
+    var parts=b.name.split(' ');
+    var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();
+    var nTasks=TASKS.filter(function(t){return t.bh===b.id}).length;
+    var nNext=TASKS.filter(function(t){return t.bh===b.id&&t.week==='next'}).length;
+    h+='<div class="card" style="cursor:default;margin-bottom:10px">'
+      +'<div style="display:flex;align-items:center;gap:12px">'
+        +'<div style="width:44px;height:44px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0">'+initials+'</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div class="card-title">'+b.name+'</div>'
+          +'<div class="card-sub" style="margin-top:3px">'+b.cases+' F\u00e4lle \u2014 \u00d8 '+b.avgDays+' Tage pro Fall</div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="margin-top:12px;display:flex;align-items:center;gap:10px">'
+        +'<div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden"><div style="width:'+r+'%;height:100%;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:3px"></div></div>'
+        +'<span style="font-size:11px;font-weight:700;color:var(--navy)">'+r+'%</span>'
+      +'</div>'
+      +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'
+        +'<span class="badge" style="background:var(--blue-50);color:var(--navy)">'+b.done+' abgeschlossen</span>'
+        +'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">'+nTasks+' Aufgaben</span>'
+        +'<span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+nNext+' n\u00e4chste Woche</span>'
+      +'</div>'
+    +'</div>';
+  });
+  h+='</div>';
+  h+=renderAdminBottomNav_2('behandler');
+  return h;
 }
 function renderAbrechnungNav(active){
   function btn(page,icon,label){
@@ -4413,6 +4451,7 @@ function renderAdminPortal_2(){
   else if(page==='labor') html=renderLab_2();
   else if(page==='einverstaendnis') html=renderEinverstaendnis();
   else if(page==='archiv') html=renderArchiv();
+  else if(page==='behandler') html=renderBehandler_2();
   else if(page==='abrechnung') html=renderAbrechnung();
   else if(page==='zepreisliste') html=renderZEPreisliste();
   else if(page==='texteditor') html=renderTexteditor();
