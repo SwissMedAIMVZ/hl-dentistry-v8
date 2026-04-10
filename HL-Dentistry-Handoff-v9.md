@@ -56,6 +56,35 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Behandler tab: email/role per card + "Behandler hinzufügen" modal
+
+**Why:** User wants the Behandler admin page to surface each person's email and role, and to expose a "Behandler hinzufügen" primary button that opens a modal for adding a new one.
+
+**What changed:**
+- `hl-dentistry-v9.html:3580` — `renderBehandler_2()` rewritten.
+  - Added a **full-width primary "Behandler hinzufügen"** button (navy→blue gradient, plus-icon, `sh-blue` shadow) at the top of `.content`, wired to `openAddBehandler()`.
+  - Each card now looks up the matching user account via `USERS.find(u => u.bId === b.id)` and shows:
+    - an **envelope-icon email line** under the name — falls back to `"— kein Account"` for Behandler entries with no `USERS` match (Dr. Gomez, currently)
+    - a **role badge** (blue "Behandler" / "Verwaltung" / etc. via a new small `roleLabel()` helper) or a muted "Kein Zugang" badge when there's no account
+  - The three stat badges below (abgeschlossen / Aufgaben / nächste Woche) stay. The `abgeschlossen` badge switched to the emerald palette so it stands apart from the role badge above it.
+- `hl-dentistry-v9.html:3620` — new `roleLabel(r)` helper that maps `behandler / verwaltung / laborant / ceo` to their display names.
+- `hl-dentistry-v9.html:3636` — new quartet of helpers for the add flow:
+  - `openAddBehandler()` — sets `S.showAddBehandler=true` and seeds `S.addBehandlerForm={name:'',email:'',role:'behandler'}`
+  - `closeAddBehandler()` — clears the flag
+  - `saveAddBehandler()` — reads the live DOM values, validates name + email are non-empty, rejects duplicate emails, derives a stable `bId` from the last word of the name (`h<Last>` with numeric suffixing on collision), and pushes to both `BEHANDLER` and `USERS`. Only adds a `BEHANDLER` entry when role === `behandler`; for verwaltung/laborant it only adds a `USERS` record with `bId:undefined` so those users still log in but don't clutter the Behandler stats list.
+  - `renderAddBehandlerModal()` — builds the overlay using the shared `.overlay-bg` / `.overlay-sheet` / `.form-label` / `.form-input` / `.form-select` / `.save-btn` classes. Three fields (Name, E-Mail, Rolle) + Hinzufügen button. Cancel via the × or backdrop.
+- `hl-dentistry-v9.html:4524` — `renderAdminPortal_2()` overlay section now appends `if(S.showAddBehandler) html+=renderAddBehandlerModal();` so the modal actually renders.
+
+**Side effects:**
+- `BEHANDLER` and `USERS` are now mutated in-place by the add flow. Reloading the page loses the entries (they're in-memory), which is fine for a mockup.
+- Saving a `verwaltung` or `laborant` role still creates a login account; they just don't appear as a Behandler card (they have no `bId` and the Behandler card list iterates over `BEHANDLER`, not `USERS`). If the user actually wanted this page to list all accounts not just behandlers, that's a separate change.
+
+**Follow-ups:**
+- No delete / edit on existing Behandler cards yet. If you want an "Entfernen" button or an edit flow (rename, change role, reset password), say the word.
+- The add form doesn't let you pick a starting `bId` — it's derived from the name. If users will want to edit the ID directly, I can surface it as an optional advanced field.
+
+---
+
 ### 2026-04-10 — Reverted: remove Behandler item from burger menu
 
 **Why:** User reverted the previous change — they don't want the Behandler entry in the burger menu.
