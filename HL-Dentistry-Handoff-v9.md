@@ -56,15 +56,16 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
-### 2026-04-10 — Behandler item added to burger menu for all roles
+### 2026-04-10 — Reverted: remove Behandler item from burger menu
 
-**Why:** User wants every role to reach the new Behandler admin page directly, not only via Verwaltung → bottom nav.
+**Why:** User reverted the previous change — they don't want the Behandler entry in the burger menu.
 
 **What changed:**
-- `hl-dentistry-v9.html:4482` — new **Behandler** item inserted into `renderMenu_2()` between **Verwaltung** and **Abmelden**. Onclick is `closeMenu_2();S.adminMode=true;S.adminPage_2='behandler';render()` — same admin-mode pattern the Verwaltung item uses, but pointing at the new `behandler` page. Icon is the same "users" SVG used by the Verwaltung bottom-nav button so the visual language stays consistent.
-- Final menu order: **Wochenplan / Management / Verwaltung / Behandler / Abmelden**.
+- `hl-dentistry-v9.html:4482` — deleted the Behandler menu item that was added one commit earlier. `renderMenu_2()` is back to its 4 items: Wochenplan / Management / Verwaltung / Abmelden.
 
-Because `renderMenu_2()` has no role gates and the burger itself is attached to every top-level header, this single edit gives behandler / laborant / ceo / verwaltung a one-tap path to the Behandler overview from Home, Lab, Messages, Search, Manager, and every admin subpage.
+**Current reachability of the Behandler tab:**
+- ceo / verwaltung: via the admin bottom-nav 5th button (from inside Verwaltung). Same as before my burger-menu commit.
+- behandler / laborant: only reachable by first opening Verwaltung (via the burger's **Verwaltung** item) and then tapping the Behandler button in the admin bottom-nav. If that's not where the user wants the entry point, they've indicated the burger isn't the right place — awaiting guidance on where to put it next.
 
 ---
 
