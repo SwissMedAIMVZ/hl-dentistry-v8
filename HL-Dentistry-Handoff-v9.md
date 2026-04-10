@@ -43,6 +43,42 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Sync Weiterführend sub-tab with Labor tab data
+
+**Why:** The Weiterführend sub-tab under Meine Aufgaben was rendering its own hardcoded `WEITERFUEHREND_PAT` array with different patients, different heim names, and different step sequences from what the Labor tab showed. The user wants Weiterführend to mirror the actual lab progress.
+
+**What changed:**
+- `hl-dentistry-v9.html:2981` — `WEITERFUEHREND_PAT` is no longer hardcoded. It's now computed from `LAB_ITEMS.map(...)`: one Weiterführend entry per lab item, with
+  - `name` = `lab.patName`
+  - `heim` = `HEIME.find(id===lab.heim).name` (with `labHeimName_2` as a fallback)
+  - `behandlung` = `lab.type` (e.g. "Voll OK", "Brücke 14-16", "Krone 36")
+  - `steps` = `LAB_STAGES.slice()` → `["Abdruck","Druck/Guss","Politur/Montage","Abholbereit"]` (same 4 stages the Labor tab uses)
+  - `currentStep` = `lab.stage` (0–3, directly mirroring the lab card's stage dot)
+- `hl-dentistry-v9.html:2989` — **side fix**: `labHeimName_2(id)` was looking up heim names in `PFLEGEHEIME[id-1]`, which was wrong for heim IDs 2–4 (it returned unrelated heims like "Procurand Bölschestraße", "FSE Käthe Kern", "FSE Käthe Kollwitz" instead of the actual home heims). I changed it to `HEIME.find(x => x.id === id).name`, so the Labor tab now also shows correct, consistent heim names (Alexa Lichtenrade, Haus am Weigandufer, Vitanas Märkisches V., Senterra Alloheim). This was a pre-existing bug that the sync exposed — leaving it would have caused Labor and Weiterführend to show different heim strings for the same patient.
+
+**Resulting list** (8 entries, one per lab item):
+| Name | Heim | Behandlung | Progress |
+|---|---|---|---|
+| Müller, Hans | Alexa Lichtenrade | Voll OK | Druck/Guss |
+| Braun, Helga | Vitanas Märkisches V. | Voll OK | Politur/Montage |
+| Lehmann, Gisela | Senterra Alloheim | Voll UK | Abdruck |
+| Krämer, Petra | Haus am Weigandufer | Tele OK | Abholbereit |
+| Schmidt, Maria | Alexa Lichtenrade | Voll UK | Druck/Guss |
+| Hoffmann, Rolf | Senterra Alloheim | MGP | Abdruck |
+| Müller, Hans | Alexa Lichtenrade | Brücke 14-16 | Politur/Montage |
+| Wagner, Klaus | Haus am Weigandufer | Krone 36 | Abholbereit |
+
+**Design preserved:**
+- Labor tab rendering is untouched. Only the heim string it displays is now correct.
+- Weiterführend rendering is untouched. The existing mini-card layout with `.weit-steps` progress bar just renders over the new data.
+- `getLabAlertForWeit()` at line 3404 still works: it matches by `lab.patName === p.name && labHeimName_2(it.heim) === p.heim`, and both sides now use HEIME names, so the match is consistent. (No lab items currently carry `stageChanged:true`, so no alerts are shown — same as before.)
+
+**Follow-ups:**
+- If the user wants Weiterführend to exclude completed lab cases (`stage===3` with `completed!=null` — Krämer and Wagner), that's a one-line filter after the `map(...)`. Ask first.
+- If the user wants the Labor tab heim dropdown (`[1,2,3,4]` at line 3347 of lab-create form) to also pull from HEIME rather than hardcoded 1–4, say so.
+
+---
+
 ### 2026-04-10 — Actually fix scroll on Verwaltung Übersicht (wrap entire tab body in one .content)
 
 **Why:** The earlier `min-height:0` patch was a symptom fix that didn't actually solve the problem. The Behandler Aufgaben section was still below the fold and unreachable.

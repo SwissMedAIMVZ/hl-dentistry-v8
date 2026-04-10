@@ -2978,15 +2978,21 @@ var PA_FAELLE=[
   {name:'Schwarz, Frieda',   heim:'Vitanas Lankwitz',   daysUntil:80}
 ];
 
-var WEITERFUEHREND_PAT=[
-  {name:'M\u00fcller, Hans',    heim:'Alexa Lichtenrade',  behandlung:'Totalprothese OK', steps:['Abdruck','Testprothese','Anprobe','Finale','Eingliederung'], currentStep:2},
-  {name:'Braun, Helga',     heim:'Vitanas Lankwitz',   behandlung:'Teilprothese UK',  steps:['Abdruck','Modell','Anpassung','Eingliederung'],               currentStep:2},
-  {name:'Lehmann, Gisela',  heim:'Haus am Waldsee',    behandlung:'Br\u00fccke 14-16',     steps:['Schleifen','Abdruck','Laborarbeit','Eingliederung'],           currentStep:1},
-  {name:'Kr\u00e4mer, Petra',   heim:'Senterra Tempelhof', behandlung:'Totalprothese UK', steps:['Abdruck','Testprothese','Anprobe','Finale','Eingliederung'], currentStep:3}
-];
+/* WEITERFUEHREND_PAT is now derived from the same LAB_ITEMS array the Labor tab renders from,
+   so the Weiterführend sub-tab shows the same patients, treatments and progress (mapped onto LAB_STAGES). */
+var WEITERFUEHREND_PAT=LAB_ITEMS.map(function(lab){
+  var hm=HEIME.find(function(x){return x.id===lab.heim});
+  return {
+    name:        lab.patName,
+    heim:        hm?hm.name:labHeimName_2(lab.heim),
+    behandlung:  lab.type,
+    steps:       LAB_STAGES.slice(),
+    currentStep: lab.stage
+  };
+});
 
 /* ===== LAB DATA ===== */
-function labHeimName_2(id){return(PFLEGEHEIME[id-1]&&PFLEGEHEIME[id-1].name)||'Unbekannt';}
+function labHeimName_2(id){var h=HEIME.find(function(x){return x.id===id});return h?h.name:'Unbekannt';}
 function labBhName_2(id){var b=BEHANDLER.find(function(x){return x.id===id});return b?b.name:id||'—';}
 /* LAB_STAGES, LAB_COLORS, LAB_BG, VITA_SHADES, PROTH_TYPES, LAB_TECHS, LAB_ITEMS are shared with klinik — defined above */
 
