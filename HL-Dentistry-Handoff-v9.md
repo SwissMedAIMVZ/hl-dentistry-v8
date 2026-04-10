@@ -43,6 +43,16 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Add "Management" item to burger menu
+
+**Why:** User wants a direct path back to the Manager screen (`renderManager`, `S.screen='manager'`) from the burger menu. Previously a Dashboard item existed for this; it was removed on user request, then re-requested under a new name.
+
+**What changed:**
+- `hl-dentistry-v9.html:4314` — new **Management** item prepended to `renderMenu_2()`, above Klinik. Onclick is `closeMenu_2();S.adminMode=false;S.screen='manager';S.mgrTab='Übersicht';render()` so it exits admin mode (if set) and lands on the Manager dashboard with the Übersicht sub-tab active. Bar-chart icon matches the `ICO.chart` used by the bottom-nav Dashboard button.
+- Final menu: **Management / Klinik / Wochenplan / Verwaltung / Abmelden**.
+
+---
+
 ### 2026-04-10 — Rename "Übersicht" menu item to "Verwaltung"
 
 **What changed:**
