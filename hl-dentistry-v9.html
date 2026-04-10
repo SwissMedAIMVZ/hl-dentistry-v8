@@ -1200,15 +1200,37 @@ function getTodayTasks(){
 function renderHome(){
   var tasks=getTodayTasks();var f=S.taskFilter||"todo";var shown=f==="todo"?tasks.filter(function(t){return!t.done}):tasks.filter(function(t){return t.done});
   var zeC=PATIENTS.filter(function(p){return p.ze}).length,paC=PATIENTS.filter(function(p){return p.pa}).length;
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start"><div><h1>Hallo, '+S.user.name.split(" ")[0]+'!</h1><div class="sub">'+new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+'</div></div><button class="logout-btn" onclick="doLogout()">Abmelden</button></div></div>';
-  if(tasks.length===0)h+='<div class="content"><div style="text-align:center;padding:24px;background:var(--blue-25);border-radius:var(--r-md);margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--navy)">Keine Aufgaben f\u00fcr heute</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">'+fmtDate(Date.now())+'</div></div>';
-  else h+='<div class="content"><div style="padding:14px;background:linear-gradient(135deg,var(--blue-25),var(--surface));border-radius:var(--r-md);margin-bottom:12px"><div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px">Heute</div><div style="font-size:22px;font-weight:800;color:var(--navy);margin-top:2px">'+tasks.filter(function(t){return!t.done}).length+' Aufgaben</div><div style="display:flex;gap:12px;margin-top:6px"><span style="font-size:10px;color:var(--text-3)">'+zeC+' ZE</span><span style="font-size:10px;color:var(--text-3)">'+paC+' PA</span></div></div>';
-  h+='<div class="task-toggle"><button class="'+(f==="todo"?"active":"")+'" onclick="S.taskFilter=\'todo\';render()">\u00dcbersicht</button><button class="'+(f==="done"?"active":"")+'" onclick="S.taskFilter=\'done\';render()">Erledigt</button></div>';
+  var nOffen=tasks.filter(function(t){return!t.done}).length;
+  var nErledigt=tasks.filter(function(t){return t.done}).length;
+  var dateLong=new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  /* Header — matches Verwaltung Übersicht: .header + .header-inner */
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Hallo, '+S.user.name.split(" ")[0]+'!</h1><div class="sub">'+dateLong+'</div></div>'
+    +'<button class="logout-btn" onclick="doLogout()">Abmelden</button>'
+  +'</div></div>';
+  h+='<div class="content">';
+  /* Heute section label + summary (or empty state) */
+  h+='<div class="sec-label" style="margin:-16px -20px 12px">Heute</div>';
+  if(tasks.length===0){
+    h+='<div style="text-align:center;padding:24px;background:var(--blue-25);border-radius:var(--r-md);margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--navy)">Keine Aufgaben f\u00fcr heute</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">'+fmtDate(Date.now())+'</div></div>';
+  } else {
+    h+='<div class="card" style="cursor:default;margin-bottom:12px">'
+      +'<div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:26px;font-weight:800;color:var(--navy);line-height:1">'+nOffen+'</div><div style="font-size:12px;color:var(--text-3);font-weight:500">Aufgaben</div></div>'
+      +'<div style="display:flex;gap:8px;margin-top:10px"><span class="badge" style="background:var(--blue-50);color:var(--navy)">'+zeC+' ZE</span><span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+paC+' PA</span></div>'
+    +'</div>';
+  }
+  /* Behandler Aufgaben — sec-label + filter-bar (matches Verwaltung Übersicht) */
+  h+='<div class="sec-label" style="margin:4px -20px 0">Behandler Aufgaben</div>';
+  h+='<div class="filter-bar" style="margin:0 -20px 12px">'
+    +'<button class="filter-btn'+(f==="todo"?" f-offen":"")+'" onclick="S.taskFilter=\'todo\';render()"><span class="filter-dot dot-o"></span>Offen<span class="f-count '+(f==="todo"?"fc-o":"fc-n")+'">'+nOffen+'</span></button>'
+    +'<button class="filter-btn'+(f==="done"?" f-erledigt":"")+'" onclick="S.taskFilter=\'done\';render()"><span class="filter-dot dot-e"></span>Erledigt<span class="f-count '+(f==="done"?"fc-e":"fc-n")+'">'+nErledigt+'</span></button>'
+  +'</div>';
   if(shown.length===0)h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">'+(f==="todo"?"Alles erledigt \u2014 gut gemacht!":"Noch keine erledigten Aufgaben")+'</div>';
   shown.forEach(function(t){
     h+='<div class="task-card'+(t.done?" done":"")+'" onclick="goPat('+t.patId+')"><div class="task-check'+(t.done?" checked":"")+'">'+( t.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.pat+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.heim+'</div></div><div style="text-align:right"><div>'+badge(t.type,t.label)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.sub+'</div></div></div>';
   });
-  h+='<div class="section-title" style="margin-top:16px">Heime</div>';
+  /* Heime section */
+  h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
   HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});
     h+='<div class="card" onclick="goHeim('+hm.id+')"><div class="card-row"><div><div class="card-title">'+hm.name+'</div><div class="card-sub">'+hm.addr+' \u2014 '+pts.length+' Pat.</div></div><span class="chevron">'+ICO.arrow+'</span></div></div>'});
   h+='</div>';
