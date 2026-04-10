@@ -43,6 +43,32 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Burger menu on every top-level screen (all roles)
+
+**Why:** After adding the burger menu to Home, Labor and Verwaltung, three top-level screens were still orphaned. Users who land on them (especially ceo/verwaltung, who log in straight to the Management dashboard) had no way to reach the menu without first navigating elsewhere.
+
+**What changed:**
+- `hl-dentistry-v9.html:1757` — `renderManager()` header: replaced the last remaining `<button class="logout-btn">Abmelden</button>` with `MENU_BTN_2`. This is the first screen ceo/verwaltung see after login; they now get the shared menu immediately.
+- `hl-dentistry-v9.html:1931` — `renderMessages()` header: wrapped the right-side area in a flex row and appended `MENU_BTN_2` alongside the existing "Alle gelesen" button. The button is only shown conditionally (when unread > 0), so the menu button now sits where it used to appear and also when no unread messages exist.
+- `hl-dentistry-v9.html:1730` — `renderSearch()` header: wrapped the "Patienten-Suche" title in a flex row so `MENU_BTN_2` can sit on the right without disturbing the search input below.
+- After this pass there are **zero** remaining `.logout-btn` uses in any template. The `.logout-btn` CSS rule at lines 85–86 is now technically unused but kept (harmless, low signal to delete, keeps the diff small).
+
+**Coverage check (post-change) — every role's top-level entry points now expose the burger menu:**
+
+| Role | Lands on | Bottom-nav targets | Menu present? |
+|---|---|---|---|
+| `behandler` (feld, hess) | Home | Home, Pipeline, Lab, Nachr., +, Suche | ✅ Home, Lab, Messages, Search (Pipeline is a sub-screen with back-btn) |
+| `laborant` (labor) | Lab | Lab, Nachr., Suche | ✅ Lab, Messages, Search |
+| `ceo` / `verwaltung` (gomez, c.weigert) | Manager | Dashboard, Labor, Nachr., Verwaltung, Suche | ✅ Manager, Lab, Messages, Verwaltung, Search |
+
+**Intentionally NOT touched:**
+- `renderPipeline()`, `renderHeim()`, `renderPatient()` — these are detail/sub-screens entered via a parent + back-button. Adding a hamburger alongside a back-button would confuse the up/left UX. The user can always pop back to the parent screen via the back button.
+- Lab / message / new-patient detail overlays for the same reason.
+
+**Follow-ups:** none. The menu is now uniformly reachable from every top-level screen for every role.
+
+---
+
 ### 2026-04-10 — Shared burger menu across Home, Labor and Verwaltung + Wochenplan item
 
 **Why:** User wants one unified hamburger menu on the Home tab, Labor tab and Verwaltung — same placement (top-right of the header), same items everywhere — plus a new "Wochenplan" entry that jumps to the home screen from wherever you are.

@@ -1727,7 +1727,7 @@ function renderSearch(){
   if(sf==="ze_aktiv")f=f.filter(function(p){return p.ze&&p.ze.st<10});
   else if(sf==="pa_aktiv")f=f.filter(function(p){return p.pa});
   else if(sf==="dringend")f=f.filter(function(p){return(p.ze&&(urg(p.ze.exp)==="expired"||urg(p.ze.exp)==="urgent"))||p.tx.indexOf("notfall")!==-1});
-  var h='<div class="header"><div style="font-size:17px;font-weight:700;margin-bottom:14px;position:relative;z-index:1">Patienten-Suche</div><input class="search-input" type="text" placeholder="Name, Zimmer oder Heim\u2026" value="'+S.searchQ+'" oninput="setSearch(this.value)"></div>';
+  var h='<div class="header"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:14px;position:relative;z-index:1"><div style="font-size:17px;font-weight:700">Patienten-Suche</div>'+MENU_BTN_2+'</div><input class="search-input" type="text" placeholder="Name, Zimmer oder Heim\u2026" value="'+S.searchQ+'" oninput="setSearch(this.value)"></div>';
   /* Filter pills */
   h+='<div class="lab-filters">';
   [["alle","Alle"],["ze_aktiv","ZE aktiv"],["pa_aktiv","PA aktiv"],["dringend","Dringend"]].forEach(function(fp){
@@ -1754,7 +1754,7 @@ function renderSearch(){
 /* ===== MANAGER DASHBOARD ===== */
 function renderManager(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div><button class="logout-btn" onclick="doLogout()">Abmelden</button></div></div>';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div>'+MENU_BTN_2+'</div></div>';
   h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div><div class="content">';
   if(tab==="\u00dcbersicht"){
@@ -1928,7 +1928,7 @@ function renderAiChat(){
 /* ===== NACHRICHTEN ===== */
 function renderMessages(){
   var msgs=getMyMessages();var nudges=msgs.filter(function(m){return m.type!=="direct"});var directs=msgs.filter(function(m){return m.type==="direct"});var tab=S.msgTab||"Alle";var shown=tab==="Alle"?msgs:tab==="Aktionen"?nudges:directs;
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start"><div><h1>Nachrichten</h1><div class="sub">'+msgs.length+' Nachrichten, '+getUnreadCount()+' ungelesen</div></div>'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+'</div></div>';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start"><div><h1>Nachrichten</h1><div class="sub">'+msgs.length+' Nachrichten, '+getUnreadCount()+' ungelesen</div></div><div style="display:flex;gap:8px;align-items:center">'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+MENU_BTN_2+'</div></div></div>';
   h+='<div class="msg-tabs"><button class="msg-tab'+(tab==="Alle"?" active":"")+'" onclick="setMsgTab(\'Alle\')">Alle ('+msgs.length+')</button><button class="msg-tab'+(tab==="Aktionen"?" active":"")+'" onclick="setMsgTab(\'Aktionen\')">Aktionen'+(nudges.filter(function(m){return!m.read}).length?'<span class="msg-badge-count">'+nudges.filter(function(m){return!m.read}).length+'</span>':'')+'</button><button class="msg-tab'+(tab==="Direkt"?" active":"")+'" onclick="setMsgTab(\'Direkt\')">Direkt</button></div>';
   h+='<div class="msg-list">';
   if(shown.length===0)h+='<div class="msg-empty"><span class="icon">'+ICO.msg+'</span><span class="text">Keine Nachrichten</span></div>';
