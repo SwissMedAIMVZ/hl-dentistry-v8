@@ -43,6 +43,22 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Fix scroll on Verwaltung Übersicht (flexbox min-height gotcha)
+
+**Why:** The Verwaltung → Übersicht screen could not be scrolled. Expanding a Behandler accordion in "Behandler Aufgaben" pushed content off the bottom of the phone frame with no way to reach it.
+
+**Root cause:** Classic flexbox `min-height: auto` gotcha. `.phone` is `display:flex; flex-direction:column; overflow:hidden`, and `.content` is the `flex:1; overflow-y:auto` scroll area. But the default `min-height:auto` on a flex item means it refuses to shrink below its intrinsic content size. On the Übersicht screen, the non-flex siblings in front of `.content` (header, tab-bar, Meine Aufgaben sec-label + mein-tabs + mein-content patient cards, Behandler Aufgaben sec-label, filter-bar) eat ~400 px on their own, leaving only ~400 px for `.content`. When the `bhSection` accordions expand, their intrinsic content blows past 400 px, so `.content` refuses to be the allotted size, the flex container overflows the 852 px phone, and the phone's `overflow:hidden` clips everything below the fold with no scrollbar.
+
+The home screen wasn't affected because it only has a header + tab-bar before `.content`, leaving plenty of room.
+
+**What changed:**
+- `hl-dentistry-v9.html:100` — added `min-height:0` to the shared `.content` CSS rule. This is the standard flexbox fix: it lets `.content` shrink below its intrinsic content size so it actually stays within its flex-allotted space, and its own `overflow-y:auto` then produces the scrollbar as intended. Safe for every other screen because none of them rely on `.content` being at least as tall as its content — they either have lots of vertical headroom (home, search, lab) or they were already fitting.
+
+**Follow-ups:**
+- None. This is a one-property patch. If any other screen starts feeling "short" unexpectedly, check for a sibling that was relying on the old `min-height:auto` behavior and give it an explicit height.
+
+---
+
 ### 2026-04-10 — Sync Verwaltung Behandler Aufgaben data with PATIENTS
 
 **Why:** The home Heute tab (sourced from `PATIENTS` via `getTodayTasks()`) and the Verwaltung → Übersicht → Behandler Aufgaben section (sourced from the hardcoded `TASKS` array) were showing completely different people. The user wants each Behandler's tasks to be consistent across both views — same patient names, same heims.
