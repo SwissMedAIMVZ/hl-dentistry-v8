@@ -56,6 +56,18 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Simplify Behandler cards to name + email + role only
+
+**What changed:**
+- `hl-dentistry-v9.html:3600` — stripped the per-card statistics (`cases`, `Ø days`, progress bar, abgeschlossen / Aufgaben / nächste Woche badges) from `renderBehandler_2()`'s BEHANDLER loop. Each card is now a compact single-row layout:
+  - Gradient initial avatar (left)
+  - Name + envelope-icon email (center, flexes to fill)
+  - Role badge (right, blue "Behandler" / muted "Kein Zugang")
+- Header sub, "Behandler hinzufügen" primary button, and the add-flow modal are all unchanged.
+- The `roleLabel()` helper introduced in the previous commit stays — still used by the right-side badge.
+
+---
+
 ### 2026-04-10 — Behandler tab: email/role per card + "Behandler hinzufügen" modal
 
 **Why:** User wants the Behandler admin page to surface each person's email and role, and to expose a "Behandler hinzufügen" primary button that opens a modal for adding a new one.

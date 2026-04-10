@@ -3588,32 +3588,22 @@ function renderBehandler_2(){
   /* Add Behandler button */
   h+='<button style="width:100%;padding:13px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:6px" onclick="openAddBehandler()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Behandler hinzuf\u00fcgen</button>';
   BEHANDLER.forEach(function(b){
-    var r=b.cases>0?Math.round(b.done/b.cases*100):0;
     var parts=b.name.split(' ');
     var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();
     var user=USERS.find(function(u){return u.bId===b.id});
     var email=user?user.email:'\u2014 kein Account';
     var role=user?user.role:null;
-    var nTasks=TASKS.filter(function(t){return t.bh===b.id}).length;
-    var nNext=TASKS.filter(function(t){return t.bh===b.id&&t.week==='next'}).length;
+    var roleBadge=role
+      ?'<span class="badge" style="background:var(--blue-50);color:var(--navy);flex-shrink:0">'+roleLabel(role)+'</span>'
+      :'<span class="badge" style="background:var(--surface-2);color:var(--text-4);flex-shrink:0">Kein Zugang</span>';
     h+='<div class="card" style="cursor:default;margin-bottom:10px">'
-      +'<div style="display:flex;align-items:flex-start;gap:12px">'
+      +'<div style="display:flex;align-items:center;gap:12px">'
         +'<div style="width:44px;height:44px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0">'+initials+'</div>'
         +'<div style="flex:1;min-width:0">'
           +'<div class="card-title">'+b.name+'</div>'
           +'<div style="font-size:11px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:5px;word-break:break-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'+email+'</div>'
-          +(role?'<div style="margin-top:6px"><span class="badge" style="background:var(--blue-50);color:var(--navy)">'+roleLabel(role)+'</span></div>':'<div style="margin-top:6px"><span class="badge" style="background:var(--surface-2);color:var(--text-4)">Kein Zugang</span></div>')
         +'</div>'
-      +'</div>'
-      +'<div style="margin-top:12px;font-size:11px;color:var(--text-3)">'+b.cases+' F\u00e4lle \u2014 \u00d8 '+b.avgDays+' Tage pro Fall</div>'
-      +'<div style="margin-top:8px;display:flex;align-items:center;gap:10px">'
-        +'<div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden"><div style="width:'+r+'%;height:100%;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:3px"></div></div>'
-        +'<span style="font-size:11px;font-weight:700;color:var(--navy)">'+r+'%</span>'
-      +'</div>'
-      +'<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">'
-        +'<span class="badge" style="background:var(--emerald-bg);color:var(--emerald)">'+b.done+' abgeschlossen</span>'
-        +'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">'+nTasks+' Aufgaben</span>'
-        +'<span class="badge" style="background:var(--violet-bg);color:var(--violet)">'+nNext+' n\u00e4chste Woche</span>'
+        +roleBadge
       +'</div>'
     +'</div>';
   });
