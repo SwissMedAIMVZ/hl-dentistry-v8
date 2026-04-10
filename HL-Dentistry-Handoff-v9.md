@@ -43,6 +43,28 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Fix unclickable burger button on Manager, Labor, Messages (z-index)
+
+**Why:** The burger button rendered on Manager and Labor headers was visible but dead — clicks did nothing. The `renderMenu_2` dropdown never appeared. Turned out to be the same menu (same function, same items) the user correctly assumed was there — they just couldn't get to it.
+
+**Root cause:** `.header` has decorative `::before` / `::after` pseudo-elements with `position:absolute` (see `hl-dentistry-v9.html:76-77`) — two radial-gradient "glow" circles at top-right and bottom-left of the header. They have no z-index and therefore sit at the default stacking order inside `.header`'s relatively-positioned box. Any header child *without* its own `z-index:1` stays below those pseudo-elements, which means the radial-gradient bubble at `top:-40%; right:-20%; width:200px; height:200px` visually overlaps and click-traps any element in the top-right area of the header — exactly where `MENU_BTN_2` sits.
+
+The CSS already lifts `h1`, `h2`, `.sub`, `.header-row`, and `.header-inner` with `position:relative; z-index:1` (lines 79–82). But Manager / Labor / Messages wrapped their flex rows in a bare inline `<div style="display:flex;...">` with no z-index, so the wrapper (and therefore the burger inside it) fell below the pseudo-element. On screens using `.header-inner` (Home, Verwaltung Übersicht, all admin subpages) the menu worked fine because `.header-inner` carries the z-index.
+
+**What changed:** added `position:relative;z-index:1` to the inline flex wrappers that hold the burger in four places:
+- `hl-dentistry-v9.html:1757` — `renderManager()` (Dashboard)
+- `hl-dentistry-v9.html:1835` — `renderLab()` (klinik Labor)
+- `hl-dentistry-v9.html:3315` — `renderLab_2()` (admin Labor)
+- `hl-dentistry-v9.html:1931` — `renderMessages()`
+
+The search header (`renderSearch()`, line 1730) already had `position:relative;z-index:1` from the earlier edit — verified and left alone. Home and all admin subpages use `.header-inner` which already carries the z-index.
+
+**Note on menu items:** the menu items themselves are identical everywhere because `renderMenu_2()` is a single shared function. The user's perception of "missing items" was the side effect of the button being unclickable — the dropdown simply never opened. No menu-items code change was needed.
+
+**Follow-ups:** none. The z-index fix is minimal and targeted.
+
+---
+
 ### 2026-04-10 — Dashboard item in burger menu + remove floating Dashboard shortcut
 
 **Why:** After putting the burger menu on all top-level screens, the old floating "Dashboard" shortcut button at `hl-dentistry-v9.html:2210` (shown for ceo/verwaltung on home/search/pipeline/heim/patient) lived in the exact same `top:18px; right:14px` slot as the burger and visually overlapped it. The menu also had no way to reach the Manager Dashboard from klinik-mode screens — Klinik just exits admin mode without changing the screen, so ceo/verwaltung on Home would be stuck with no direct shortcut back to Dashboard.
