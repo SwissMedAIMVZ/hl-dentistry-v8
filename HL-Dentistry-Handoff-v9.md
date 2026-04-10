@@ -43,6 +43,27 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Trim burger menu to Klinik / Wochenplan / Übersicht / Abmelden
+
+**Why:** User wants a leaner menu — removed Dashboard, Einverständnis and Abrechnung per direct request.
+
+**What changed:**
+- `hl-dentistry-v9.html:4310` — three items deleted from `renderMenu_2()`:
+  - **Dashboard** (added earlier today)
+  - **Einverständnis**
+  - **Abrechnung**
+- Remaining menu items (top → bottom):
+  1. **Klinik** — `S.adminMode=false`
+  2. **Wochenplan** — `S.adminMode=false; S.screen='home'`
+  3. **Übersicht** — `S.adminMode=true; S.adminPage_2='uebersicht'`
+  4. **Abmelden** (divider) — `closeMenu_2(); doLogout()`
+
+**Known consequence:** ceo/verwaltung users no longer have a quick shortcut back to the Manager dashboard from non-admin screens. The floating Dashboard shortcut button was removed in the previous pass (it overlapped the burger), and Dashboard is no longer in the menu. To reach Dashboard from home/search/pipeline/heim/patient, they have to bounce through the bottom nav via Messages (which shows the admin bottom nav including a Dashboard button) or via Übersicht → bottom nav. Say the word if you want the direct shortcut restored.
+
+**Admin page access preserved:** Einverständnis and Abrechnung are still reachable from inside Verwaltung via the admin bottom-nav and hamburger side-menu inside Verwaltung. Only the top-level burger menu entries were removed.
+
+---
+
 ### 2026-04-10 — Fix unclickable burger button on Manager, Labor, Messages (z-index)
 
 **Why:** The burger button rendered on Manager and Labor headers was visible but dead — clicks did nothing. The `renderMenu_2` dropdown never appeared. Turned out to be the same menu (same function, same items) the user correctly assumed was there — they just couldn't get to it.
