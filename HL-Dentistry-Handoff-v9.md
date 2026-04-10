@@ -43,6 +43,30 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Dashboard item in burger menu + remove floating Dashboard shortcut
+
+**Why:** After putting the burger menu on all top-level screens, the old floating "Dashboard" shortcut button at `hl-dentistry-v9.html:2210` (shown for ceo/verwaltung on home/search/pipeline/heim/patient) lived in the exact same `top:18px; right:14px` slot as the burger and visually overlapped it. The menu also had no way to reach the Manager Dashboard from klinik-mode screens — Klinik just exits admin mode without changing the screen, so ceo/verwaltung on Home would be stuck with no direct shortcut back to Dashboard.
+
+**What changed:**
+- `hl-dentistry-v9.html:4314` — new **Dashboard** item prepended to `renderMenu_2()`, above Klinik. It sets `S.adminMode=false; S.screen='manager'; S.mgrTab='Übersicht'` and routes to the Manager screen from anywhere. Icon is a bar-chart SVG to match the `ICO.chart` used by the bottom-nav Dashboard button.
+- `hl-dentistry-v9.html:2210` — deleted the floating absolute-positioned "Dashboard" shortcut button. The burger menu now carries that responsibility, so there is no more overlap with the top-right burger button. The line is kept as a comment marker for context.
+- The previous turn's fix to `renderManager()` header (`hl-dentistry-v9.html:1757`, commit `64e1164`) is already in place: `MENU_BTN_2` replaces the old logout button. Nothing to do there.
+
+**Menu items now (top to bottom):**
+
+1. **Dashboard** *(new)* — `S.adminMode=false; S.screen='manager'; S.mgrTab='Übersicht'`
+2. Klinik — `S.adminMode=false`
+3. Wochenplan — `S.adminMode=false; S.screen='home'`
+4. Übersicht — `S.adminMode=true; S.adminPage_2='uebersicht'`
+5. Einverständnis — `S.adminMode=true; S.adminPage_2='einverstaendnis'`
+6. Abrechnung — `S.adminMode=true; S.adminPage_2='abrechnung'`
+7. Abmelden (divider) — `closeMenu_2(); doLogout()`
+
+**Follow-ups:**
+- Behandler / laborant roles see the Dashboard menu item too. The manager screen renders for any role (no RBAC gate), so clicking it works but shows management stats that aren't really their concern. If you want to hide the Dashboard item from non-admin roles, the onclick can be wrapped in a role check — say the word.
+
+---
+
 ### 2026-04-10 — Burger menu on every top-level screen (all roles)
 
 **Why:** After adding the burger menu to Home, Labor and Verwaltung, three top-level screens were still orphaned. Users who land on them (especially ceo/verwaltung, who log in straight to the Management dashboard) had no way to reach the menu without first navigating elsewhere.
