@@ -146,7 +146,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
 
 /* ===== ODONTOGRAM ===== */
 .odo-wrap{padding:16px;background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-card);position:relative}
-.odo-zoom-btn{position:absolute;bottom:12px;right:12px;width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s;padding:0;font-family:inherit}
+.odo-zoom-btn{width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s;padding:0;font-family:inherit}
 .odo-zoom-btn:hover{background:var(--blue-50);color:var(--navy);border-color:var(--blue)}
 .odo-zoom-overlay{position:absolute;inset:0;background:rgba(15,23,42,0.92);z-index:200;backdrop-filter:blur(4px)}
 .odo-zoom-close{position:absolute;top:14px;right:14px;z-index:202;width:36px;height:36px;border-radius:var(--r-full);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;line-height:1}
@@ -1103,6 +1103,8 @@ function renderOdo(o,patId){
     h+='<div class="odo-gap"></div>';
     for(var i=0;i<8;i++)h+='<div>'+(31+i)+'</div>';
     h+='</div>';
+    /* Horizontal zoom trigger — directly under the odontogram grid */
+    h+='<div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="odo-zoom-btn" onclick="openOdoZoom()" title="Horizontal anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button></div>';
     /* Legend — expanded */
     h+='<div class="odo-legend"><span><span class="dot" style="background:var(--t-healthy)"></span>Gesund/Ersetzt</span><span><span class="dot" style="background:var(--t-caries)"></span>Kari\u00f6s</span><span><span class="dot" style="background:var(--t-extract)"></span>Extraktion</span><span><span class="dot" style="background:var(--t-crown)"></span>Krone/Impl.</span><span><span class="dot" style="background:var(--t-composite)"></span>F\u00fcllung</span><span><span class="dot" style="background:var(--t-bridge)"></span>Br\u00fccke</span><span><span class="dot" style="background:var(--t-teleskop)"></span>Teleskop</span><span><span class="dot" style="background:var(--t-stift)"></span>Stift</span><span><span class="dot" style="background:var(--t-fehlt);border:1px dashed var(--border-2)"></span>Fehlt</span></div>';
     /* Edit button */
@@ -1129,8 +1131,6 @@ function renderOdo(o,patId){
     var labItems=LAB_ITEMS.filter(function(l){return l.patId===patId});if(labItems.length>0){h+='<div style="'+(pat.pa?'margin-top:8px':'margin-top:12px;padding-top:12px;border-top:1px solid var(--border)')+'"><div style="display:flex;flex-wrap:wrap;gap:6px">';labItems.forEach(function(li){h+='<span class="lab-patient-badge" onclick="showLabDetail('+li.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 3h6v5.586a1 1 0 0 0 .293.707l4.414 4.414A2 2 0 0 1 21 15.121V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3.879a2 2 0 0 1 .586-1.414L8 9.293A1 1 0 0 0 9 8.586V3z"/></svg> '+li.prothType+' ('+li.jaw+'): <span style="font-weight:700;color:'+LAB_COLORS[li.stage]+'">'+LAB_STAGES[li.stage]+'</span>'+(li.vita?' \u2014 VITA '+li.vita:'')+'</span>'});h+='</div></div>'}
   }
   if(S.odoRef){h+='<div style="margin-top:12px;padding:12px;background:var(--surface);border-radius:var(--r-md);border:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Zahnstatus-Katalog (16 Codes)</div><div style="font-size:10px;color:var(--text-3);line-height:1.7"><strong>Status:</strong> E=ersetzt, Ex=Extraktion, F=fehlend, F\u00fc=F\u00fcllung, G=gesund, C=kari\u00f6s, Kr=Krone, B=Br\u00fccke, I=Implantat, T=Teleskop, Wr=Wurzelrest, Z=zerst\u00f6rt, st=Stift, ph=Halteelement, rt=retiniert<br><strong>Modifikatoren:</strong> (+)=Vitalit\u00e4t positiv, (\u2212)=Vitalit\u00e4t negativ<br><strong>Kombiniert:</strong> C+Kr=kari\u00f6se Krone, st+Kr=Stift+Krone, T+E=Teleskop unter Prothese</div></div>'}
-  /* Magnifying-glass zoom button — opens the horizontal (rotated) odontogram overlay */
-  h+='<button class="odo-zoom-btn" onclick="openOdoZoom()" title="Horizontal anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>';
   h+='</div>';return h;
 }
 

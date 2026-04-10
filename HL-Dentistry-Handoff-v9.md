@@ -43,6 +43,19 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Move zoom button to right below the odontogram grid
+
+**Why:** The previous absolute-positioned button sat in the bottom-right corner of the `.odo-wrap` widget, which meant it landed below the legend, edit buttons and history bar — visually too far from the teeth grid. User wants it right under the odontogram itself.
+
+**What changed:**
+- `hl-dentistry-v9.html:149` — dropped `position:absolute; bottom:12px; right:12px` from `.odo-zoom-btn`. Kept the size (30×30), border, hover state. Changed `display:flex` → `display:inline-flex` so it behaves as a normal inline element wherever it's placed.
+- `hl-dentistry-v9.html:1093` — inserted the button on its own right-aligned row *immediately after the lower FDI number row* and *before the legend*, inside the `if(tab==="status")` branch. Uses `<div style="display:flex;justify-content:flex-end;margin-top:8px">` as a wrapper so it hugs the right edge of the teeth grid.
+- `hl-dentistry-v9.html:1132` — removed the old absolute-positioned insertion at the bottom of `.odo-wrap`.
+
+**Consequence:** the button is now only visible on the Status tab (it was on all three before via the absolute corner placement). That matches the zoom view which only shows status data. Say the word if you still want it on Behandlung / PA Blatt too — happy to add a parallel insertion in those branches.
+
+---
+
 ### 2026-04-10 — Odontogram magnifying-glass button + horizontal zoom overlay
 
 **Why:** User wants a way to view the odontogram larger / horizontally without leaving the patient screen. A magnifying-glass icon in the bottom-right corner of the widget opens a full-screen rotated overlay so the teeth are easier to read.
