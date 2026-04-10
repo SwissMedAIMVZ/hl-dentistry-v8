@@ -146,7 +146,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
 
 /* ===== ODONTOGRAM ===== */
 .odo-wrap{padding:16px;background:var(--white);border-radius:var(--r-lg);border:1px solid var(--border);box-shadow:var(--sh-card);position:relative}
-.odo-zoom-btn{width:30px;height:30px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s;padding:0;font-family:inherit}
+.odo-zoom-btn{width:24px;height:24px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s;padding:0;font-family:inherit}
 .odo-zoom-btn:hover{background:var(--blue-50);color:var(--navy);border-color:var(--blue)}
 .odo-zoom-overlay{position:absolute;inset:0;background:rgba(15,23,42,0.92);z-index:200;backdrop-filter:blur(4px)}
 .odo-zoom-close{position:absolute;top:14px;right:14px;z-index:202;width:36px;height:36px;border-radius:var(--r-full);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;line-height:1}
@@ -1103,8 +1103,8 @@ function renderOdo(o,patId){
     h+='<div class="odo-gap"></div>';
     for(var i=0;i<8;i++)h+='<div>'+(31+i)+'</div>';
     h+='</div>';
-    /* Horizontal zoom trigger — directly under the odontogram grid */
-    h+='<div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="odo-zoom-btn" onclick="openOdoZoom()" title="Horizontal anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button></div>';
+    /* Horizontal zoom trigger — directly under the odontogram grid, before the legend */
+    h+='<div style="display:flex;justify-content:center;margin-top:6px"><button class="odo-zoom-btn" onclick="openOdoZoom()" title="Horizontal anzeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button></div>';
     /* Legend — expanded */
     h+='<div class="odo-legend"><span><span class="dot" style="background:var(--t-healthy)"></span>Gesund/Ersetzt</span><span><span class="dot" style="background:var(--t-caries)"></span>Kari\u00f6s</span><span><span class="dot" style="background:var(--t-extract)"></span>Extraktion</span><span><span class="dot" style="background:var(--t-crown)"></span>Krone/Impl.</span><span><span class="dot" style="background:var(--t-composite)"></span>F\u00fcllung</span><span><span class="dot" style="background:var(--t-bridge)"></span>Br\u00fccke</span><span><span class="dot" style="background:var(--t-teleskop)"></span>Teleskop</span><span><span class="dot" style="background:var(--t-stift)"></span>Stift</span><span><span class="dot" style="background:var(--t-fehlt);border:1px dashed var(--border-2)"></span>Fehlt</span></div>';
     /* Edit button */
