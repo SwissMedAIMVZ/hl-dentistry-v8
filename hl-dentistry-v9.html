@@ -2602,26 +2602,32 @@ var PFLEGEHEIME=[
   {name:'WG Helle Mitte',                             strasse:'Schleusinger Str. 8',                plz:'12687 Berlin'},
   {name:'Hauskrankenpflege Annette Huth',             strasse:'Bundesplatz 2',                      plz:'10715 Berlin'}
 ];
-function heimAddr(name){var h=PFLEGEHEIME.find(function(x){return x.name===name;});return h?h.strasse+', '+h.plz:'';}
+function heimAddr(name){var h=PFLEGEHEIME.find(function(x){return x.name===name;});if(h)return h.strasse+', '+h.plz;var hh=HEIME.find(function(x){return x.name===name});return hh?hh.addr:'';}
 
 var BEHANDLUNG_OPTIONS=['ZE-Eingliederung','ZE-Befund','ZE-Abnahme','PA-Befund','PA-Therapie','UPT-Sitzung','Kontrolle','Extraktion','R\u00f6ntgen','F\u00fcllungstherapie','HKP-Einreichung','Erstuntersuchung','Prothesenkontrolle','Abdrucknahme'];
 
-var nextId=15;
+var nextId=17;
+/* TASKS are now sourced from the same PATIENTS array the home screen uses,
+   so each Behandler sees the same patients + heims in both views. */
 var TASKS=[
-  {id:1, bh:'hFeld', name:'Zimmermann, Anna',  heim:'Alexa Lichtenrade',  behandlung:'ZE-Eingliederung', status:'offen',    week:'current',date:fmtShort(dt(0))},
-  {id:2, bh:'hFeld', name:'Richter, Karl',      heim:'Haus am Waldsee',    behandlung:'PA-Befund',        status:'offen',    week:'current',date:fmtShort(dt(1))},
-  {id:3, bh:'hFeld', name:'Schulze, Elisabeth', heim:'Alexa Lichtenrade',  behandlung:'Kontrolle',        status:'erledigt', week:'current',date:fmtShort(dt(-1))},
-  {id:4, bh:'hFeld', name:'Becker, Heinrich',   heim:'Vitanas Lankwitz',   behandlung:'Extraktion',       status:'erledigt', week:'current',date:fmtShort(dt(-2))},
-  {id:5, bh:'hHess', name:'Sch\u00e4fer, Walter',    heim:'Alexa Lichtenrade',  behandlung:'UPT-Sitzung',      status:'offen',    week:'current',date:fmtShort(dt(0))},
-  {id:6, bh:'hHess', name:'Koch, Hildegard',     heim:'Senterra Tempelhof', behandlung:'ZE-Abnahme',       status:'offen',    week:'current',date:fmtShort(dt(2))},
-  {id:7, bh:'hHess', name:'Neumann, Werner',     heim:'Senterra Tempelhof', behandlung:'R\u00f6ntgen',          status:'erledigt', week:'current',date:fmtShort(dt(-1))},
-  {id:8, bh:'hGomez',name:'Meyer, Horst',        heim:'Vitanas Lankwitz',   behandlung:'Erstuntersuchung', status:'offen',    week:'current',date:fmtShort(dt(1))},
-  {id:9, bh:'hGomez',name:'Braun, Lieselotte',   heim:'Senterra Tempelhof', behandlung:'PA-Therapie',      status:'erledigt', week:'current',date:fmtShort(dt(-2))},
-  {id:10,bh:'hFeld', name:'Wolf, Gertrud',        heim:'Haus am Waldsee',    behandlung:'HKP-Einreichung',  status:'offen',    week:'next',   date:fmtShort(dt(7))},
-  {id:11,bh:'hFeld', name:'Lorenz, Dieter',       heim:'Alexa Lichtenrade',  behandlung:'Prothesenkontrolle',status:'offen',   week:'next',   date:fmtShort(dt(8))},
-  {id:12,bh:'hHess', name:'Schwarz, Frieda',      heim:'Vitanas Lankwitz',   behandlung:'F\u00fcllungstherapie', status:'offen',    week:'next',   date:fmtShort(dt(7))},
-  {id:13,bh:'hHess', name:'Hartmann, Ursula',     heim:'Haus am Waldsee',    behandlung:'PA-Befund',        status:'offen',    week:'next',   date:fmtShort(dt(9))},
-  {id:14,bh:'hGomez',name:'Fischer, Renate',      heim:'Senterra Tempelhof', behandlung:'ZE-Befund',        status:'offen',    week:'next',   date:fmtShort(dt(8))}
+  /* ---- Current week ---- all date=today ---- */
+  {id:1, bh:'hFeld', name:'M\u00fcller, Hans',      heim:'Alexa Lichtenrade',       behandlung:'ZE-Eingliederung', status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:2, bh:'hFeld', name:'Wagner, Klaus',         heim:'Haus am Weigandufer',     behandlung:'Extraktion',       status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:3, bh:'hFeld', name:'Braun, Helga',          heim:'Vitanas M\u00e4rkisches V.', behandlung:'ZE-Eingliederung', status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:4, bh:'hFeld', name:'M\u00fcller, Hans',      heim:'Alexa Lichtenrade',       behandlung:'Kontrolle',        status:'erledigt', week:'current',date:fmtShort(dt(0))},
+  {id:5, bh:'hFeld', name:'Fischer, Ingrid',       heim:'Vitanas M\u00e4rkisches V.', behandlung:'F\u00fcllungstherapie', status:'erledigt', week:'current',date:fmtShort(dt(0))},
+  {id:6, bh:'hHess', name:'Schmidt, Maria',        heim:'Alexa Lichtenrade',       behandlung:'HKP-Einreichung',  status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:7, bh:'hHess', name:'Hoffmann, Rolf',        heim:'Senterra Alloheim',       behandlung:'Erstuntersuchung', status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:8, bh:'hHess', name:'Hoffmann, Rolf',        heim:'Senterra Alloheim',       behandlung:'R\u00f6ntgen',     status:'erledigt', week:'current',date:fmtShort(dt(0))},
+  {id:9, bh:'hGomez',name:'Kr\u00e4mer, Petra',     heim:'Haus am Weigandufer',     behandlung:'ZE-Abnahme',       status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:10,bh:'hGomez',name:'Lehmann, Gisela',       heim:'Senterra Alloheim',       behandlung:'ZE-Befund',        status:'offen',    week:'current',date:fmtShort(dt(0))},
+  {id:11,bh:'hGomez',name:'Lehmann, Gisela',       heim:'Senterra Alloheim',       behandlung:'PA-Therapie',      status:'erledigt', week:'current',date:fmtShort(dt(0))},
+  /* ---- Next week ---- */
+  {id:12,bh:'hFeld', name:'M\u00fcller, Hans',      heim:'Alexa Lichtenrade',       behandlung:'UPT-Sitzung',      status:'offen',    week:'next',   date:fmtShort(dt(7))},
+  {id:13,bh:'hFeld', name:'Braun, Helga',          heim:'Vitanas M\u00e4rkisches V.', behandlung:'UPT-Sitzung',      status:'offen',    week:'next',   date:fmtShort(dt(8))},
+  {id:14,bh:'hHess', name:'Schmidt, Maria',        heim:'Alexa Lichtenrade',       behandlung:'HKP-Einreichung',  status:'offen',    week:'next',   date:fmtShort(dt(9))},
+  {id:15,bh:'hGomez',name:'Kr\u00e4mer, Petra',     heim:'Haus am Weigandufer',     behandlung:'Prothesenkontrolle',status:'offen',   week:'next',   date:fmtShort(dt(7))},
+  {id:16,bh:'hGomez',name:'Lehmann, Gisela',       heim:'Senterra Alloheim',       behandlung:'UPT-Sitzung',      status:'offen',    week:'next',   date:fmtShort(dt(8))}
 ];
 
 /* === TASK CARD === */
@@ -2829,6 +2835,14 @@ var HEIM_T={
   'Vitanas Lankwitz':   {'Alexa Lichtenrade':10,'Haus am Waldsee':16,'Vitanas Lankwitz':0, 'Senterra Tempelhof':10},
   'Senterra Tempelhof': {'Alexa Lichtenrade':14,'Haus am Waldsee':20,'Vitanas Lankwitz':10,'Senterra Tempelhof':0}
 };
+/* Extend HEIM_T with the home HEIME names so the Verwaltung route box works on the synced TASKS
+   (which now use home heim names: Haus am Weigandufer, Vitanas Märkisches V., Senterra Alloheim). */
+HEIM_T['Haus am Weigandufer']=HOME_HEIM_T['Haus am Weigandufer'];
+HEIM_T['Vitanas M\u00e4rkisches V.']=HOME_HEIM_T['Vitanas M\u00e4rkisches V.'];
+HEIM_T['Senterra Alloheim']=HOME_HEIM_T['Senterra Alloheim'];
+HEIM_T['Alexa Lichtenrade']['Haus am Weigandufer']=HOME_HEIM_T['Alexa Lichtenrade']['Haus am Weigandufer'];
+HEIM_T['Alexa Lichtenrade']['Vitanas M\u00e4rkisches V.']=HOME_HEIM_T['Alexa Lichtenrade']['Vitanas M\u00e4rkisches V.'];
+HEIM_T['Alexa Lichtenrade']['Senterra Alloheim']=HOME_HEIM_T['Alexa Lichtenrade']['Senterra Alloheim'];
 function nearestRoute(heime){
   if(heime.length<=1)return heime.slice();
   var rem=heime.slice(),route=[rem.splice(0,1)[0]];

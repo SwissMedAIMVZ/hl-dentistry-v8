@@ -43,6 +43,33 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Sync Verwaltung Behandler Aufgaben data with PATIENTS
+
+**Why:** The home Heute tab (sourced from `PATIENTS` via `getTodayTasks()`) and the Verwaltung → Übersicht → Behandler Aufgaben section (sourced from the hardcoded `TASKS` array) were showing completely different people. The user wants each Behandler's tasks to be consistent across both views — same patient names, same heims.
+
+**What changed:**
+- `hl-dentistry-v9.html:2610` — `TASKS` array rewritten. All 16 entries now reference real `PATIENTS` records (Müller, Wagner, Braun, Fischer, Schmidt, Hoffmann, Krämer, Lehmann) and the four home `HEIME` names (Alexa Lichtenrade, Haus am Weigandufer, Vitanas Märkisches V., Senterra Alloheim). `nextId` bumped from 15 → 17.
+  - **Behandler assignments** match each patient's `ze.bh` / `pa.behandler` field on `PATIENTS`:
+    - `hFeld` (Dr. Feld) → Müller, Wagner, Braun, Fischer → 3 offen + 2 erledigt today, 2 next week
+    - `hHess` (Dr. Hess) → Schmidt, Hoffmann → 2 offen + 1 erledigt today, 1 next week
+    - `hGomez` (Dr. Gomez) → Krämer, Lehmann → 2 offen + 1 erledigt today, 2 next week
+  - **All current-week dates** are now `fmtShort(dt(0))` (= today) so erledigt rows actually show up in the v2 filter (the v2 bhSection filter is `t.date===todayStr && t.status===f` — the old data had erledigt rows dated to past days, so they were silently hidden).
+  - **Behandlung labels** were picked to match each patient's clinical state (ZE-Eingliederung for mid-state ZE, HKP-Einreichung for expired HKP, Extraktion for `tx.includes('notfall')`, ZE-Befund for early ZE, UPT-Sitzung for next-week PA patients, etc.).
+- `hl-dentistry-v9.html:2605` — `heimAddr()` now falls back to the home `HEIME` array's `.addr` field when `PFLEGEHEIME` doesn't have the heim. That's because two of the four home heim names ("Vitanas Märkisches V." and "Senterra Alloheim") don't exist in `PFLEGEHEIME`, so the v2 route box would otherwise render without an address for those stops. The fallback returns short neighborhood strings like "Berlin Prenzlberg".
+- `hl-dentistry-v9.html:2838` — `HEIM_T` extended at runtime with entries for the three home heim names (Haus am Weigandufer, Vitanas Märkisches V., Senterra Alloheim) copied from `HOME_HEIM_T`, plus cross-distances added to the existing `Alexa Lichtenrade` row. This is done additively (`HEIM_T['Alexa Lichtenrade']['Haus am Weigandufer']=...`) so the original Verwaltung heim keys (Haus am Waldsee, Vitanas Lankwitz, Senterra Tempelhof) remain untouched — they're still referenced by `EXISTING_PATIENTS`, `OFFEN_PAT`, and other admin arrays (see line 2566+), which we did not change.
+
+**Design invariants preserved:**
+- `bhSection()`, `taskCard()`, `renderMeineAufgaben()`, `renderRouteHeims()`, the Übersicht / Nächste Woche tab switching, and the Verwaltung create-task / reassign flows are all unchanged structurally. They just operate on a different `TASKS` list.
+- Home Heute tab (`getTodayTasks()` from `PATIENTS`) is unchanged. Home Nächste Woche tab (`TASKS.filter(bh===bId&&week==='next')`) now shows synced patient names — Dr. Feld sees Müller and Braun instead of Wolf and Lorenz.
+- `EXISTING_PATIENTS`, `OFFEN_PAT`, `ZE_PIPELINE_PATIENTS`, `EINV_PATIENTS`, etc. are untouched. Those flows (ZE pipeline, Einverständnis, etc.) still use their own demo names because the user only asked about Behandler Aufgaben.
+
+**Follow-ups:**
+- If the user also wants the ZE pipeline, Einverständnis, Medikamente, and other admin arrays to reference real `PATIENTS`, that's a separate pass (would touch `EXISTING_PATIENTS`, `ZE_PIPELINE_PATIENTS`, `EINV_PATIENTS`, `MEDIKAMENTE_PATIENTS`, `PROTH_PATIENTS`, `ARCHIV_PATIENTS`, `NEXT_APPTS`, `PROTHESEN_IN_ARBEIT`). Ask before touching.
+- If the home Heute tab should ALSO be scoped by `S.user.bId` (so Dr. Feld only sees his 3 patients, not all 8), say the word — one-line filter in `renderHome()`.
+- Home Nächste Woche empty-state text ("Keine Behandler-Zuordnung…") still applies for verwaltung / ceo / laborant users who somehow land on home.
+
+---
+
 ### 2026-04-10 — Vorgeschlagene Route on Heute tab
 
 **Why:** User wants the same "suggested route" feature that lives in Verwaltung → Behandler Aufgaben to appear on the Heute tab, scoped to today's tasks for the logged-in user.
