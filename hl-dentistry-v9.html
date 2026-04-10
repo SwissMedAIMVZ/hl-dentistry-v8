@@ -3613,17 +3613,17 @@ function renderBehandler_2(){
 }
 
 /* === ADD BEHANDLER MODAL === */
-function openAddBehandler(){S.showAddBehandler=true;S.addBehandlerForm={name:'',email:'',role:'behandler'};render()}
+function openAddBehandler(){S.showAddBehandler=true;S.addBehandlerForm={email:'',name:'',pw:''};render()}
 function closeAddBehandler(){S.showAddBehandler=false;render()}
 function saveAddBehandler(){
   var f=S.addBehandlerForm||{};
-  var nameEl=document.getElementById('abName');
   var emailEl=document.getElementById('abEmail');
-  var roleEl=document.getElementById('abRole');
-  var name=(nameEl?nameEl.value:f.name||'').trim();
+  var nameEl=document.getElementById('abName');
+  var pwEl=document.getElementById('abPw');
   var email=(emailEl?emailEl.value:f.email||'').trim().toLowerCase();
-  var role=(roleEl?roleEl.value:f.role)||'behandler';
-  if(!name||!email){showToast('Name und E-Mail erforderlich','var(--crimson)');return}
+  var name=(nameEl?nameEl.value:f.name||'').trim();
+  var pw=(pwEl?pwEl.value:f.pw||'');
+  if(!email||!name||!pw){showToast('E-Mail, Name und Passwort sind Pflichtfelder','var(--crimson)');return}
   if(USERS.find(function(u){return u.email===email})){showToast('E-Mail bereits vergeben','var(--crimson)');return}
   /* Derive a stable bId from the last word of the name, avoiding collisions */
   var parts=name.split(/\s+/);
@@ -3631,32 +3631,27 @@ function saveAddBehandler(){
   var base='h'+last.charAt(0).toUpperCase()+last.slice(1).toLowerCase();
   var bId=base,i=1;
   while(BEHANDLER.find(function(b){return b.id===bId})){bId=base+i;i++}
-  if(role==='behandler'){
-    BEHANDLER.push({id:bId,name:name,cases:0,avgDays:0,done:0});
-  }
-  USERS.push({email:email,pw:'demo',name:name,role:role,bId:role==='behandler'?bId:undefined});
+  BEHANDLER.push({id:bId,name:name,cases:0,avgDays:0,done:0});
+  USERS.push({email:email,pw:pw,name:name,role:'behandler',bId:bId});
   S.showAddBehandler=false;
   showToast(name+' hinzugef\u00fcgt','var(--emerald)');
 }
 function renderAddBehandlerModal(){
   if(!S.showAddBehandler)return'';
-  var f=S.addBehandlerForm||{name:'',email:'',role:'behandler'};
+  var f=S.addBehandlerForm||{email:'',name:'',pw:''};
   return '<div class="overlay-bg" onclick="closeAddBehandler()">'
     +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
       +'<div class="overlay-header">'
         +'<div class="overlay-title">Behandler hinzuf\u00fcgen</div>'
         +'<button class="overlay-close" onclick="closeAddBehandler()">\u00d7</button>'
       +'</div>'
-      +'<label class="form-label">Name</label>'
-      +'<input type="text" class="form-input" id="abName" placeholder="Dr. Max Mustermann" value="'+(f.name||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.name=this.value">'
-      +'<label class="form-label">E-Mail</label>'
-      +'<input type="email" class="form-input" id="abEmail" placeholder="name@swissmedai.com" value="'+(f.email||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.email=this.value">'
-      +'<label class="form-label">Rolle</label>'
-      +'<select class="form-select" id="abRole" onchange="S.addBehandlerForm.role=this.value">'
-        +'<option value="behandler"'+(f.role==='behandler'?' selected':'')+'>Behandler</option>'
-        +'<option value="verwaltung"'+(f.role==='verwaltung'?' selected':'')+'>Verwaltung</option>'
-        +'<option value="laborant"'+(f.role==='laborant'?' selected':'')+'>Laborant</option>'
-      +'</select>'
+      +'<label class="form-label">E-Mail-Adresse <span style="color:var(--crimson)">*</span></label>'
+      +'<input type="email" class="form-input" id="abEmail" required placeholder="name@swissmedai.com" value="'+(f.email||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.email=this.value">'
+      +'<label class="form-label">Vollst\u00e4ndiger Name <span style="color:var(--crimson)">*</span></label>'
+      +'<input type="text" class="form-input" id="abName" required placeholder="Dr. Max Mustermann" value="'+(f.name||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.name=this.value">'
+      +'<label class="form-label">Erstes Passwort <span style="color:var(--crimson)">*</span></label>'
+      +'<input type="password" class="form-input" id="abPw" required placeholder="Initiales Passwort" value="'+(f.pw||'').replace(/"/g,'&quot;')+'" oninput="S.addBehandlerForm.pw=this.value">'
+      +'<div style="font-size:10px;color:var(--text-3);margin-top:6px">Alle Felder sind Pflichtfelder.</div>'
       +'<button class="save-btn" onclick="saveAddBehandler()">Hinzuf\u00fcgen</button>'
     +'</div>'
   +'</div>';

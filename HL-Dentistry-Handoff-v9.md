@@ -56,6 +56,31 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Add-Behandler modal: email / full name / first password, all mandatory
+
+**Why:** User wants the add modal to collect a real initial password (not use the hardcoded `'demo'`) and to drop the role picker. All three inputs are required.
+
+**What changed:**
+- `hl-dentistry-v9.html:3636` — `openAddBehandler()` now seeds `S.addBehandlerForm = {email:'', name:'', pw:''}` (no role field).
+- `hl-dentistry-v9.html:3640` — `saveAddBehandler()` updated:
+  - Reads three DOM values: `#abEmail`, `#abName`, `#abPw`
+  - Validation now requires all three to be non-empty (single toast "E-Mail, Name und Passwort sind Pflichtfelder" on failure)
+  - Duplicate email check kept
+  - Role is hard-coded to `'behandler'` since this modal lives on the Behandler tab — a new `BEHANDLER` entry is always pushed, and the `USERS` record uses the user-supplied password instead of `'demo'`
+- `hl-dentistry-v9.html:3662` — `renderAddBehandlerModal()` rebuilt:
+  - Field order matches the request: **E-Mail-Adresse → Vollständiger Name → Erstes Passwort**
+  - Each label has a red `*` asterisk and the inputs carry the native `required` attribute
+  - Password field uses `type="password"` so the value is masked while typing
+  - Small hint "Alle Felder sind Pflichtfelder." under the last field for clarity
+  - Role dropdown removed entirely
+- No state-init changes needed — `S.addBehandlerForm` / `S.showAddBehandler` are still lazy-initialised.
+
+**Follow-ups:**
+- The password is stored in plain text inside the `USERS` array, same as the existing demo accounts. That's fine for a mockup. A real build would hash it.
+- No "confirm password" second field. Say the word if you want me to add one.
+
+---
+
 ### 2026-04-10 — Simplify Behandler cards to name + email + role only
 
 **What changed:**
