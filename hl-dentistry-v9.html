@@ -2836,9 +2836,43 @@ function toggleOdoPlanned(){S.odoShowPlanned=!S.odoShowPlanned;render()}
 function togglePatNotes(){S.patNotesEdit=false;S.patNotesExpand=!S.patNotesExpand;render()}
 function savePatNotes(){var ta=document.getElementById('patNotesTA');var p=PATIENTS.find(function(x){return x.id===S.patId});if(p&&ta){p.notes=ta.value}S.patNotesEdit=false;render()}
 
+/* ===== VIEW MODE SELECTOR (testing) ===== */
+S._forceView=null; /* null=auto, 'desktop', 'mobile' */
+function showViewPicker(){
+  var el=document.createElement('div');
+  el.id='viewPicker';
+  el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
+  el.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 36px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;max-width:340px;width:90%">'
+    +'<div style="font-size:18px;font-weight:800;color:#082A99;margin-bottom:6px">HL-Dentistry v9</div>'
+    +'<div style="font-size:12px;color:#64748B;margin-bottom:24px">Welche Ansicht m\u00f6chten Sie testen?</div>'
+    +'<div style="display:flex;gap:12px">'
+      +'<button onclick="pickView(\'desktop\')" style="flex:1;padding:16px 12px;background:linear-gradient(135deg,#082A99,#3D66FE);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(8,42,153,0.3)">'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
+        +'Desktop</button>'
+      +'<button onclick="pickView(\'mobile\')" style="flex:1;padding:16px 12px;background:#F8FAFC;color:#082A99;border:2px solid #E2E8F0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
+        +'Mobile</button>'
+    +'</div>'
+  +'</div>';
+  document.body.appendChild(el);
+}
+function pickView(mode){
+  S._forceView=mode;
+  var picker=document.getElementById('viewPicker');
+  if(picker)picker.remove();
+  render();
+}
+/* Override isDesktop to respect the forced view */
+var _origIsDesktop=isDesktop;
+isDesktop=function(){
+  if(S._forceView==='desktop')return true;
+  if(S._forceView==='mobile')return false;
+  return _origIsDesktop();
+};
+showViewPicker();
 render();
-/* Re-render on resize so phone↔desktop switches live */
-window.addEventListener('resize',(function(){var t;return function(){clearTimeout(t);t=setTimeout(render,200)}})());
+/* Re-render on resize so phone↔desktop switches live (only in auto mode) */
+window.addEventListener('resize',(function(){var t;return function(){clearTimeout(t);t=setTimeout(function(){if(!S._forceView)render()},200)}})());
 
 /* ============================================================
    ADMIN PORTAL v3 — Integrated into v8
