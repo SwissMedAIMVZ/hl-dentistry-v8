@@ -2533,6 +2533,10 @@ function renderDesktop(){
     h+='<div class="dk-verw-content" style="position:relative">'+renderBehandler_2()+'</div>';
   } else if(page==='wochenplan'){
     h+='<div class="dk-verw-content" style="position:relative">'+renderHome()+'</div>';
+  } else if(page==='nachrichten'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderMessages()+'</div>';
+  } else if(page==='suche'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderSearch()+'</div>';
   } else {
     h+=renderDesktopPlaceholder(page);
   }

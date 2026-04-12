@@ -45,6 +45,27 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Port Nachrichten + Suche into desktop version
+
+**Why:** Both pages were still showing the placeholder in desktop mode. All 7 sidebar sections are now ported.
+
+**What changed:**
+- `hl-dentistry-v10.html:2537` — desktop dispatcher routes `page==='nachrichten'` to `renderMessages()` and `page==='suche'` to `renderSearch()`, both wrapped in `dk-verw-content` (hides mobile header + bottom-nav via CSS). No new code — same reuse pattern as Labor/Behandler/Wochenplan.
+
+**Desktop pages — all 7 ported:**
+
+| Sidebar item | Content |
+|---|---|
+| Wochenplan | renderHome (Heute/Nächste Woche tabs) |
+| Management (5 sub-tabs) | renderDesktopManagerBody (custom 2-col layout) |
+| Verwaltung (5 sub-pages) | renderDesktopVerwaltungBody (mobile renderers) |
+| Behandler | renderBehandler_2 |
+| Labor (4 sub-items) | renderLab |
+| Nachrichten | renderMessages (inbox + compose) |
+| Suche | renderSearch (patient search) |
+
+---
+
 ### 2026-04-12 — Initialize v10 from v9
 
 **Why:** Start a fresh iteration cycle. v9 is frozen as a reference.
