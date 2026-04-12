@@ -2363,7 +2363,7 @@ function renderDesktopSidebar(){
   var gridIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>';
   var usersIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
   /* Dropdown groups — toggled open/closed via S.dkOpen */
-  if(!S.dkOpen)S.dkOpen={manager:true,verwaltung:true,labor:true};
+  if(!S.dkOpen)S.dkOpen={wochenplan:true,manager:true,verwaltung:true,labor:true};
   var chevDown='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="flex-shrink:0;margin-left:auto;opacity:0.5;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>';
   var chevUp='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="flex-shrink:0;margin-left:auto;opacity:0.5;transition:transform .2s"><polyline points="18 15 12 9 6 15"/></svg>';
   var isMgrOpen=S.dkOpen.manager;
@@ -2373,8 +2373,15 @@ function renderDesktopSidebar(){
     +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry</div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
     +'<div class="dk-sidebar-nav">';
 
-  /* Wochenplan */
-  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopPage(\'wochenplan\')">'+calIcon+'<span>Wochenplan</span></button>';
+  /* Wochenplan dropdown */
+  var isWochOpen=S.dkOpen.wochenplan;
+  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="toggleDkGroup(\'wochenplan\')" style="padding-right:10px">'+calIcon+'<span>Wochenplan</span>'+(isWochOpen?chevUp:chevDown)+'</button>';
+  if(isWochOpen){
+    [{t:'heute',l:'Heute'},{t:'woche',l:'N\u00e4chste Woche'}].forEach(function(it){
+      var active=(S.dkPage==='wochenplan'&&S.homeTab===it.t)?'active':'';
+      h+='<button class="dk-nav-item '+active+'" style="padding-left:44px;font-size:12px" onclick="goDesktopHomeTab(\''+it.t+'\')"><span>'+it.l+'</span></button>';
+    });
+  }
 
   /* Management dropdown */
   h+='<button class="dk-nav-item '+(S.dkPage==='manager'?'active':'')+'" onclick="toggleDkGroup(\'manager\')" style="padding-right:10px">'+ICO.chart+'<span>Management</span>'+(isMgrOpen?chevUp:chevDown)+'</button>';
@@ -2491,6 +2498,7 @@ function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
 function goDesktopMgrTab(t){S.dkPage='manager';S.adminMode=false;S.screen='manager';S.mgrTab=t;render()}
 function goDesktopLabFilter(f){S.dkPage='labor';S.adminMode=false;S.screen='lab';S.labFilter=f;render()}
+function goDesktopHomeTab(t){S.dkPage='wochenplan';S.adminMode=false;S.screen='home';S.homeTab=t;render()}
 function renderDesktopVerwaltungBody(){
   var pg=S.adminPage_2||'uebersicht';
   /* Render content directly — no internal sub-nav; navigation is in the sidebar */
@@ -2530,6 +2538,8 @@ function renderDesktop(){
     h+='<div class="dk-verw-content" style="position:relative">'+renderLab()+'</div>';
   } else if(page==='behandler'){
     h+='<div class="dk-verw-content" style="position:relative">'+renderBehandler_2()+'</div>';
+  } else if(page==='wochenplan'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderHome()+'</div>';
   } else {
     h+=renderDesktopPlaceholder(page);
   }

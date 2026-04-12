@@ -56,6 +56,40 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: Wochenplan with dropdown sub-items (increment 5)
+
+**Why:** Port the Wochenplan (home) screen into the desktop layout with Heute / Nächste Woche as sidebar dropdown sub-items.
+
+**What changed:**
+- `hl-dentistry-v9.html:2376` — Wochenplan sidebar item converted from a flat button to a collapsible dropdown (same pattern as Management / Verwaltung / Labor). Two sub-items: **Heute** (`S.homeTab='heute'`) and **Nächste Woche** (`S.homeTab='woche'`). Toggled via `S.dkOpen.wochenplan` (defaults open).
+- `hl-dentistry-v9.html:2492` — new `goDesktopHomeTab(t)` helper sets `S.dkPage='wochenplan'`, `S.homeTab=t`, `S.screen='home'`, `S.adminMode=false` and renders.
+- `hl-dentistry-v9.html:2530` — desktop dispatcher routes `page==='wochenplan'` to `renderHome()` wrapped in `dk-verw-content`. The mobile header and bottom-nav are hidden via the existing CSS overrides; the Heute/Nächste Woche tab bar, summary card, Meine Aufgaben filter, task cards, Vorgeschlagene Route, and Heime section all render in the desktop content area.
+
+**Sidebar layout (Wochenplan expanded):**
+```
+📅 Wochenplan          ▲
+     Heute
+     Nächste Woche
+📊 Management          ▲
+     ...
+```
+
+Clicking **Heute** navigates to the Wochenplan with today's tasks; clicking **Nächste Woche** shows the upcoming week tasks for the logged-in behandler.
+
+**Desktop pages now ported: 6 of 7:**
+
+| Sidebar item | Status |
+|---|---|
+| **Wochenplan** (2 sub-items) | **ported** |
+| Management (5 sub-items) | **ported** |
+| Verwaltung (5 sub-items) | **ported** |
+| Behandler | **ported** |
+| Labor (4 sub-items) | **ported** |
+| Nachrichten | placeholder |
+| Suche | placeholder |
+
+---
+
 ### 2026-04-10 — Desktop: collapsible dropdowns for Management + Verwaltung sub-pages
 
 **Why:** User wants Management's sub-tabs (Übersicht, Behandler, Heime, Planung, Fälle) and Verwaltung's sub-pages (Übersicht, Einverständnis, Archiv, Abrechnung, Pflegeheime) exposed as collapsible dropdowns in the sidebar.
