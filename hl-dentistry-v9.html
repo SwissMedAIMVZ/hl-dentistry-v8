@@ -437,7 +437,41 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
 /* ===== RESPONSIVE DESKTOP ===== */
 @media(min-width:900px){
   body{padding:0;background:var(--surface)}
-  .phone.desktop-mode{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:1200px;margin:0 auto}
+  .phone.desktop-mode{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;flex-direction:row;overflow:hidden}
+  /* Sidebar */
+  .dk-sidebar{width:240px;min-width:240px;height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#041347 100%);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+  .dk-sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:12px}
+  .dk-sidebar-logo svg{width:32px;height:32px;color:#fff}
+  .dk-sidebar-logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px}
+  .dk-sidebar-logo-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
+  .dk-sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+  .dk-nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--r-md);font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+  .dk-nav-item:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9)}
+  .dk-nav-item.active{background:rgba(255,255,255,0.12);color:#fff}
+  .dk-nav-item svg{width:18px;height:18px;flex-shrink:0}
+  .dk-nav-divider{height:1px;background:rgba(255,255,255,0.08);margin:10px 14px}
+  .dk-sidebar-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+  .dk-sidebar-user-avatar{width:34px;height:34px;border-radius:var(--r-full);background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+  .dk-sidebar-user-info{flex:1;min-width:0}
+  .dk-sidebar-user-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dk-sidebar-user-role{font-size:10px;color:rgba(255,255,255,0.5);margin-top:1px}
+  /* Main area */
+  .dk-main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--surface)}
+  .dk-topbar{padding:18px 32px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .dk-topbar h1{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+  .dk-topbar-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+  .dk-body{flex:1;overflow-y:auto;padding:24px 32px;min-height:0}
+  /* Desktop stat cards — 4 across */
+  .dk-body .mgr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .dk-body .mgr-stat{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-card)}
+  .dk-body .mgr-section{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh-card);margin-bottom:20px}
+  .dk-body .mgr-section-title{font-size:14px;margin-bottom:16px}
+  .dk-body .card{box-shadow:none;border:1px solid var(--border)}
+  /* Desktop tabs — inline pills */
+  .dk-tabs{display:flex;gap:6px;padding:0 32px 0;background:var(--white);border-bottom:1px solid var(--border);flex-shrink:0}
+  .dk-tabs button{padding:10px 18px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-family:inherit;position:relative;transition:color .2s}
+  .dk-tabs button.active{color:var(--navy)}
+  .dk-tabs button.active::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:2.5px;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:2px}
 }
 
 /* ===== SCROLLBAR ===== */
@@ -2307,9 +2341,110 @@ function renderF174List(p){
   return h;
 }
 
+/* ===== DESKTOP MODE ===== */
+function isDesktop(){return window.innerWidth>=900}
+function renderDesktopSidebar(){
+  var u=S.user||{name:'',role:''};
+  var initials=u.name?u.name.split(' ').map(function(p){return p[0]}).join('').slice(0,2).toUpperCase():'';
+  var items=[
+    {id:'manager',icon:ICO.chart,label:'Dashboard'},
+    {id:'_div_'},
+    {id:'wochenplan',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',label:'Wochenplan'},
+    {id:'verwaltung',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',label:'Verwaltung'}
+  ];
+  var h='<div class="dk-sidebar">'
+    +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry</div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
+    +'<div class="dk-sidebar-nav">';
+  items.forEach(function(it){
+    if(it.id==='_div_'){h+='<div class="dk-nav-divider"></div>';return}
+    var active=S.dkPage===it.id?'active':'';
+    h+='<button class="dk-nav-item '+active+'" onclick="goDesktopPage(\''+it.id+'\')">'+it.icon+'<span>'+it.label+'</span></button>';
+  });
+  h+='</div>'
+    +'<div class="dk-sidebar-user">'
+      +'<div class="dk-sidebar-user-avatar">'+initials+'</div>'
+      +'<div class="dk-sidebar-user-info"><div class="dk-sidebar-user-name">'+u.name+'</div><div class="dk-sidebar-user-role">'+roleLabel(u.role)+'</div></div>'
+    +'</div>'
+  +'</div>';
+  return h;
+}
+function renderDesktopManagerBody(){
+  var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
+  /* Tabs */
+  var h='<div class="dk-tabs">';
+  ["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="'+(tab===t?"active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
+  h+='</div>';
+  /* Scrollable body */
+  h+='<div class="dk-body">';
+  if(tab==="\u00dcbersicht"){
+    h+='<div class="mgr-stats"><div class="mgr-stat"><div class="num" style="color:var(--navy)">'+totalPat+'</div><div class="label">Patienten</div><div class="trend trend-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> +12 Monat</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--violet)">'+zeC+'</div><div class="label">Aktive ZE</div><div class="trend trend-flat">Pipeline aktiv</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--emerald)">'+paC+'</div><div class="label">Aktive PA</div><div class="trend trend-up">+3 Woche</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--crimson)">'+expC+'</div><div class="label">HKP Abgelaufen</div><div class="trend trend-down">Sofort handeln</div></div></div>';
+    /* Two-column grid for sections */
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';
+    /* Left: ZE Pipeline + Dringende Fälle */
+    h+='<div>';
+    h+='<div class="mgr-section"><div class="mgr-section-title">ZE Pipeline</div><div class="bar-chart">';
+    var mx=0;ZE_STATES.forEach(function(s,i){var c=PATIENTS.filter(function(p){return p.ze&&p.ze.st===i}).length;if(c>mx)mx=c});
+    ZE_STATES.forEach(function(s,i){var c=PATIENTS.filter(function(p){return p.ze&&p.ze.st===i}).length;var bh=mx>0?Math.max(4,Math.round(c/mx*80)):4;var cl=i<=3?"var(--blue)":i<=7?"var(--navy)":"var(--emerald)";h+='<div class="bar-wrap"><div class="bar-val">'+c+'</div><div class="bar" style="height:'+bh+'px;background:'+cl+'"></div><div class="bar-label">'+s.substring(0,5)+'</div></div>'});
+    h+='</div></div>';
+    h+='<div class="mgr-section"><div class="mgr-section-title">Dringende F\u00e4lle</div>';
+    var uc=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).slice(0,4);
+    if(uc.length===0)h+='<div style="padding:16px;text-align:center;color:var(--emerald);font-size:12px;font-weight:600">Keine dringenden F\u00e4lle</div>';
+    else uc.forEach(function(p){h+='<div class="card" onclick="mgrDrillPat('+p.id+')" style="border-left:3px solid var(--crimson)"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 HKP abgelaufen</div></div>'+badge("urgent","Dringend")+'</div></div>'});
+    h+='</div></div>';
+    /* Right: Tagesprotokoll + Behandler-Leistung */
+    h+='<div>';
+    h+='<div class="mgr-section"><div class="mgr-section-title">Tagesprotokoll \u2014 Heute</div>';
+    var todayVisits={};PATIENTS.forEach(function(p){if(p.visits){p.visits.forEach(function(v){if(N-v.date<D){var bn=bhdlName(v.behandler)||v.behandler;if(!todayVisits[bn])todayVisits[bn]={patients:{},treatments:0};todayVisits[bn].patients[p.id]=true;todayVisits[bn].treatments++}})}});
+    var bKeys=Object.keys(todayVisits);
+    if(bKeys.length>0){bKeys.forEach(function(bn){var d=todayVisits[bn];h+='<div style="padding:6px 0;border-bottom:1px solid var(--surface-2);font-size:12px"><strong style="color:var(--navy)">'+bn+'</strong>: '+Object.keys(d.patients).length+' Patienten, '+d.treatments+' Behandlungen</div>'})}
+    else{h+='<div style="font-size:12px;color:var(--text-3);text-align:center;padding:12px">Noch keine Aktivit\u00e4ten heute</div>'}
+    h+='</div>';
+    h+='<div class="mgr-section"><div class="mgr-section-title">Behandler-Leistung</div><table class="mgr-table"><thead><tr><th>Behandler</th><th>F\u00e4lle</th><th>\u00d8 Tage</th><th>Fertig</th></tr></thead><tbody>';
+    BEHANDLER.forEach(function(b){var r=Math.round(b.done/b.cases*100);h+='<tr><td style="font-weight:600">'+b.name+'</td><td>'+b.cases+'</td><td>'+b.avgDays+'</td><td>'+badge(r>60?"done":"warning",r+"%")+'</td></tr>'});
+    h+='</tbody></table></div>';
+    h+='</div></div>'; /* close 2-col grid */
+  }
+  if(tab==="Behandler"){h+='<div class="mgr-section"><div class="mgr-section-title">Behandler-\u00dcbersicht</div>';BEHANDLER.forEach(function(b){var r=Math.round(b.done/b.cases*100);h+='<div class="card" style="cursor:default"><div class="card-title">'+b.name+'</div><div class="card-sub" style="margin-top:6px">'+b.cases+' F\u00e4lle \u2014 \u00d8 '+b.avgDays+' Tage</div><div style="margin-top:10px;display:flex;align-items:center;gap:10px"><div style="flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden"><div style="width:'+r+'%;height:100%;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;color:var(--navy)">'+r+'%</span></div></div>'});h+='</div>'}
+  if(tab==="Heime"){h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="mgr-section-title" style="margin:0">Heim-\u00dcbersicht</div></div><table class="mgr-table"><thead><tr><th>Heim</th><th>Pat.</th><th>ZE</th><th>PA</th><th>Dring.</th></tr></thead><tbody>';HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});var ze=pts.filter(function(p){return p.ze}).length;var pa=pts.filter(function(p){return p.pa}).length;var ug=pts.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;h+='<tr style="cursor:pointer"><td style="font-weight:600">'+hm.name+'</td><td>'+pts.length+'</td><td>'+ze+'</td><td>'+pa+'</td><td>'+(ug>0?badge("urgent",ug):badge("done","0"))+'</td></tr>'});h+='</tbody></table></div>'}
+  if(tab==="Planung"){var days=["Mo","Di","Mi","Do","Fr"];var bIds=[{id:"hFeld",name:"Dr. Feld"},{id:"hHess",name:"Dr. Hess"},{id:"hGomez",name:"Dr. Gomez"}];h+='<div class="mgr-section"><div class="mgr-section-title">Wochenplan</div><table class="mgr-table"><thead><tr><th>Behandler</th>';days.forEach(function(d){h+='<th>'+d+'</th>'});h+='</tr></thead><tbody>';bIds.forEach(function(b){h+='<tr><td style="font-weight:600">'+b.name+'</td>';days.forEach(function(d,di){var val=SCHEDULE[b.id]?SCHEDULE[b.id][di]||"":"";var isEditing=S.scheduleEdit&&S.scheduleEdit.bId===b.id&&S.scheduleEdit.day===di;if(isEditing){h+='<td style="padding:2px"><select id="schedSel" style="width:100%;font-size:11px;padding:4px;border:1.5px solid var(--blue);border-radius:4px;font-family:inherit;background:var(--blue-25)" onchange="scheduleSave(\''+b.id+'\','+di+')"><option value="">\u2014</option>';HEIME.forEach(function(hm){h+='<option value="'+hm.name+'"'+(val===hm.name?' selected':'')+'>'+hm.name+'</option>'});h+='</select></td>'}else{h+='<td style="cursor:pointer;'+(val?'color:var(--navy);font-weight:600':'color:var(--text-4)')+'" onclick="scheduleEdit(\''+b.id+'\','+di+')">'+(val||'\u2014')+'</td>'}});h+='</tr>'});h+='</tbody></table></div>'}
+  if(tab==="F\u00e4lle"){h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';h+='<div class="mgr-section"><div class="mgr-section-title">Alle ZE-F\u00e4lle ('+zeC+')</div>';PATIENTS.filter(function(p){return p.ze}).sort(function(a,b){var ua=urg(a.ze.exp)==="expired"?0:1;var ub=urg(b.ze.exp)==="expired"?0:1;return ua-ub}).forEach(function(p){var u2=urg(p.ze.exp);h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+bhdlName(p.ze.bh)+'</div></div>'+badge(u2==="expired"?"urgent":u2==="urgent"?"warning":"active",ZE_STATES[p.ze.st])+'</div></div>'});h+='</div>';h+='<div class="mgr-section"><div class="mgr-section-title">Alle PA-F\u00e4lle ('+paC+')</div>';PATIENTS.filter(function(p){return p.pa}).forEach(function(p){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(!ps)return;h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+ps.label+'</div></div>'+badge("purple",ps.label)+'</div></div>'});h+='</div></div>'}
+  h+='</div>';
+  return h;
+}
+function goDesktopPage(id){
+  S.showMenu_2=false;
+  if(id==='manager'){S.dkPage='manager';S.adminMode=false;S.screen='manager'}
+  else if(id==='wochenplan'){S.dkPage='wochenplan';S.adminMode=false;S.screen='home'}
+  else if(id==='verwaltung'){S.dkPage='verwaltung';S.adminMode=true;S.adminPage_2='uebersicht'}
+  render();
+}
+function renderDesktop(){
+  var app=document.getElementById("app");
+  app.className='phone desktop-mode';
+  if(!S.dkPage)S.dkPage='manager';
+  var h=renderDesktopSidebar();
+  h+='<div class="dk-main">';
+  /* Top bar */
+  var pageTitle=S.dkPage==='manager'?'Management Dashboard':S.dkPage==='wochenplan'?'Wochenplan':'Verwaltung';
+  var u=S.user||{name:'',role:''};
+  h+='<div class="dk-topbar"><div><h1>'+pageTitle+'</h1><div class="dk-topbar-sub">'+u.name+' \u2014 '+roleLabel(u.role)+'</div></div></div>';
+  if(S.dkPage==='manager'){
+    h+=renderDesktopManagerBody();
+  }
+  h+='</div>'; /* close dk-main */
+  /* Toast */
+  if(S.toast)h+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
+  app.innerHTML=h;
+}
+
 function render(){
+  if(S.screen!=="login"&&isDesktop()){renderDesktop();return}
   if(S.adminMode){renderAdminPortal_2();return;}
   var app=document.getElementById("app"),html="";
+  app.className='phone';
   if(S.screen==="login"){app.innerHTML=renderLogin();return}
   if(S.screen==="manager")html=renderManager();
   else if(S.screen==="lab")html=renderLab();
@@ -2655,6 +2790,8 @@ function togglePatNotes(){S.patNotesEdit=false;S.patNotesExpand=!S.patNotesExpan
 function savePatNotes(){var ta=document.getElementById('patNotesTA');var p=PATIENTS.find(function(x){return x.id===S.patId});if(p&&ta){p.notes=ta.value}S.patNotesEdit=false;render()}
 
 render();
+/* Re-render on resize so phone↔desktop switches live */
+window.addEventListener('resize',(function(){var t;return function(){clearTimeout(t);t=setTimeout(render,200)}})());
 
 /* ============================================================
    ADMIN PORTAL v3 — Integrated into v8

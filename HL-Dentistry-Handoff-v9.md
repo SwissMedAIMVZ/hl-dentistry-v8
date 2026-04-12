@@ -56,6 +56,56 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop version: Management Dashboard (increment 1)
+
+**Why:** User requested a desktop version of the app, starting with the Management Dashboard. This is the first increment — additional screens (Wochenplan, Verwaltung) will be ported in later passes.
+
+**Architecture overview:**
+
+The desktop layout is a **sidebar + main** pattern that activates automatically at `min-width:900px`. Below that breakpoint the original phone mockup renders unchanged. There is NO separate file — everything lives in `hl-dentistry-v9.html`, switched by `isDesktop()` at render time.
+
+**How it works:**
+- `isDesktop()` (line ~2344) returns `window.innerWidth >= 900`.
+- In `render()`, the first check (before adminMode and before the phone branch) is `if(S.screen!=="login" && isDesktop()){renderDesktop();return}`. Login always renders in the phone frame, even on desktop.
+- `renderDesktop()` sets `app.className='phone desktop-mode'` on the `#app` div, which triggers the `@media(min-width:900px)` CSS overrides: full viewport width, no border-radius, horizontal flexbox instead of vertical.
+- Inside, it builds two columns:
+  1. **`.dk-sidebar`** (240 px, dark navy gradient, persistent) — logo, nav items, user profile at the bottom. Nav items are `goDesktopPage('manager'|'wochenplan'|'verwaltung')` which sets `S.dkPage`, the appropriate `S.screen`/`S.adminMode`, and re-renders.
+  2. **`.dk-main`** (flex:1) — top bar + page body. For `S.dkPage==='manager'`, the body is produced by the new `renderDesktopManagerBody()` function.
+- `renderDesktopManagerBody()` is a **desktop-optimised rebuild** of the mobile `renderManager()`, not a wrapper. Key differences:
+  - 4-column stat grid (vs. 2×2 stacked on mobile) via `.dk-body .mgr-stats { grid-template-columns: repeat(4,1fr) }`
+  - 2-column grid for the Übersicht sections: left column = ZE Pipeline + Dringende Fälle; right column = Tagesprotokoll + Behandler-Leistung
+  - Fälle tab splits ZE and PA into a 2-column side-by-side layout
+  - `.dk-tabs` replaces the mobile `.tabs` pill bar with underlined desktop-style tab buttons
+  - All sections sit inside `.dk-body` which scrolls independently
+  - No bottom nav — navigation is in the persistent sidebar
+  - No burger menu — not needed when the sidebar is always visible
+- A debounced `resize` event listener at init time (line ~2793) re-calls `render()` on viewport changes so the user gets **live phone↔desktop switching** when resizing the browser.
+
+**CSS layout** (`hl-dentistry-v9.html:438`):
+- `.phone.desktop-mode` → `width:100%;height:100vh;display:flex;flex-direction:row` (overrides the phone's column flex)
+- `.dk-sidebar` → 240 px fixed-width column, navy gradient, overflow:hidden
+- `.dk-main` → flex:1, column flex, overflow:hidden
+- `.dk-body` → flex:1, overflow-y:auto, padding:24px 32px, **min-height:0** inherited from `.content`
+- Desktop-specific overrides for `.mgr-stats`, `.mgr-stat`, `.mgr-section`, `.card` lift the content out of the phone's compact styling into a spacious desktop grid
+
+**State model:**
+- `S.dkPage` — `'manager'|'wochenplan'|'verwaltung'` — tracks which sidebar item is active. Defaults to `'manager'` on first desktop render.
+- Sidebar navigation calls `goDesktopPage(id)` which sets `S.dkPage` and the matching `S.screen`/`S.adminMode` so the mobile state stays in sync if the user resizes back to phone width.
+
+**What's NOT ported yet (next increments):**
+- Wochenplan (home) desktop body — the sidebar item exists and sets state, but `renderDesktop()` only renders the Dashboard body right now. Wochenplan will need its own `renderDesktopWochenplanBody()`.
+- Verwaltung desktop body — same, sidebar item exists but needs its own renderer.
+- Lab, Messages, Search, Patient detail — no sidebar items yet.
+- Overlays (add-task, reschedule, add-behandler, edit-behandler, odontogram zoom) are not shown in desktop mode yet.
+- Login screen always renders in phone frame — a desktop login form could be a later pass.
+
+**Follow-ups:**
+- The sidebar nav currently has 3 items (Dashboard, Wochenplan, Verwaltung). When we port more screens, add matching nav items.
+- If you want the sidebar to collapse on medium screens (900–1100 px) to icons-only, that's a CSS-only change on `.dk-sidebar` width + hiding label spans.
+- The resize listener debounces at 200 ms. If the switch feels slow, reduce to 100 ms.
+
+---
+
 ### 2026-04-10 — Behandler add button → floating "+" FAB
 
 **Why:** User wants the add button out of the card list header. The list can grow, so a fixed lower-right "+" FAB is the cleanest solution — always visible, doesn't crowd the list, standard mobile pattern.
