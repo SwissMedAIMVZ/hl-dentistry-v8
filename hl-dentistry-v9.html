@@ -2449,7 +2449,6 @@ function renderDesktopPlaceholder(page){
 }
 function renderDesktop(){
   var app=document.getElementById("app");
-  app.className='phone desktop-mode';
   if(!S.dkPage)S.dkPage=dkDefaultPage();
   var page=S.dkPage;
   var h=renderDesktopSidebar();
@@ -2468,11 +2467,31 @@ function renderDesktop(){
   app.innerHTML=h;
 }
 
+function syncDkPageFromMobile(){
+  /* When switching from mobile → desktop, derive S.dkPage from the current mobile state */
+  if(S.adminMode){
+    var pg=S.adminPage_2||'uebersicht';
+    if(pg==='uebersicht')S.dkPage='verwaltung';
+    else if(pg==='behandler')S.dkPage='behandler';
+    else S.dkPage='verwaltung';
+  } else if(S.screen==='manager')S.dkPage='manager';
+  else if(S.screen==='home')S.dkPage='wochenplan';
+  else if(S.screen==='lab')S.dkPage='labor';
+  else if(S.screen==='messages')S.dkPage='nachrichten';
+  else if(S.screen==='search')S.dkPage='suche';
+}
 function render(){
-  if(S.screen!=="login"&&isDesktop()){renderDesktop();return}
-  if(S.adminMode){renderAdminPortal_2();return;}
-  var app=document.getElementById("app"),html="";
+  var app=document.getElementById("app");
+  /* Desktop auto-switch (not on login) */
+  if(S.screen!=="login"&&isDesktop()){
+    if(!S.dkPage)syncDkPageFromMobile();
+    app.className='phone desktop-mode';
+    renderDesktop();return
+  }
+  /* Mobile — always reset desktop class */
   app.className='phone';
+  if(S.adminMode){renderAdminPortal_2();return;}
+  var html="";
   if(S.screen==="login"){app.innerHTML=renderLogin();return}
   if(S.screen==="manager")html=renderManager();
   else if(S.screen==="lab")html=renderLab();
@@ -4721,6 +4740,7 @@ function renderPflegeheime(){
 /* ===== renderAdminPortal_2 — Admin Portal Main Dispatcher ===== */
 function renderAdminPortal_2(){
   var app=document.getElementById('app');
+  app.className='phone';
   var page=S.adminPage_2||'uebersicht';
   var html='';
   if(page==='uebersicht') html=renderHome_2();
