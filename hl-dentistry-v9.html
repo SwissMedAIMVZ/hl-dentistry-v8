@@ -472,6 +472,25 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
   .dk-tabs button{padding:10px 18px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-family:inherit;position:relative;transition:color .2s}
   .dk-tabs button.active{color:var(--navy)}
   .dk-tabs button.active::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:2.5px;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:2px}
+  /* Verwaltung desktop: sub-nav + content panel */
+  .dk-verw-wrap{display:flex;flex:1;overflow:hidden}
+  .dk-verw-nav{width:200px;min-width:200px;background:var(--white);border-right:1px solid var(--border);padding:16px 10px;overflow-y:auto;flex-shrink:0}
+  .dk-verw-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-md);font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:inherit;transition:all .15s}
+  .dk-verw-nav-item:hover{background:var(--surface-2);color:var(--text)}
+  .dk-verw-nav-item.active{background:var(--blue-50);color:var(--navy)}
+  .dk-verw-nav-item svg{width:16px;height:16px;flex-shrink:0}
+  .dk-verw-content{flex:1;overflow-y:auto;min-height:0}
+  /* Override mobile admin styles inside desktop Verwaltung */
+  .dk-verw-content .header{display:none}
+  .dk-verw-content .bottom-nav{display:none}
+  .dk-verw-content .content{padding:20px 28px}
+  .dk-verw-content .fab{bottom:24px;right:24px;position:absolute}
+  .dk-verw-content .sec-label{margin:0 -28px 12px}
+  .dk-verw-content .filter-bar{margin:0 -28px 12px}
+  .dk-verw-content .tab-bar{border-bottom:1px solid var(--border)}
+  .dk-verw-content .lab-summary{border-bottom:1px solid var(--border)}
+  .dk-verw-content .einv-tabs{border-bottom:1px solid var(--border)}
+  .dk-verw-content .card{box-shadow:none;border:1px solid var(--border)}
 }
 
 /* ===== SCROLLBAR ===== */
@@ -2440,6 +2459,40 @@ function dkDefaultPage(){
   return'manager';
 }
 var DK_TITLES={manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
+function dkVerwPage(pg){S.adminPage_2=pg;S.adminMode=true;render()}
+function renderDesktopVerwaltungBody(){
+  var pg=S.adminPage_2||'uebersicht';
+  /* Sub-navigation items */
+  var navItems=[
+    {id:'uebersicht', icon:ICO.chart,   label:'\u00dcbersicht'},
+    {id:'labor',      icon:ICO.lab,     label:'Labor'},
+    {id:'einverstaendnis', icon:ICO.doc, label:'Einverst\u00e4ndnis'},
+    {id:'archiv',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>', label:'Archiv'},
+    {id:'abrechnung', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', label:'Abrechnung'},
+    {id:'pflegeheime',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', label:'Pflegeheime'}
+  ];
+  var h='<div class="dk-verw-wrap">';
+  /* Left sub-nav */
+  h+='<div class="dk-verw-nav">';
+  navItems.forEach(function(it){
+    var active=pg===it.id?'active':'';
+    h+='<button class="dk-verw-nav-item '+active+'" onclick="dkVerwPage(\''+it.id+'\')">'+it.icon+'<span>'+it.label+'</span></button>';
+  });
+  h+='</div>';
+  /* Right content — reuse mobile renderers, CSS hides their header + bottom-nav */
+  h+='<div class="dk-verw-content" style="position:relative">';
+  if(pg==='uebersicht') h+=renderHome_2();
+  else if(pg==='labor') h+=renderLab_2();
+  else if(pg==='einverstaendnis') h+=renderEinverstaendnis();
+  else if(pg==='archiv') h+=renderArchiv();
+  else if(pg==='abrechnung') h+=renderAbrechnung();
+  else if(pg==='zepreisliste') h+=renderZEPreisliste();
+  else if(pg==='texteditor') h+=renderTexteditor();
+  else if(pg==='pflegeheime') h+=renderPflegeheime();
+  else if(pg==='behandler') h+=renderBehandler_2();
+  h+='</div></div>';
+  return h;
+}
 function renderDesktopPlaceholder(page){
   return '<div class="dk-body"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-3)">'
     +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="color:var(--border-2);margin-bottom:16px"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>'
@@ -2458,6 +2511,8 @@ function renderDesktop(){
   h+='<div class="dk-topbar"><div><h1>'+(DK_TITLES[page]||page)+'</h1><div class="dk-topbar-sub">'+u.name+' \u2014 '+roleLabel(u.role)+'</div></div></div>';
   if(page==='manager'){
     h+=renderDesktopManagerBody();
+  } else if(page==='verwaltung'){
+    h+=renderDesktopVerwaltungBody();
   } else {
     h+=renderDesktopPlaceholder(page);
   }

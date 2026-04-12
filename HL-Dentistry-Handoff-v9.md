@@ -56,6 +56,66 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: Verwaltung section (increment 2)
+
+**Why:** User wants the full Verwaltung admin area ported to the desktop layout as the next increment.
+
+**Architecture — sub-nav + content panel:**
+The Verwaltung desktop body uses a split-pane layout inside `.dk-main`: a 200 px left sub-nav (`.dk-verw-nav`) listing 6 admin pages, and a flex:1 right content area (`.dk-verw-content`) that embeds the existing mobile renderers.
+
+```
+┌─ dk-sidebar ─┬─── dk-main ──────────────────────────────────┐
+│              │ dk-topbar: "Verwaltung"                       │
+│  Wochenplan  │┌─ dk-verw-wrap ──────────────────────────────┐│
+│  Management  ││ dk-verw-nav │ dk-verw-content               ││
+│ ►Verwaltung  ││             │                                ││
+│  Behandler   ││ ●Übersicht  │ [renderHome_2 output]         ││
+│  ─────       ││  Labor      │  (header + bottom-nav hidden   ││
+│  Labor       ││  Einverst.  │   via CSS)                     ││
+│  Nachrichten ││  Archiv     │                                ││
+│  Suche       ││  Abrechnung │                                ││
+│              ││  Pflegeheime│                                ││
+│  [user]      │└─────────────┴────────────────────────────────┘│
+└──────────────┴────────────────────────────────────────────────┘
+```
+
+**What changed:**
+- `hl-dentistry-v9.html:475` — new CSS rules inside the `@media(min-width:900px)` block:
+  - `.dk-verw-wrap` — flex row, fill available space
+  - `.dk-verw-nav` — 200 px white sidebar with border-right, scrollable
+  - `.dk-verw-nav-item` — nav buttons with icon + label, blue-50 active state
+  - `.dk-verw-content` — flex:1 scrollable content area
+  - **Overrides inside `.dk-verw-content`:** hides the mobile `.header` and `.bottom-nav` via `display:none`, adjusts `.content` padding to 20px 28px, makes `.fab` position:absolute inside the content pane, removes card shadows in favour of borders, and extends `.sec-label` / `.filter-bar` / `.tab-bar` / `.einv-tabs` to full width.
+- `hl-dentistry-v9.html:2443` — new `dkVerwPage(pg)` helper: sets `S.adminPage_2` and `S.adminMode=true`, then re-renders. Used by the sub-nav button onclicks.
+- `hl-dentistry-v9.html:2444` — new `renderDesktopVerwaltungBody()` function:
+  - Builds the `.dk-verw-nav` with 6 items: Übersicht, Labor, Einverständnis, Archiv, Abrechnung, Pflegeheime.
+  - Renders the active page into `.dk-verw-content` by calling the existing mobile renderer: `renderHome_2()`, `renderLab_2()`, `renderEinverstaendnis()`, `renderArchiv()`, `renderAbrechnung()`, `renderZEPreisliste()`, `renderTexteditor()`, `renderPflegeheime()`, `renderBehandler_2()`. The CSS overrides strip the mobile header and bottom-nav so only the scrollable body content shows.
+- `hl-dentistry-v9.html:2474` — `renderDesktop()` dispatcher now routes `page==='verwaltung'` to `renderDesktopVerwaltungBody()` instead of the placeholder.
+
+**Key design decision — reuse mobile renderers, not rebuild:**
+Instead of writing desktop-specific versions of all 9 admin pages (like I did for the Management Dashboard), the Verwaltung section embeds the mobile renderers as-is and uses CSS overrides to:
+1. Hide the redundant mobile `.header` (title is in `dk-topbar`)
+2. Hide the mobile `.bottom-nav` (navigation is in `dk-verw-nav`)
+3. Adjust padding and card shadows for desktop density
+
+This approach ports all 9 pages in one pass with zero duplication. The trade-off is that the content layout is still single-column (mobile-optimised) — a future pass could add 2-column grids like the Management Dashboard has.
+
+**Sub-pages accessible from the Verwaltung sub-nav:**
+1. **Übersicht** — Behandler-Aufgaben with Meine Aufgaben + filter-bar + bhSections
+2. **Labor** — Lab kanban board with 4-stage columns + filters
+3. **Einverständnis** — 4-tab consent workflow (Neu / Angefragt / Zugestimmt / Abrechnen)
+4. **Archiv** — Archived patients with search + year/month drill-in
+5. **Abrechnung** — Hub for ZE Preisliste, Texteditor, Pflegeheime
+6. **Pflegeheime** — Editable list of care homes
+
+Abrechnung's sub-pages (ZE Preisliste, Texteditor) are also routed through the same dispatcher — clicking their navigation cards inside the Abrechnung page sets `S.adminPage_2` and re-renders correctly.
+
+**Follow-ups:**
+- The content pane is still single-column. If you want Übersicht or Einverständnis to use a 2-column desktop layout (like Management Dashboard's Übersicht does), that would be a per-page CSS override or a dedicated desktop renderer — ask before building.
+- Overlays (add-task, reassign, einv-add, zugestimmt, custom-price, add-behandler, edit-behandler) are not yet rendered in the desktop Verwaltung. They'd need to be appended inside `.dk-verw-content` or as a global overlay. Currently they silently don't appear.
+
+---
+
 ### 2026-04-10 — Desktop: all roles + full sidebar (increment 1b)
 
 **Why:** User wants all roles to work on the desktop version, not just ceo/verwaltung.
