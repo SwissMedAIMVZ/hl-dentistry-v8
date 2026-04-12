@@ -2596,8 +2596,16 @@ function renderDesktop(){
   var page=S.dkPage;
   var h=renderDesktopSidebar();
   h+='<div class="dk-main">';
-  /* Top bar */
   var u=S.user||{name:'',role:''};
+  /* Detail screens (patient, heim, pipeline) override the dkPage routing */
+  if(S.screen==='patient'||S.screen==='heim'||S.screen==='pipeline'){
+    var detailTitle=S.screen==='patient'?(function(){var p=PATIENTS.find(function(x){return x.id===S.patId});return p?p.name:'Patient'})():S.screen==='heim'?(function(){var hm=HEIME.find(function(x){return x.id===S.heimId});return hm?hm.name:'Heim'})():'Pipeline';
+    h+='<div class="dk-topbar"><div style="display:flex;align-items:center;gap:12px"><button style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--text-2);display:flex;align-items:center" onclick="goBack()">\u2039 Zur\u00fcck</button><div><h1>'+detailTitle+'</h1><div class="dk-topbar-sub">'+u.name+' \u2014 '+roleLabel(u.role)+'</div></div></div></div>';
+    if(S.screen==='patient')h+='<div class="dk-verw-content" style="position:relative">'+renderPatient()+'</div>';
+    else if(S.screen==='heim')h+='<div class="dk-verw-content" style="position:relative">'+renderHeim()+'</div>';
+    else h+='<div class="dk-verw-content" style="position:relative">'+renderPipeline()+'</div>';
+  } else {
+  /* Top bar */
   var title=page==='verwaltung'?'Verwaltung \u2014 '+(DK_VERW_TITLES[S.adminPage_2||'uebersicht']||''):(DK_TITLES[page]||page);
   h+='<div class="dk-topbar"><div><h1>'+title+'</h1><div class="dk-topbar-sub">'+u.name+' \u2014 '+roleLabel(u.role)+'</div></div></div>';
   if(page==='manager'){
@@ -2617,6 +2625,7 @@ function renderDesktop(){
   } else {
     h+=renderDesktopPlaceholder(page);
   }
+  } /* close detail-screen else */
   h+='</div>'; /* close dk-main */
   /* Toast */
   if(S.toast)h+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
@@ -2721,7 +2730,7 @@ function render(){
 function goHome(){S.screen="home";S.heimId=null;S.patId=null;S.patTab="Historie";render()}
 function goHeim(id){S.screen="heim";S.heimId=id;S.heimSearch="";render()}
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";render()}
-function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";if(isDesktop())S.dkPage='wochenplan';render()}
+function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";render()}
 function goPipeline(){S.screen="pipeline";S.pipeView="Fristen";render()}
 function goSearch(){S.screen="search";S.searchQ="";render()}
 function goBack(){if(S.screen==="patient"){S.screen="heim";S.patId=null}else if(S.screen==="heim"){S.screen="home";S.heimId=null}else S.screen="home";render()}

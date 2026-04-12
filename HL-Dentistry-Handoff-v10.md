@@ -45,6 +45,23 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Patient detail works on both desktop + mobile from Verwaltung
+
+**Why:** Clicking a patient in Verwaltung Übersicht needs to open their detail screen on both mobile AND desktop. Previously the desktop dispatcher didn't handle `S.screen='patient'` so it fell through to the dkPage routing and showed the wrong page.
+
+**What changed:**
+- `hl-dentistry-v10.html:2604` — `renderDesktop()` now checks `S.screen==='patient'|'heim'|'pipeline'` BEFORE the `S.dkPage` routing. When a detail screen is active, it renders:
+  - A topbar with a **"‹ Zurück" button** (calls `goBack()`) + the patient/heim name as the title
+  - The mobile `renderPatient()` / `renderHeim()` / `renderPipeline()` inside `dk-verw-content` (CSS hides mobile header+bottom-nav)
+- `hl-dentistry-v10.html:2724` — `goPatFromAdmin()` simplified: no longer sets `S.dkPage='wochenplan'`. The desktop renderer now detects `S.screen='patient'` directly and doesn't need a page override.
+- The `goBack()` function (already existing) restores the previous screen. On desktop, when the patient detail closes, the render falls back to whatever `S.dkPage` was before — so Verwaltung Übersicht reappears.
+
+**Works on both views:**
+- **Mobile:** tap patient → exits admin mode → phone renders patient screen with back button
+- **Desktop:** tap patient → desktop renders patient inside dk-main with "‹ Zurück" topbar button → click Zurück → back to Verwaltung Übersicht
+
+---
+
 ### 2026-04-12 — Verwaltung Übersicht: all patient cards clickable
 
 **Why:** User wants to click on any patient in the Verwaltung Übersicht to open their patient detail screen.
