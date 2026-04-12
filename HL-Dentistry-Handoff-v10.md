@@ -45,6 +45,45 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Redesign Nachrichten as Email UI (mobile + desktop)
+
+**Why:** Messages are emails, not notifications. The UI should look and feel like an email inbox connected to the user's login email address.
+
+**What changed — CSS** (`hl-dentistry-v10.html:363`):
+- Section comment renamed from "NACHRICHTEN" to "E-MAIL INBOX"
+- Replaced `.msg-icon` (colored square icon per type) with `.em-avatar` (circular gradient avatar with sender initials — same pattern as Behandler cards)
+- Replaced `.msg-title` with `.em-sender` (sender name + email) and `.em-subject` (subject line, bolds when unread)
+- Replaced `.msg-time` with `.em-date` (right-aligned, shows time for today's emails, date for older ones)
+- `.msg-item.unread` now bolds both `.em-sender` and `.em-subject` for a proper email-inbox feel
+- Added `.em-detail-hdr` (grey box with Von/An/Datum header fields), `.em-reply-bar` and `.em-reply-btn` for the reply/forward bar at the bottom of the detail view
+- Added `.em-field-label` for compose form labels (An/Betreff/Nachricht)
+- Compose textarea increased from min-height:60 to 100px; send button now has a paper-plane icon
+
+**What changed — JS** (`hl-dentistry-v10.html:1027`):
+- New helpers: `fmtEmailDate(t)` (time for today, dd.mm.yy for older), `fmtEmailDateLong(t)` (full German date+time for detail view), `msgSenderEmail(m)` (looks up the sender's USERS entry to get their email, falls back to system@hl-dentistry.de), `msgSenderInitials(m)` (first letters of sender name)
+- **`renderMessages()`** rewritten:
+  - Header title changed from "Nachrichten" to **"E-Mail"** with the user's login email as subtitle
+  - Tabs changed from Alle/Aktionen/Direkt to **Alle / Posteingang / System** (inbox = direct+system messages, system = urgent+nudge notifications)
+  - List items now show: unread dot, **sender avatar** (initials), **sender name + <email>**, **subject line** (bold when unread), **body preview** (60 chars), **date** (right-aligned)
+  - Compose FAB icon changed from pen to **envelope** (matching the email metaphor)
+  - Empty state text changed from "Keine Nachrichten" to "Keine E-Mails"
+- **`renderMsgDetail()`** rewritten:
+  - Header changed from "Nachricht" to **"E-Mail"**
+  - Added **email header block** (`.em-detail-hdr`): Von (sender name + email), An (logged-in user's email), Datum (full German date+time)
+  - Added **reply bar** at the bottom with two buttons: **Antworten** (reply icon) and **Weiterleiten** (forward icon). Antworten pre-fills the compose form with the sender's email and "Re: subject".
+  - Patient link card and action button unchanged
+- **`renderMsgCompose()`** rewritten:
+  - Title changed from "Neue Nachricht" to **"Neue E-Mail"** with an × close button
+  - Added labeled fields: **An** (select showing "Name (email)"), **Betreff** (pre-filled with "Re: ..." on reply), **Nachricht** (textarea)
+  - Send button has a paper-plane icon + "Senden" text
+  - New `S.msgReplyTo` state links the reply flow: clicking "Antworten" in detail → compose opens with recipient + subject pre-filled
+
+**Works on both mobile and desktop** — the same renderMessages/renderMsgDetail/renderMsgCompose functions serve both views. The desktop wraps them in dk-verw-content (hides mobile header+bottom-nav), the mobile renders them natively.
+
+**Data model unchanged** — MESSAGES array structure, getMyMessages filter, sendMsg push logic, openMsg/markAllRead handlers all stay the same. Only the rendering layer changed.
+
+---
+
 ### 2026-04-12 — Port Nachrichten + Suche into desktop version
 
 **Why:** Both pages were still showing the placeholder in desktop mode. All 7 sidebar sections are now ported.

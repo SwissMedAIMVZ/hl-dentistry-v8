@@ -360,38 +360,45 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
 .ai-typing span:nth-child(3){animation-delay:.4s}
 @keyframes aiDot{0%,80%,100%{opacity:.3}40%{opacity:1}}
 
-/* ===== NACHRICHTEN ===== */
+/* ===== E-MAIL INBOX ===== */
 .msg-tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);padding:0 8px}
 .msg-tab{flex:1;padding:12px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-family:inherit;position:relative;transition:color .2s}
 .msg-tab.active{color:var(--navy)}
 .msg-tab.active::after{content:'';position:absolute;bottom:0;left:16%;right:16%;height:2.5px;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:2px}
 .msg-tab .msg-badge-count{position:absolute;top:4px;right:20%;background:var(--crimson);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:var(--r-full)}
 .msg-list{flex:1;overflow-y:auto}
-.msg-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--surface-2);cursor:pointer;transition:background .2s;align-items:flex-start}
+.msg-item{display:flex;gap:10px;padding:12px 20px;border-bottom:1px solid var(--surface-2);cursor:pointer;transition:background .15s;align-items:flex-start}
 .msg-item:hover{background:var(--surface)}
 .msg-item.unread{background:var(--blue-25)}
-.msg-icon{width:40px;height:40px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.msg-icon.nudge{background:var(--amber-bg)}.msg-icon.direct{background:var(--blue-50)}.msg-icon.system{background:var(--violet-bg)}.msg-icon.urgent{background:var(--crimson-bg)}
+.msg-item.unread .em-sender{font-weight:800;color:var(--text)}
+.msg-item.unread .em-subject{font-weight:700;color:var(--text)}
+.em-avatar{width:34px;height:34px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
 .msg-body{flex:1;min-width:0}
-.msg-title{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.em-sender{font-size:12px;font-weight:600;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.em-subject{font-size:13px;font-weight:600;color:var(--text);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .msg-preview{font-size:11px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.msg-meta{display:flex;gap:6px;align-items:center;margin-top:6px}
-.msg-time{font-size:9px;color:var(--text-4);font-weight:500}
-.msg-tag{font-size:9px;padding:2px 7px;border-radius:var(--r-full);font-weight:600}
-.msg-tag.patient{background:var(--blue-50);color:var(--navy)}.msg-tag.lab{background:var(--violet-bg);color:var(--violet)}.msg-tag.hkp{background:var(--amber-bg);color:var(--amber)}.msg-tag.urgent{background:var(--crimson-bg);color:var(--crimson)}
-.msg-unread-dot{width:8px;height:8px;background:var(--blue);border-radius:var(--r-full);flex-shrink:0;margin-top:8px}
+.em-date{font-size:10px;color:var(--text-4);font-weight:500;flex-shrink:0;text-align:right;min-width:50px}
+.msg-unread-dot{width:8px;height:8px;background:var(--blue);border-radius:var(--r-full);flex-shrink:0;margin-top:13px}
+/* Email detail */
 .msg-detail{position:absolute;inset:0;background:var(--white);z-index:95;display:flex;flex-direction:column}
 .msg-detail-body{flex:1;overflow-y:auto;padding:20px}
-.msg-detail-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
-.msg-detail-sender{font-size:11px;color:var(--text-3);margin-bottom:12px}
+.em-detail-hdr{background:var(--surface);border-radius:var(--r-md);padding:14px;margin-bottom:16px;font-size:11px;line-height:1.8;color:var(--text-3)}
+.em-detail-hdr strong{color:var(--text);font-weight:700}
+.msg-detail-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.3}
 .msg-detail-text{font-size:13px;line-height:1.7;color:var(--text-2)}
 .msg-detail-action{margin-top:16px;padding:14px;background:var(--blue-50);border-radius:var(--r-md);cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--navy);transition:all .2s var(--ease)}
 .msg-detail-action:hover{background:var(--navy);color:#fff}
+.em-reply-bar{padding:12px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px}
+.em-reply-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--white);color:var(--text-2);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.em-reply-btn:hover{border-color:var(--navy);color:var(--navy)}
+/* Email compose */
 .msg-compose{position:absolute;bottom:0;left:0;right:0;background:var(--white);border-top-left-radius:var(--r-xl);border-top-right-radius:var(--r-xl);padding:24px 20px;box-shadow:0 -8px 30px rgba(0,0,0,0.12);z-index:96}
-.msg-compose select,.msg-compose input,.msg-compose textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:12px;font-family:inherit;margin-bottom:8px;outline:none;transition:border .2s}
+.msg-compose select,.msg-compose input,.msg-compose textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:12px;font-family:inherit;margin-bottom:4px;outline:none;transition:border .2s}
 .msg-compose select:focus,.msg-compose input:focus,.msg-compose textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(61,102,254,0.1)}
-.msg-compose textarea{min-height:60px;resize:none}
-.msg-compose-send{width:100%;padding:14px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)}
+.msg-compose textarea{min-height:100px;resize:none}
+.msg-compose-send{width:100%;padding:14px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px}
+.em-field-label{font-size:10px;font-weight:600;color:var(--text-3);margin-bottom:4px;margin-top:10px;text-transform:uppercase;letter-spacing:0.5px}
+.em-field-label:first-child{margin-top:0}
 .msg-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;color:var(--text-4)}
 .msg-empty .icon{font-size:40px;margin-bottom:12px;opacity:0.5}
 .msg-empty .text{font-size:12px;font-weight:600}
@@ -1025,6 +1032,10 @@ var AI_RESPONSES={
 function getMyMessages(){if(!S.user)return[];var r=S.user.role,b=S.user.bId||null;return MESSAGES.filter(function(m){return m.to.indexOf(r)!==-1||(b&&m.to.indexOf(b)!==-1)}).sort(function(a,b){return b.time-a.time})}
 function getUnreadCount(){return getMyMessages().filter(function(m){return!m.read}).length}
 function fmtTimeAgo(t){var d=Math.floor((Date.now()-t)/60000);if(d<60)return d+" Min.";var h=Math.floor(d/60);if(h<24)return h+" Std.";var dd=Math.floor(h/24);return"vor "+dd+(dd===1?" Tag":" Tagen")}
+function fmtEmailDate(t){var d=new Date(t);var now=new Date();var sameDay=d.toDateString()===now.toDateString();if(sameDay)return d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'})}
+function fmtEmailDateLong(t){return new Date(t).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+function msgSenderEmail(m){if(m.fromId){var u=USERS.find(function(x){return x.role===m.fromId||x.bId===m.fromId});if(u)return u.email}return'system@hl-dentistry.de'}
+function msgSenderInitials(m){return m.from.split(' ').map(function(p){return p[0]}).join('').slice(0,2).toUpperCase()}
 function urg(e){if(!e)return"ok";var d=Math.ceil((e-Date.now())/D);return d<0?"expired":d<=30?"urgent":d<=60?"warning":"ok"}
 function fmtDate(t){return new Date(t).toLocaleDateString("de-DE")}
 function heimName(id){var h=HEIME.find(function(x){return x.id===id});return h?h.name:""}
@@ -2096,26 +2107,73 @@ function renderAiChat(){
 
 /* ===== NACHRICHTEN ===== */
 function renderMessages(){
-  var msgs=getMyMessages();var nudges=msgs.filter(function(m){return m.type!=="direct"});var directs=msgs.filter(function(m){return m.type==="direct"});var tab=S.msgTab||"Alle";var shown=tab==="Alle"?msgs:tab==="Aktionen"?nudges:directs;
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Nachrichten</h1><div class="sub">'+msgs.length+' Nachrichten, '+getUnreadCount()+' ungelesen</div></div><div style="display:flex;gap:8px;align-items:center">'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+MENU_BTN_2+'</div></div></div>';
-  h+='<div class="msg-tabs"><button class="msg-tab'+(tab==="Alle"?" active":"")+'" onclick="setMsgTab(\'Alle\')">Alle ('+msgs.length+')</button><button class="msg-tab'+(tab==="Aktionen"?" active":"")+'" onclick="setMsgTab(\'Aktionen\')">Aktionen'+(nudges.filter(function(m){return!m.read}).length?'<span class="msg-badge-count">'+nudges.filter(function(m){return!m.read}).length+'</span>':'')+'</button><button class="msg-tab'+(tab==="Direkt"?" active":"")+'" onclick="setMsgTab(\'Direkt\')">Direkt</button></div>';
+  var msgs=getMyMessages();var tab=S.msgTab||"Alle";
+  var inbox=msgs.filter(function(m){return m.type==="direct"||m.type==="system"});
+  var notifs=msgs.filter(function(m){return m.type==="urgent"||m.type==="nudge"});
+  var shown=tab==="Alle"?msgs:tab==="Posteingang"?inbox:notifs;
+  var userEmail=S.user?S.user.email:'';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>E-Mail</h1><div class="sub">'+userEmail+'</div></div><div style="display:flex;gap:8px;align-items:center">'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+MENU_BTN_2+'</div></div></div>';
+  h+='<div class="msg-tabs"><button class="msg-tab'+(tab==="Alle"?" active":"")+'" onclick="setMsgTab(\'Alle\')">Alle ('+msgs.length+')</button><button class="msg-tab'+(tab==="Posteingang"?" active":"")+'" onclick="setMsgTab(\'Posteingang\')">Posteingang'+(inbox.filter(function(m){return!m.read}).length?'<span class="msg-badge-count">'+inbox.filter(function(m){return!m.read}).length+'</span>':'')+'</button><button class="msg-tab'+(tab==="System"?" active":"")+'" onclick="setMsgTab(\'System\')">System</button></div>';
   h+='<div class="msg-list">';
-  if(shown.length===0)h+='<div class="msg-empty"><span class="icon">'+ICO.msg+'</span><span class="text">Keine Nachrichten</span></div>';
-  else shown.forEach(function(m){h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')">';if(!m.read)h+='<div class="msg-unread-dot"></div>';h+='<div class="msg-icon '+m.type+'">'+msgIcon(m.type)+'</div><div class="msg-body"><div class="msg-title">'+m.title+'</div><div class="msg-preview">'+m.from+': '+m.body.substring(0,50)+'\u2026</div><div class="msg-meta"><span class="msg-time">'+fmtTimeAgo(m.time)+'</span>';if(m.tag)h+='<span class="msg-tag '+m.tag+'">'+({patient:"Patient",lab:"Labor",hkp:"HKP",urgent:"Dringend"}[m.tag]||m.tag)+'</span>';h+='</div></div></div>'});
+  if(shown.length===0)h+='<div class="msg-empty"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="text">Keine E-Mails</span></div>';
+  else shown.forEach(function(m){
+    var senderEmail=msgSenderEmail(m);
+    var initials=msgSenderInitials(m);
+    h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')">';
+    if(!m.read)h+='<div class="msg-unread-dot"></div>';
+    h+='<div class="em-avatar">'+initials+'</div>'
+      +'<div class="msg-body">'
+        +'<div class="em-sender">'+m.from+' <span style="font-weight:400;color:var(--text-4)">&lt;'+senderEmail+'&gt;</span></div>'
+        +'<div class="em-subject">'+m.title+'</div>'
+        +'<div class="msg-preview">'+m.body.substring(0,60)+'\u2026</div>'
+      +'</div>'
+      +'<div class="em-date">'+fmtEmailDate(m.time)+'</div>'
+    +'</div>';
+  });
   h+='</div>';
-  h+='<button style="position:absolute;bottom:76px;right:16px;width:50px;height:50px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--r-full);border:none;color:#fff;font-size:20px;cursor:pointer;box-shadow:var(--sh-blue);z-index:80;display:flex;align-items:center;justify-content:center" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
+  h+='<button style="position:absolute;bottom:76px;right:16px;width:50px;height:50px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--r-full);border:none;color:#fff;cursor:pointer;box-shadow:var(--sh-blue);z-index:80;display:flex;align-items:center;justify-content:center" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></button>';
   return h;
 }
 function renderMsgDetail(){
   var m=MESSAGES.find(function(x){return x.id===S.msgDetail});if(!m)return"";
-  var h='<div class="msg-detail"><div class="header"><div class="header-row"><button class="back-btn" onclick="S.msgDetail=null;render()">\u2039</button><h2>Nachricht</h2></div></div><div class="msg-detail-body">';
-  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div class="msg-icon '+m.type+'" style="width:44px;height:44px;font-size:20px">'+msgIcon(m.type)+'</div><div><div class="msg-detail-sender">'+m.from+' \u2014 '+fmtTimeAgo(m.time)+'</div>';if(m.tag)h+='<span class="msg-tag '+m.tag+'">'+({patient:"Patient",lab:"Labor",hkp:"HKP",urgent:"Dringend"}[m.tag]||m.tag)+'</span>';h+='</div></div>';
-  h+='<div class="msg-detail-title">'+m.title+'</div><div class="msg-detail-text" style="margin-top:12px">'+m.body.replace(/\n/g,'<br>')+'</div>';
+  var senderEmail=msgSenderEmail(m);
+  var userEmail=S.user?S.user.email:'';
+  var h='<div class="msg-detail"><div class="header"><div class="header-row"><button class="back-btn" onclick="S.msgDetail=null;render()">\u2039</button><h2>E-Mail</h2></div></div><div class="msg-detail-body">';
+  h+='<div class="msg-detail-title">'+m.title+'</div>';
+  h+='<div class="em-detail-hdr">'
+    +'<div><strong>Von:</strong> '+m.from+' &lt;'+senderEmail+'&gt;</div>'
+    +'<div><strong>An:</strong> '+userEmail+'</div>'
+    +'<div><strong>Datum:</strong> '+fmtEmailDateLong(m.time)+'</div>'
+  +'</div>';
+  h+='<div class="msg-detail-text">'+m.body.replace(/\n/g,'<br>')+'</div>';
   if(m.patId){var p=PATIENTS.find(function(x){return x.id===m.patId});if(p)h+='<div style="margin-top:16px;padding:14px;background:var(--surface);border-radius:var(--r-md);border:1px solid var(--border)"><div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Verkn\u00fcpfter Patient</div><div style="font-size:14px;font-weight:700">'+p.name+'</div><div style="font-size:11px;color:var(--text-3)">'+heimName(p.heim)+' \u2014 Zi. '+p.room+'</div></div>'}
   if(m.action)h+='<div class="msg-detail-action" onclick="'+m.action.fn+'">'+m.action.label+' \u2192</div>';
-  h+='</div></div>';return h;
+  h+='</div>';
+  /* Reply / Forward bar */
+  h+='<div class="em-reply-bar">'
+    +'<button class="em-reply-btn" onclick="S.msgDetail=null;S.msgCompose=true;S.msgReplyTo='+m.id+';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg> Antworten</button>'
+    +'<button class="em-reply-btn" onclick="S.msgDetail=null;S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 0 0 4-4h12"/></svg> Weiterleiten</button>'
+  +'</div>';
+  h+='</div>';return h;
 }
-function renderMsgCompose(){var h='<div class="overlay" onclick="S.msgCompose=false;render()"><div class="msg-compose" onclick="event.stopPropagation()"><div style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--text)">Neue Nachricht</div><select id="msgTo"><option value="">Empf\u00e4nger w\u00e4hlen\u2026</option>';USERS.forEach(function(u){if(S.user&&u.email!==S.user.email)h+='<option value="'+u.email+'">'+u.name+'</option>'});h+='</select><input id="msgSubj" placeholder="Betreff\u2026"><textarea id="msgBody" placeholder="Nachricht\u2026"></textarea><button class="msg-compose-send" onclick="sendMsg()">Senden</button></div></div>';return h}
+function renderMsgCompose(){
+  var reply=S.msgReplyTo?MESSAGES.find(function(x){return x.id===S.msgReplyTo}):null;
+  var replyEmail=reply?msgSenderEmail(reply):'';
+  var replySubj=reply?'Re: '+reply.title:'';
+  var h='<div class="overlay" onclick="S.msgCompose=false;S.msgReplyTo=null;render()"><div class="msg-compose" onclick="event.stopPropagation()">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:15px;font-weight:700;color:var(--text)">Neue E-Mail</div><button style="border:none;background:none;font-size:18px;color:var(--text-3);cursor:pointer" onclick="S.msgCompose=false;S.msgReplyTo=null;render()">\u00d7</button></div>'
+    +'<div class="em-field-label">An</div>'
+    +'<select id="msgTo"><option value="">E-Mail-Adresse w\u00e4hlen\u2026</option>';
+  USERS.forEach(function(u){if(S.user&&u.email!==S.user.email)h+='<option value="'+u.email+'"'+(replyEmail===u.email?' selected':'')+'>'+u.name+' ('+u.email+')</option>'});
+  h+='</select>'
+    +'<div class="em-field-label">Betreff</div>'
+    +'<input id="msgSubj" placeholder="Betreff eingeben\u2026" value="'+replySubj.replace(/"/g,'&quot;')+'">'
+    +'<div class="em-field-label">Nachricht</div>'
+    +'<textarea id="msgBody" placeholder="E-Mail verfassen\u2026"></textarea>'
+    +'<button class="msg-compose-send" onclick="sendMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Senden</button>'
+  +'</div></div>';
+  return h;
+}
 
 /* ===== EVENT HANDLERS ===== */
 function openMsg(id){var m=MESSAGES.find(function(x){return x.id===id});if(m)m.read=true;S.msgDetail=id;render()}
