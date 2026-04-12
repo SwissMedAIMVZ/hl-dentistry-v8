@@ -2373,15 +2373,8 @@ function renderDesktopSidebar(){
     +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry</div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
     +'<div class="dk-sidebar-nav">';
 
-  /* Wochenplan dropdown */
-  var isWochOpen=S.dkOpen.wochenplan;
-  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopHomeTab(\'heute\');S.dkOpen.wochenplan=true" style="padding-right:10px">'+calIcon+'<span>Wochenplan</span>'+(isWochOpen?chevUp:chevDown)+'</button>';
-  if(isWochOpen){
-    [{t:'heute',l:'Heute'},{t:'woche',l:'N\u00e4chste Woche'}].forEach(function(it){
-      var active=(S.dkPage==='wochenplan'&&S.homeTab===it.t)?'active':'';
-      h+='<button class="dk-nav-item '+active+'" style="padding-left:44px;font-size:12px" onclick="goDesktopHomeTab(\''+it.t+'\')"><span>'+it.l+'</span></button>';
-    });
-  }
+  /* Wochenplan */
+  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopHomeTab(\'heute\')">'+calIcon+'<span>Wochenplan</span></button>';
 
   /* Management dropdown */
   h+='<button class="dk-nav-item '+(S.dkPage==='manager'?'active':'')+'" onclick="toggleDkGroup(\'manager\')" style="padding-right:10px">'+ICO.chart+'<span>Management</span>'+(isMgrOpen?chevUp:chevDown)+'</button>';
