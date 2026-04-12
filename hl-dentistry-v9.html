@@ -2518,6 +2518,8 @@ function renderDesktop(){
     h+=renderDesktopVerwaltungBody();
   } else if(page==='labor'){
     h+='<div class="dk-verw-content" style="position:relative">'+renderLab()+'</div>';
+  } else if(page==='behandler'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderBehandler_2()+'</div>';
   } else {
     h+=renderDesktopPlaceholder(page);
   }
