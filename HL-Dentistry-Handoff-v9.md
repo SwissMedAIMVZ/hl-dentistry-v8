@@ -56,6 +56,40 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: all roles + full sidebar (increment 1b)
+
+**Why:** User wants all roles to work on the desktop version, not just ceo/verwaltung.
+
+**What changed:**
+- `hl-dentistry-v9.html:2346` — `renderDesktopSidebar()` sidebar nav expanded from 3 items to 8:
+  1. **Wochenplan** (calendar icon) — `S.screen='home'`
+  2. **Management** (chart icon) — `S.screen='manager'`
+  3. **Verwaltung** (grid icon) — `S.adminMode=true; S.adminPage_2='uebersicht'`
+  4. **Behandler** (users icon) — `S.adminMode=true; S.adminPage_2='behandler'`
+  5. *(divider)*
+  6. **Labor** (flask icon) — `S.screen='lab'`
+  7. **Nachrichten** (message icon) — `S.screen='messages'`
+  8. **Suche** (search icon) — `S.screen='search'`
+- `hl-dentistry-v9.html:2417` — `goDesktopPage(id)` expanded to handle all 7 page ids, each setting the correct `S.adminMode` / `S.screen` / `S.adminPage_2` combination.
+- `hl-dentistry-v9.html:2425` — new `dkDefaultPage()` helper returns a role-appropriate landing: `laborant→'labor'`, `behandler→'wochenplan'`, `ceo/verwaltung→'manager'`.
+- `hl-dentistry-v9.html:2427` — `DK_TITLES` lookup for page titles shown in the top bar.
+- `hl-dentistry-v9.html:2428` — new `renderDesktopPlaceholder(page)` renders a centered "Wird im nächsten Inkrement portiert" message for unported pages (everything except Dashboard).
+- `hl-dentistry-v9.html:2434` — `renderDesktop()` now uses `dkDefaultPage()` for the initial `S.dkPage` instead of hardcoding 'manager', and falls back to the placeholder renderer for pages other than 'manager'.
+
+**Landing pages per role:**
+
+| Role | Default S.dkPage | Sidebar items visible |
+|---|---|---|
+| `behandler` (feld, hess) | wochenplan | all 8 |
+| `laborant` (labor) | labor | all 8 |
+| `ceo` / `verwaltung` (gomez, weigert) | manager | all 8 |
+
+All sidebar items are shown for every role (same permissive model as the burger menu). No role gating.
+
+**Placeholder pages:** Labor, Wochenplan, Verwaltung, Behandler, Nachrichten, and Suche show a centered "Wird im nächsten Inkrement portiert" message with a muted icon. Only Management Dashboard has its full desktop body.
+
+---
+
 ### 2026-04-10 — Desktop version: Management Dashboard (increment 1)
 
 **Why:** User requested a desktop version of the app, starting with the Management Dashboard. This is the first increment — additional screens (Wochenplan, Verwaltung) will be ported in later passes.
