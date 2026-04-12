@@ -56,6 +56,39 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: Verwaltung sub-items in sidebar (increment 2b)
+
+**Why:** User wants the 5 Verwaltung sub-pages as indented sidebar items under a "Verwaltung" group header — not in an internal split-pane sub-nav.
+
+**What changed:**
+- `hl-dentistry-v9.html:2371` — sidebar items restructured. The old flat `{id:'verwaltung'}` is replaced with:
+  - A **group header** `_verw_head_` — non-clickable, small uppercase label with the grid icon, always visible
+  - **5 indented sub-items** (`verw:uebersicht`, `verw:einverstaendnis`, `verw:archiv`, `verw:abrechnung`, `verw:pflegeheime`) with `padding-left:44px` and smaller font (12 px). Active state is determined by `S.dkPage==='verwaltung' && S.adminPage_2===pg`.
+- `hl-dentistry-v9.html:2443` — new `goDesktopVerwSub(pg)` helper replaces the old `dkVerwPage(pg)`. Sets `S.dkPage='verwaltung'`, `S.adminPage_2=pg`, `S.adminMode=true`, and renders.
+- `hl-dentistry-v9.html:2444` — `renderDesktopVerwaltungBody()` simplified: the internal `.dk-verw-wrap` / `.dk-verw-nav` split-pane is gone. Content renders directly inside `.dk-verw-content` by calling the matching mobile renderer. CSS overrides still hide the mobile header + bottom-nav.
+- `hl-dentistry-v9.html:2462` — new `DK_VERW_TITLES` lookup for sub-page names, used by the topbar which now shows `"Verwaltung — Übersicht"` / `"Verwaltung — Archiv"` etc.
+- `hl-dentistry-v9.html:475` — cleaned up CSS: removed `.dk-verw-wrap`, `.dk-verw-nav`, `.dk-verw-nav-item` rules (no longer needed). Kept `.dk-verw-content` and all the content overrides.
+- `hl-dentistry-v9.html:2443` — removed the `verwaltung` case from `goDesktopPage` since sidebar sub-items now call `goDesktopVerwSub` directly.
+
+**Sidebar layout:**
+```
+📅 Wochenplan
+📊 Management
+⊞  VERWALTUNG          ← group header (always visible, not clickable)
+     Übersicht          ← indented, clickable
+     Einverständnis
+     Archiv
+     Abrechnung
+     Pflegeheime
+👥 Behandler
+─────────────
+🧪 Labor
+💬 Nachrichten
+🔍 Suche
+```
+
+---
+
 ### 2026-04-10 — Desktop: Verwaltung section (increment 2)
 
 **Why:** User wants the full Verwaltung admin area ported to the desktop layout as the next increment.
