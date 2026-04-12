@@ -2680,7 +2680,7 @@ function render(){
   else if(S.screen==="search")html=renderSearch();
 
   var role=S.user?S.user.role:"",s=S.screen,uc=getUnreadCount();
-  var msgNav=navBtn('<span class="nav-badge">'+ICO.msg+(uc?'<span class="nav-badge-count">'+uc+'</span>':'')+'</span>','Nachr.','"goMessages()"',s==="messages");
+  var msgNav=navBtn('<span class="nav-badge">'+ICO.msg+(uc?'<span class="nav-badge-count">'+uc+'</span>':'')+'</span>','Nachr.','goMessages()',s==="messages");
 
   if(role==="laborant"){html+='<div class="bottom-nav">'+navBtn(ICO.lab,"Labor","goLab()",s==="lab")+msgNav+navBtn(ICO.search,"Suche","goSearch()",s==="search")+'</div>'}
   else if(s==="manager"||((role==="ceo"||role==="verwaltung")&&s==="messages")){html+='<div class="bottom-nav">'+navBtn(ICO.chart,"Dashboard","S.screen=\'manager\';S.mgrTab=\'\u00dcbersicht\';render()",s==="manager")+navBtn(ICO.lab,"Labor","goLab()",false)+msgNav+navBtn(ICO.search,"Suche","goSearch()",s==="search")+'</div>'}

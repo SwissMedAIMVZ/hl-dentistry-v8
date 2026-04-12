@@ -45,6 +45,14 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Fix: Nachrichten button not clickable on mobile
+
+**Root cause:** The `msgNav` navBtn call at line 2683 was passing the onclick handler as `'"goMessages()"'` (with extra inner double quotes). When navBtn spliced this into `onclick="` + scr + `"`, the result was `onclick=""goMessages()""` — broken HTML that the browser parsed as an empty onclick. Every other navBtn call (`'goLab()'`, `'goSearch()'`, etc.) correctly omitted the inner quotes. This was a latent bug since v8 — the Nachrichten bottom-nav button was never clickable on mobile.
+
+**Fix:** `'"goMessages()"'` → `'goMessages()'` (removed the extra inner double quotes). One character change.
+
+---
+
 ### 2026-04-12 — Desktop login screen
 
 **Why:** The login was always rendered in the 393×852 phone frame, even on desktop. User wants a proper desktop login experience.
