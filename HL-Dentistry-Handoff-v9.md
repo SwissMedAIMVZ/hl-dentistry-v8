@@ -56,6 +56,43 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: collapsible dropdowns for Management + Verwaltung sub-pages
+
+**Why:** User wants Management's sub-tabs (Übersicht, Behandler, Heime, Planung, Fälle) and Verwaltung's sub-pages (Übersicht, Einverständnis, Archiv, Abrechnung, Pflegeheime) exposed as collapsible dropdowns in the sidebar.
+
+**What changed:**
+- `hl-dentistry-v9.html:2365` — sidebar rebuilt. Both **Management** and **Verwaltung** are now clickable group headers with a chevron indicator (▼ open / ▲ closed). Clicking the header toggles `S.dkOpen[group]`. When open, 5 indented sub-items appear below.
+- `hl-dentistry-v9.html:2476` — new helpers:
+  - `toggleDkGroup(g)` — flips `S.dkOpen[g]` and re-renders
+  - `goDesktopMgrTab(t)` — sets `S.dkPage='manager'`, `S.mgrTab=t` and renders. Clicking a Management sub-item navigates directly to that tab in the dashboard (e.g. "Heime" opens the Management Dashboard scrolled to the Heime tab).
+- `S.dkOpen` — new state map (lazy-initialised, defaults `{manager:true, verwaltung:true}`) tracking which groups are expanded.
+
+**Sidebar layout (both groups open):**
+```
+📅 Wochenplan
+📊 Management            ▲
+     Übersicht
+     Behandler
+     Heime
+     Planung
+     Fälle
+⊞  Verwaltung            ▲
+     Übersicht
+     Einverständnis
+     Archiv
+     Abrechnung
+     Pflegeheime
+👥 Behandler
+─────────────
+🧪 Labor
+💬 Nachrichten
+🔍 Suche
+```
+
+Clicking either header collapses its children and shows ▼. The active sub-item highlights blue-50.
+
+---
+
 ### 2026-04-10 — Desktop: Labor page (increment 3)
 
 **Why:** Port the Labor screen into the desktop layout.
