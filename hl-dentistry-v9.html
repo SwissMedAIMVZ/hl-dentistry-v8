@@ -2375,7 +2375,7 @@ function renderDesktopSidebar(){
 
   /* Wochenplan dropdown */
   var isWochOpen=S.dkOpen.wochenplan;
-  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="toggleDkGroup(\'wochenplan\')" style="padding-right:10px">'+calIcon+'<span>Wochenplan</span>'+(isWochOpen?chevUp:chevDown)+'</button>';
+  h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopHomeTab(\'heute\');S.dkOpen.wochenplan=true" style="padding-right:10px">'+calIcon+'<span>Wochenplan</span>'+(isWochOpen?chevUp:chevDown)+'</button>';
   if(isWochOpen){
     [{t:'heute',l:'Heute'},{t:'woche',l:'N\u00e4chste Woche'}].forEach(function(it){
       var active=(S.dkPage==='wochenplan'&&S.homeTab===it.t)?'active':'';
