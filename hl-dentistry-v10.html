@@ -2721,6 +2721,7 @@ function render(){
 function goHome(){S.screen="home";S.heimId=null;S.patId=null;S.patTab="Historie";render()}
 function goHeim(id){S.screen="heim";S.heimId=id;S.heimSearch="";render()}
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";render()}
+function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";if(isDesktop())S.dkPage='wochenplan';render()}
 function goPipeline(){S.screen="pipeline";S.pipeView="Fristen";render()}
 function goSearch(){S.screen="search";S.searchQ="";render()}
 function goBack(){if(S.screen==="patient"){S.screen="heim";S.patId=null}else if(S.screen==="heim"){S.screen="home";S.heimId=null}else S.screen="home";render()}
@@ -3160,7 +3161,9 @@ function taskCard(t){
   var sbadge=t.status==='offen'
     ?'<span class="tbadge tb-o">'+ICO.clock+' Offen</span>'
     :'<span class="tbadge tb-e">'+ICO.check+' Erledigt</span>';
-  return '<div class="task-card '+cls+'">'
+  var pat=PATIENTS.find(function(p){return p.name===t.name});
+  var onclick=pat?'onclick="goPatFromAdmin('+pat.id+')" style="cursor:pointer"':'';
+  return '<div class="task-card '+cls+'" '+onclick+'>'
     +'<div class="task-name">'+t.name+'</div>'
     +'<div class="task-date">'+t.date+'</div>'
     +'<div class="task-row"><span class="task-heim">'+ICO.pin+' '+t.heim+'</span></div>'
@@ -3559,7 +3562,9 @@ function renderMeineAufgaben(){
     if(OFFEN_PAT.length===0){h+='<div class="mein-empty">Keine offenen Patienten</div>';}
     else{
       OFFEN_PAT.forEach(function(p,i){
-        h+='<div class="mini-card">'
+        var pid=PATIENTS.find(function(x){return x.name===p.name});
+        var oc=pid?'onclick="goPatFromAdmin('+pid.id+')" style="cursor:pointer"':'';
+        h+='<div class="mini-card" '+oc+'>'
           +'<div class="mini-card-body">'
             +'<div class="mini-name">'+p.name+'</div>'
             +'<div class="mini-sub">'+ICO.pin+' '+p.heim+'</div>'
@@ -3595,7 +3600,9 @@ function renderMeineAufgaben(){
         var alertBanner=labMatch
           ?'<div class="weit-lab-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M9 3h6v5.586a1 1 0 0 0 .293.707l4.414 4.414A2 2 0 0 1 21 15.121V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3.879a2 2 0 0 1 .586-1.414L8 9.293A1 1 0 0 0 9 8.586V3z"/></svg>Labor aktualisiert: <strong>'+LAB_STAGES[labMatch.stage]+(labMatch.phase?' ('+labPhaseLabel_2(labMatch)+'Prothese)':'')+'</strong></div>'
           :'';
-        h+='<div class="mini-card'+(labMatch?' weit-lab-alert':'')+'" style="flex-direction:column;align-items:stretch;gap:8px;padding:'+(labMatch?'0':'12px 14px')+'">'
+        var wpid=PATIENTS.find(function(x){return x.name===p.name});
+        var woc=wpid?'cursor:pointer" onclick="goPatFromAdmin('+wpid.id+')':'';
+        h+='<div class="mini-card'+(labMatch?' weit-lab-alert':'')+'" style="flex-direction:column;align-items:stretch;gap:8px;padding:'+(labMatch?'0':'12px 14px')+';'+woc+'">'
           +alertBanner
           +'<div style="display:flex;align-items:center;gap:8px'+(labMatch?';padding:10px 14px 0':'')+';">'
             +'<div class="mini-card-body">'
@@ -3621,7 +3628,8 @@ function renderMeineAufgaben(){
       zeFiltered.forEach(function(p){
         var zeIdx=ZE_FAELLE.indexOf(p);
         var bhObj=p.bh?BEHANDLER.find(function(b){return b.id===p.bh;}):null;
-        h+='<div class="mini-card'+(p.haertefall?' ze-haertefall':'')+'">'
+        var zpid=PATIENTS.find(function(x){return x.name===p.name});
+        h+='<div class="mini-card'+(p.haertefall?' ze-haertefall':'')+'"'+(zpid?' onclick="goPatFromAdmin('+zpid.id+')" style="cursor:pointer"':'')+'>'
           +'<div class="mini-card-body" style="flex:1">'
             +'<div class="mini-name">'+p.name+'</div>'
             +'<div class="mini-sub">'+ICO.pin+' '+p.heim+'</div>'
@@ -3648,7 +3656,8 @@ function renderMeineAufgaben(){
       EX_PATIENTEN.forEach(function(p,exIdx){
         var bvYes=p.blutverdünner;
         var bhObj=p.bh?BEHANDLER.find(function(b){return b.id===p.bh;}):null;
-        h+='<div class="mini-card">'
+        var expid=PATIENTS.find(function(x){return x.name===p.name});
+        h+='<div class="mini-card"'+(expid?' onclick="goPatFromAdmin('+expid.id+')" style="cursor:pointer"':'')+'>'
           +'<div class="mini-card-body" style="flex:1">'
             +'<div class="mini-name">'+p.name+'</div>'
             +'<div class="mini-sub">'+ICO.pin+' '+p.heim+'</div>'
@@ -3681,7 +3690,8 @@ function renderMeineAufgaben(){
         var p=item.p,origIdx=item.i;
         var dc=paDotClass(p.daysUntil);
         var dl=paDueLabel(p.daysUntil);
-        h+='<div class="mini-card">'
+        var papid=PATIENTS.find(function(x){return x.name===p.name});
+        h+='<div class="mini-card"'+(papid?' onclick="goPatFromAdmin('+papid.id+')" style="cursor:pointer"':'')+'>'
           +'<div class="pa-dot '+dc+'"></div>'
           +'<div class="mini-card-body">'
             +'<div class="mini-name">'+p.name+'</div>'

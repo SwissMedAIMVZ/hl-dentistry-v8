@@ -45,6 +45,25 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Verwaltung Übersicht: all patient cards clickable
+
+**Why:** User wants to click on any patient in the Verwaltung Übersicht to open their patient detail screen.
+
+**What changed:**
+- `hl-dentistry-v10.html:3158` — `taskCard(t)` now looks up `PATIENTS.find(p => p.name === t.name)` and adds `onclick="goPatFromAdmin(patId)"` with `cursor:pointer` when a match is found. Every task card in the Behandler Aufgaben section is now clickable.
+- `hl-dentistry-v10.html:2724` — new `goPatFromAdmin(id)` function: exits admin mode, sets `S.screen='patient'` + `S.patId`, and on desktop sets `S.dkPage='wochenplan'` so the sidebar state is consistent. This is the shared entry point for all admin→patient navigation.
+- `hl-dentistry-v10.html:3565` — **OFFEN_PAT** mini-cards: added patient lookup + onclick.
+- `hl-dentistry-v10.html:3604` — **WEITERFUEHREND_PAT** mini-cards: added patient lookup + onclick (via inline style concatenation).
+- `hl-dentistry-v10.html:3632` — **ZE_FAELLE** mini-cards: added patient lookup + onclick.
+- `hl-dentistry-v10.html:3660` — **EX_PATIENTEN** mini-cards: added patient lookup + onclick.
+- `hl-dentistry-v10.html:3694` — **PA_FAELLE** mini-cards: added patient lookup + onclick.
+
+**Patient lookup mechanism:** each admin data array (OFFEN_PAT, ZE_FAELLE, etc.) stores patient names but not IDs. The lookup `PATIENTS.find(p => p.name === t.name)` matches by name. This works for the mockup because names are unique in PATIENTS. A production build would use proper foreign keys.
+
+**Navigation flow:** click patient in Verwaltung → `goPatFromAdmin(id)` → exits admin mode → renders patient screen (Historie tab) with odontogram, visits, photos, etc. On desktop, the sidebar switches to Wochenplan context. The back button on the patient screen returns to whatever screen was previous.
+
+---
+
 ### 2026-04-12 — "Neue Aufgabe" existing patient: dropdown → search
 
 **Why:** User wants a search input instead of a dropdown for selecting an existing patient in the "Neue Aufgabe" overlay (Verwaltung → Übersicht → + FAB).
