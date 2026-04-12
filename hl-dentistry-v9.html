@@ -2507,6 +2507,8 @@ function renderDesktop(){
     h+=renderDesktopManagerBody();
   } else if(page==='verwaltung'){
     h+=renderDesktopVerwaltungBody();
+  } else if(page==='labor'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderLab()+'</div>';
   } else {
     h+=renderDesktopPlaceholder(page);
   }

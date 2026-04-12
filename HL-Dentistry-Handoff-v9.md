@@ -56,6 +56,18 @@ Each change gets its own entry. Newest on top. Keep entries short — link to li
 
 ---
 
+### 2026-04-10 — Desktop: Labor page (increment 3)
+
+**Why:** Port the Labor screen into the desktop layout.
+
+**What changed:**
+- `hl-dentistry-v9.html:2509` — `renderDesktop()` dispatcher now routes `page==='labor'` to `renderLab()` wrapped in `<div class="dk-verw-content">`. This reuses the existing `.dk-verw-content` CSS overrides (hide mobile header + bottom-nav, adjust padding/shadows) so the lab kanban board, filters, search bar and stage summary all render in the desktop content area with zero new code.
+- The sidebar `Labor` item was already wired in previous increments — clicking it sets `S.dkPage='labor'` and `S.screen='lab'`, which now produces the lab content instead of a placeholder.
+
+**No new CSS or JS functions needed** — the mobile `renderLab()` + the existing `.dk-verw-content` overrides handle everything.
+
+---
+
 ### 2026-04-10 — Desktop: Verwaltung sub-items in sidebar (increment 2b)
 
 **Why:** User wants the 5 Verwaltung sub-pages as indented sidebar items under a "Verwaltung" group header — not in an internal split-pane sub-nav.
