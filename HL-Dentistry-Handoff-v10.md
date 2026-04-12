@@ -45,6 +45,48 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Desktop login screen
+
+**Why:** The login was always rendered in the 393×852 phone frame, even on desktop. User wants a proper desktop login experience.
+
+**What changed:**
+- `hl-dentistry-v10.html:494` — new CSS rules inside the `@media(min-width:900px)` block:
+  - `.phone.desktop-login` — full viewport (100% × 100vh), no border-radius/shadow, navy→blue gradient background with decorative radial-gradient circles (matching the mobile login's gradient), centered flexbox
+  - `.dk-login-card` — 420 px white card with 20 px radius, 40 px padding, drop shadow, centered on the gradient
+  - `.dk-login-header` — centered logo (72×72 on light bg instead of dark), title in navy, subtitle in grey
+  - Input/label/button styles matching the mobile login but adapted for the wider card (box-sizing:border-box, consistent focus states)
+  - `.dk-login-version` — absolute-positioned at the bottom of the viewport
+- `hl-dentistry-v10.html:2620` — new `renderDesktopLogin()` function builds the card HTML directly (logo + title + email/password inputs + error div + Anmelden button + Passwort vergessen link + version tag). Includes Enter-key support on the password field (`onkeydown="if(event.key==='Enter')doLogin()"`).
+- `hl-dentistry-v10.html:2638` — `render()` dispatcher updated: first check is now `if(S.screen==="login"&&isDesktop()){renderDesktopLogin();return}` before the existing desktop and mobile branches. This gives the desktop login its own render path with the `desktop-login` class instead of `desktop-mode`.
+
+**Desktop login layout:**
+```
+┌──────────────────────────────────────────────┐
+│                                              │
+│           ◌ radial glow                      │
+│                                              │
+│            ┌──────────────┐                  │
+│            │  🦷           │                  │
+│            │ HL-Dentistry  │                  │
+│            │ Mobile Alt... │                  │
+│            │               │                  │
+│            │ E-MAIL        │                  │
+│            │ [          ]  │                  │
+│            │ PASSWORT      │                  │
+│            │ [          ]  │                  │
+│            │               │                  │
+│            │ [ Anmelden ]  │                  │
+│            │ Passwort v..? │                  │
+│            └──────────────┘                  │
+│                                              │
+│        v10.0 — SwissMedAI GmbH               │
+└──────────────────────────────────────────────┘
+```
+
+**Mobile login unchanged** — the existing `.login-bg` / `.login-form` / `.login-top` layout still renders inside the phone frame when `isDesktop()` returns false.
+
+---
+
 ### 2026-04-12 — Redesign Nachrichten as Email UI (mobile + desktop)
 
 **Why:** Messages are emails, not notifications. The UI should look and feel like an email inbox connected to the user's login email address.

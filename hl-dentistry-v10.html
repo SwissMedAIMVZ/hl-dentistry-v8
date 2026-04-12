@@ -492,6 +492,24 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4
   .dk-verw-content .lab-summary{border-bottom:1px solid var(--border)}
   .dk-verw-content .einv-tabs{border-bottom:1px solid var(--border)}
   .dk-verw-content .card{box-shadow:none;border:1px solid var(--border)}
+  /* Desktop login — full viewport, centered card */
+  .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#041347 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
+  .phone.desktop-login::before{content:'';position:absolute;top:-10%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(61,102,254,0.12) 0%,transparent 60%);border-radius:50%}
+  .phone.desktop-login::after{content:'';position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(108,71,255,0.08) 0%,transparent 60%);border-radius:50%}
+  .dk-login-card{background:var(--white);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.25);width:420px;max-width:90%;padding:40px;position:relative;z-index:1}
+  .dk-login-header{text-align:center;margin-bottom:32px}
+  .dk-login-header .login-logo{margin:0 auto 16px;width:72px;height:72px;background:rgba(8,42,153,0.08);border:1px solid var(--border)}
+  .dk-login-header .login-logo svg{color:var(--navy)}
+  .dk-login-header .login-title{font-size:24px;font-weight:800;color:var(--navy);letter-spacing:-0.5px}
+  .dk-login-header .login-subtitle{font-size:12px;color:var(--text-3);margin-top:4px}
+  .dk-login-card label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;margin-top:18px;text-transform:uppercase;letter-spacing:0.5px}
+  .dk-login-card label:first-of-type{margin-top:0}
+  .dk-login-card input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:14px;font-family:inherit;outline:none;background:var(--surface);transition:all .2s var(--ease);box-sizing:border-box}
+  .dk-login-card input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(61,102,254,0.1);background:var(--white)}
+  .dk-login-card .login-btn{margin-top:24px}
+  .dk-login-card .login-error{background:var(--crimson-bg);color:var(--crimson);padding:12px;border-radius:var(--r-md);font-size:12px;font-weight:600;margin-top:12px;text-align:center;display:none;border:1px solid rgba(201,49,61,0.15)}
+  .dk-login-card .login-forgot{text-align:center;margin-top:14px;font-size:12px;color:var(--blue);cursor:pointer;font-weight:500}
+  .dk-login-version{position:absolute;bottom:20px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.35);z-index:1}
 }
 
 /* ===== SCROLLBAR ===== */
@@ -2617,8 +2635,30 @@ function syncDkPageFromMobile(){
   else if(S.screen==='messages')S.dkPage='nachrichten';
   else if(S.screen==='search')S.dkPage='suche';
 }
+function renderDesktopLogin(){
+  var app=document.getElementById("app");
+  app.className='phone desktop-login';
+  var h='<div class="dk-login-card">'
+    +'<div class="dk-login-header">'
+      +'<div class="login-logo">'+ICO.tooth+'</div>'
+      +'<div class="login-title">HL-Dentistry</div>'
+      +'<div class="login-subtitle">Mobile Altenzahnheilkunde</div>'
+    +'</div>'
+    +'<label>E-Mail</label>'
+    +'<input type="email" id="loginEmail" placeholder="name@swissmedai.com">'
+    +'<label>Passwort</label>'
+    +'<input type="password" id="loginPw" placeholder="Passwort eingeben" onkeydown="if(event.key===\'Enter\')doLogin()">'
+    +'<div class="login-error" id="loginErr">Ung\u00fcltige E-Mail oder Passwort</div>'
+    +'<button class="login-btn" onclick="doLogin()">Anmelden</button>'
+    +'<div class="login-forgot">Passwort vergessen?</div>'
+  +'</div>'
+  +'<div class="dk-login-version">v10.0 \u2014 SwissMedAI GmbH</div>';
+  app.innerHTML=h;
+}
 function render(){
   var app=document.getElementById("app");
+  /* Desktop login */
+  if(S.screen==="login"&&isDesktop()){renderDesktopLogin();return}
   /* Desktop auto-switch (not on login) */
   if(S.screen!=="login"&&isDesktop()){
     if(!S.dkPage)syncDkPageFromMobile();
