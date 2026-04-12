@@ -45,6 +45,29 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — "Neue Aufgabe" existing patient: dropdown → search
+
+**Why:** User wants a search input instead of a dropdown for selecting an existing patient in the "Neue Aufgabe" overlay (Verwaltung → Übersicht → + FAB).
+
+**What changed:**
+- `hl-dentistry-v10.html:3303` — the `<select>` dropdown for existing patients replaced with:
+  - A text `<input>` with placeholder "Name oder Heim eingeben…" that filters `EXISTING_PATIENTS` as the user types (matches against name or heim, case-insensitive).
+  - A results dropdown (max-height 140 px, scrollable) that appears when the search has matches and no patient is selected yet. Each result row shows the patient name (bold) + heim (grey sub), and clicking selects it.
+  - A green confirmation chip when a patient is selected, showing name + heim + an "× Ändern" link to clear the selection and search again.
+  - An empty state "Kein Patient gefunden" when the search returns no results.
+- `hl-dentistry-v10.html:3775` — `openAdd()`, `closeAdd()`, `setPatType()` all clear `S._addPatSearch` to reset the search when opening/closing/switching.
+- `hl-dentistry-v10.html:3778` — removed the old `selectExPat()` function (was tied to the `<select>` onchange).
+- `S._addPatSearch` — new transient state string for the search input value.
+
+**UX flow:**
+1. User opens "Neue Aufgabe" → types in the search box (e.g. "Lor")
+2. Dropdown shows matching patients (e.g. "Lorenz, Dieter — Alexa Lichtenrade")
+3. User taps a result → green chip appears with name+heim, search box shows the selected name
+4. User can click "× Ändern" on the chip to clear and search again
+5. Rest of the form (Behandlung, Behandler, Datum, Status) works as before
+
+---
+
 ### 2026-04-12 — Fix: Nachrichten button not clickable on mobile
 
 **Root cause:** The `msgNav` navBtn call at line 2683 was passing the onclick handler as `'"goMessages()"'` (with extra inner double quotes). When navBtn spliced this into `onclick="` + scr + `"`, the result was `onclick=""goMessages()""` — broken HTML that the browser parsed as an empty onclick. Every other navBtn call (`'goLab()'`, `'goSearch()'`, etc.) correctly omitted the inner quotes. This was a latent bug since v8 — the Nachrichten bottom-nav button was never clickable on mobile.
