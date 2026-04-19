@@ -1491,7 +1491,7 @@ function erledigtBehandlung(){
     var prettyDate=dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':taskDate;
     var taskDateObj=new Date(taskDate);
     var isNextWeek=taskDateObj.getTime()>TODAY.getTime()+D;
-    TASKS.push({
+    var newTask={
       id:nextId++,
       bh:assigneeBhId,
       name:p.name,
@@ -1500,7 +1500,13 @@ function erledigtBehandlung(){
       status:'offen',
       week:isNextWeek?'next':'current',
       date:dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':fmtShort(new Date(TODAY.getTime()+7*D))
-    });
+    };
+    /* If assigned to a Verwaltung user, tag the task so it shows up in their "Meine Aufgaben > Offen" list */
+    if(assignee&&assignee.role==='verwaltung'){
+      newTask.assignedToEmail=assignee.email;
+      newTask.delegatedFromBh=S.user?S.user.bId||null:null;
+    }
+    TASKS.push(newTask);
     var who=assignee?assignee.name:'Behandler';
     toastText+=' \u00b7 '+wBeh+': '+prettyDate+' ('+who+')';
   }
@@ -3734,7 +3740,34 @@ function renderMeineAufgaben(){
   +'</div>';
   h+='<div class="mein-content">';
   if(mt==='offen'){
-    if(OFFEN_PAT.length===0){h+='<div class="mein-empty">Keine offenen Patienten</div>';}
+    /* Tasks delegated from Behandler-Aufgaben to the current Verwaltung user */
+    var myEmail=S.user?S.user.email:'';
+    var delegated=TASKS.filter(function(t){return t.assignedToEmail===myEmail&&t.status==='offen'});
+    if(delegated.length>0){
+      h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:4px 0 8px 2px">Von Behandler zugewiesen</div>';
+      delegated.forEach(function(t){
+        var pid=PATIENTS.find(function(x){return x.name===t.name});
+        var oc=pid?'onclick="goPatFromAdmin('+pid.id+')" style="cursor:pointer"':'';
+        var fromBh=t.delegatedFromBh?bhdlName(t.delegatedFromBh):'';
+        h+='<div class="mini-card" '+oc+' style="border-left:3px solid var(--violet)">'
+          +'<div class="mini-card-body">'
+            +'<div class="mini-name">'+t.name+'</div>'
+            +'<div class="mini-sub">'+ICO.pin+' '+t.heim+'</div>'
+            +'<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">'
+              +'<span class="mini-badge" style="background:var(--violet-bg);color:var(--violet)">'+t.behandlung+'</span>'
+              +'<span style="font-size:10px;color:var(--text-3);font-weight:600">'+t.date+'</span>'
+              +(fromBh?'<span style="font-size:10px;color:var(--text-4)">\u2190 '+fromBh+'</span>':'')
+            +'</div>'
+          +'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">'
+            +'<span class="mini-badge" style="background:var(--amber-bg);color:var(--amber)">Offen</span>'
+            +'<button class="reassign-btn" onclick="event.stopPropagation();openReassignTask('+t.id+')">Zuweisen \u2192</button>'
+          +'</div>'
+        +'</div>';
+      });
+      if(OFFEN_PAT.length>0)h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:14px 0 8px 2px">Offene Patienten</div>';
+    }
+    if(OFFEN_PAT.length===0&&delegated.length===0){h+='<div class="mein-empty">Keine offenen Patienten</div>';}
     else{
       OFFEN_PAT.forEach(function(p,i){
         var pid=PATIENTS.find(function(x){return x.name===p.name});
@@ -3746,7 +3779,7 @@ function renderMeineAufgaben(){
           +'</div>'
           +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">'
             +'<span class="mini-badge mb-late">Vor '+p.since+' Tagen</span>'
-            +'<button class="reassign-btn" onclick="openReassign('+i+',\'offen\')">Zuweisen →</button>'
+            +'<button class="reassign-btn" onclick="openReassign('+i+',\'offen\')">Zuweisen \u2192</button>'
           +'</div>'
         +'</div>';
       });
@@ -3886,10 +3919,10 @@ function setMeinTab(t){S.meinTab_2=t;render()}
 function renderReassign(){
   var src=S.reassignSrc_2||'offen';
   var isZE=src==='ze', isEX=src==='ex';
-  var p=isZE?ZE_FAELLE[S.reassignIdx_2]:isEX?EX_PATIENTEN[S.reassignIdx_2]:src==='pa'?PA_FAELLE[S.reassignIdx_2]:src==='weiterfuehrend'?WEITERFUEHREND_PAT[S.reassignIdx_2]:OFFEN_PAT[S.reassignIdx_2];
+  var p=src==='delegated'?TASKS.find(function(t){return t.id===S._reassignTaskId}):isZE?ZE_FAELLE[S.reassignIdx_2]:isEX?EX_PATIENTEN[S.reassignIdx_2]:src==='pa'?PA_FAELLE[S.reassignIdx_2]:src==='weiterfuehrend'?WEITERFUEHREND_PAT[S.reassignIdx_2]:OFFEN_PAT[S.reassignIdx_2];
   if(!p)return'';
   var f=S.reassignForm_2;
-  var title=(isZE||isEX)?(S._zeMode==='termin'?'Termin planen':'Behandler zuweisen'):src==='pa'?'PA-Aufgabe zuweisen':src==='weiterfuehrend'?'Weiterf\u00fchrende Behandlung zuweisen':'Aufgabe zuweisen';
+  var title=(isZE||isEX)?(S._zeMode==='termin'?'Termin planen':'Behandler zuweisen'):src==='pa'?'PA-Aufgabe zuweisen':src==='weiterfuehrend'?'Weiterf\u00fchrende Behandlung zuweisen':src==='delegated'?'Behandler zuweisen':'Aufgabe zuweisen';
   var bhSelect='<label class="form-label">Behandler</label>'
     +'<select class="form-select" id="rBh" onchange="S.reassignForm_2.bh=this.value">'
       +'<option value="">Behandler w\u00e4hlen\u2026</option>'
@@ -3936,7 +3969,22 @@ function openZEEdit(idx,mode,src){
   S.reassignErr_2='';
   render();
 }
-function closeReassign(){S.reassignIdx_2=null;render();}
+function openReassignTask(taskId){
+  var t=TASKS.find(function(x){return x.id===taskId});
+  if(!t)return;
+  S._reassignTaskId=taskId;
+  S.reassignIdx_2=-1;
+  S.reassignSrc_2='delegated';
+  /* Try to convert display date like "24.04." back to ISO yyyy-mm-dd for the date input */
+  var iso='';
+  var dm=/^(\d{1,2})\.(\d{1,2})\.?/;
+  var m=t.date&&t.date.match(dm);
+  if(m){var yr=TODAY.getFullYear();iso=yr+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');}
+  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||''};
+  S.reassignErr_2='';
+  render();
+}
+function closeReassign(){S.reassignIdx_2=null;S._reassignTaskId=null;render();}
 function saveReassign(){
   var f=S.reassignForm_2;
   var src2=S.reassignSrc_2||'offen';
@@ -3944,6 +3992,22 @@ function saveReassign(){
   if(!f.bh){S.reassignErr_2='Bitte Behandler ausw\u00e4hlen.';render();return;}
   if(!isZE&&!isEX&&!f.behandlung){S.reassignErr_2='Bitte Behandlung ausw\u00e4hlen.';render();return;}
   var dateStr=f.date?new Date(f.date).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}):fmtShort(TODAY);
+  if(src2==='delegated'){
+    var t=TASKS.find(function(x){return x.id===S._reassignTaskId});
+    if(t){
+      t.bh=f.bh;
+      t.date=f.date?new Date(f.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+'.':t.date;
+      t.behandlung=f.behandlung||t.behandlung;
+      var tDate=f.date?new Date(f.date):TODAY;
+      t.week=tDate.getTime()>=TODAY.getTime()+7*D?'next':'current';
+      delete t.assignedToEmail;
+      delete t.delegatedFromBh;
+    }
+    S.reassignIdx_2=null;S._reassignTaskId=null;
+    showToast('Aufgabe zugewiesen an '+bhdlName(f.bh),'var(--emerald)');
+    render();
+    return;
+  }
   if(isZE||isEX){
     var rec=isEX?EX_PATIENTEN[S.reassignIdx_2]:ZE_FAELLE[S.reassignIdx_2];
     if(rec){rec.bh=f.bh;rec.date=dateStr;}
