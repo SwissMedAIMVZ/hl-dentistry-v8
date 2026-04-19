@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- HL-Dentistry — horizontal wordmark. Signal dot after the name, Ledger-inspired. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" width="220" height="40" role="img" aria-label="HL-Dentistry">
+<!-- HL-Dentistry — elegant horizontal wordmark. Inter Medium with tight tracking. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" width="240" height="40" role="img" aria-label="HL-Dentistry">
   <text x="0" y="28" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        font-weight="700" font-size="22" letter-spacing="-0.5" fill="#0A2E9E">HL-Dentistry</text>
-  <circle cx="198" cy="28" r="4" fill="#14C295"/>
+        font-weight="500" font-size="22" letter-spacing="-0.8" fill="#0A2E9E">HL-Dentistry</text>
+  <circle cx="215" cy="27" r="2.5" fill="#14C295"/>
 </svg>
