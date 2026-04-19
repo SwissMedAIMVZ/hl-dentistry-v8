@@ -1418,6 +1418,13 @@ function openBehandelnModal(k){
 function closeBehandelnModal(){S.behandelnModal=null;render()}
 function saveBehandelnModal(){
   var m=S.behandelnModal;if(!m)return;
+  var ta=document.getElementById('bhDictText');
+  var note=ta?ta.value.trim():'';
+  var p=PATIENTS.find(function(x){return x.id===m.patId});
+  if(p&&note){
+    if(!p.visits)p.visits=[];
+    p.visits.unshift({date:Date.now(),behandler:S.user?S.user.bId||'hFeld':'hFeld',codes:[],text:note,voice:true});
+  }
   if(!S.doneTaskIds)S.doneTaskIds={};
   S.doneTaskIds[m.key]=true;
   S.behandelnModal=null;
@@ -1429,17 +1436,22 @@ function renderBehandelnModal(){
   var h='<div class="overlay-bg" onclick="closeBehandelnModal()">'
     +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
       +'<div class="overlay-header">'
-        +'<div class="overlay-title">Behandeln</div>'
+        +'<div class="overlay-title">'+m.patName+'</div>'
         +'<button class="overlay-close" onclick="closeBehandelnModal()">\u00d7</button>'
       +'</div>'
-      +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px">'
-        +'<div style="font-size:14px;font-weight:700;color:var(--text)">'+m.patName+'</div>'
-        +'<div style="font-size:12px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+m.heim+'</div>'
-        +'<div style="font-size:11px;color:var(--navy);margin-top:6px;font-weight:600">'+m.label+'</div>'
+      +'<div style="font-size:12px;color:var(--text-3);margin-top:-10px;margin-bottom:14px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+m.heim+'</div>'
+      +'<div style="background:var(--blue-50);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-md);padding:12px 14px;margin-bottom:18px">'
+        +'<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Geplante Behandlung</div>'
+        +'<div style="font-size:14px;font-weight:700;color:var(--navy)">'+m.label+'</div>'
       +'</div>'
-      +'<label class="form-label">Behandlungsnotiz</label>'
-      +'<textarea class="form-input" id="bhNotes" rows="4" placeholder="Durchgef\u00fchrte Behandlung, Befund, n\u00e4chste Schritte\u2026" style="resize:vertical;font-family:inherit" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
-      +'<button class="save-btn" onclick="saveBehandelnModal()">Behandlung abschlie\u00dfen</button>'
+      +'<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-sm)">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+          +'<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text)">'+ICO.mic+'<span>KI-Diktat</span></div>'
+        +'</div>'
+        +'<div class="dict-bar" style="animation:pulse 1.5s infinite">'+ICO.mic+' Aufnahme aktiv\u2026</div>'
+        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:90px;resize:none;margin-bottom:12px;outline:none;transition:border .2s" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+        +'<button class="submit" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveBehandelnModal()">Behandlung abschlie\u00dfen</button>'
+      +'</div>'
     +'</div>'
   +'</div>';
   return h;
