@@ -1793,10 +1793,29 @@ function renderPatient(){
   if(tab==="Historie"){
     h+='<div class="section-title">Aktive Behandlungen</div>';
     if(p.tx.length>0){h+='<div class="badges" style="margin-bottom:10px">';p.tx.forEach(function(t){h+=badge("treat",t.toUpperCase())});h+='</div>'}
-    /* Open Behandler-Aufgaben connected to this patient — rendered with the same taskCard used in Verwaltung > Behandler-Aufgaben > Wochenplanung */
+    /* Open Behandler-Aufgaben connected to this patient — rendered exactly like Wochenplan > Meine Aufgaben task cards */
     var patTasks=TASKS.filter(function(t){return t.name===p.name&&t.status==='offen'});
     if(patTasks.length>0){
-      patTasks.forEach(function(t){h+=taskCard(t)});
+      var doneSet=S.doneTaskIds||{};
+      patTasks.forEach(function(t){
+        var pat=PATIENTS.find(function(x){return x.name===t.name});
+        var patId=pat?pat.id:0;
+        var key=patId+'|treat|'+t.behandlung;
+        var isDone=!!doneSet[key];
+        var bhName=t.assignedToEmail?(function(){var u=USERS.find(function(x){return x.email===t.assignedToEmail});return u?u.name:'Verwaltung'})():bhdlName(t.bh);
+        var actions=isDone
+          ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
+          :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openBehandelnModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Behandeln</button>'
+           +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openRescheduleModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
+        h+='<div class="task-card'+(isDone?' done':'')+'" style="flex-direction:column;align-items:stretch;gap:10px">'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+            +'<div class="task-check'+(isDone?' checked':'')+'">'+(isDone?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+            +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.behandlung+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.date+' \u00b7 '+bhName+'</div></div>'
+            +'<div style="text-align:right"><div>'+badge("treat",t.behandlung)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.heim+'</div></div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">'+actions+'</div>'
+        +'</div>';
+      });
     }
     if(p.tx.length===0&&patTasks.length===0)h+='<div style="color:var(--text-3);font-size:12px;margin-bottom:16px">Keine aktiven Behandlungen</div>';
     h+='<div style="height:10px"></div>';

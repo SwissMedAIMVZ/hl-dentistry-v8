@@ -47,6 +47,32 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patient file → Aktive Behandlungen: use Wochenplan > Meine Aufgaben card layout
+
+**Commit:** `(current)` — *Patient file → Aktive Behandlungen: render via Meine Aufgaben card style*
+
+**Why:** The previous iteration used the Verwaltung `taskCard()` renderer (flat card with patient name, date, heim, status badge). User wanted the *Klinik Wochenplan > Meine Aufgaben* card style instead — the richer card with checkbox, treatment badge, action buttons (Behandeln / Neu planen), and sub-line with heim + date + behandler name.
+
+**Change:** Replaced `taskCard(t)` calls with inline markup that mirrors lines `~1670–1683` in `renderHome()` (Klinik Heute > Meine Aufgaben). Each open TASK connected to the patient now renders as:
+
+- `.task-card` wrapper with `flex-direction: column; align-items: stretch; gap: 10px`
+- **Top row** (flex):
+  - Checkbox circle (`.task-check`, checked/unchecked) tracking `S.doneTaskIds[key]`
+  - Treatment name as primary label (12 px, bold) + subline with `date · behandler name`
+  - Treatment badge on the right (same `badge("treat", …)` used in Meine Aufgaben) + heim text below
+- **Action row** (bottom, separated by 1 px border-top):
+  - **Behandeln** button → `openBehandelnModal(key)` — identical to Klinik Heute
+  - **Neu planen** button → `openRescheduleModal(key)` — identical to Klinik Heute
+  - If done: **Zurück zu Offen** button → `markTaskUndone(key)`
+
+**Assignee display**: if the task has `assignedToEmail` (Verwaltung delegation), looks up the user name; otherwise uses `bhdlName(t.bh)`.
+
+**Task key**: uses the same `patId|treat|behandlung` pattern as the Klinik Heute tasks so that `S.doneTaskIds` / `S.rescheduledTaskIds` / the Behandeln modal all interoperate correctly.
+
+**Removed:** the `taskCard(t)` calls (Verwaltung Wochenplanung style) and the "OFFENE BEHANDLER-AUFGABEN" overline (already removed in prior commit).
+
+---
+
 ### 2026-04-19 — Patient file → Aktive Behandlungen: use shared `taskCard` renderer, drop custom overline
 
 **Why:** The first iteration rendered open tasks as bespoke mini-cards with a "Offene Behandler-Aufgaben" overline. User wanted them to look exactly like the tasks in Verwaltung > Behandler-Aufgaben > Wochenplanung — same visual language, same click target, no separate section header.
