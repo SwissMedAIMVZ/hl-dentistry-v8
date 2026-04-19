@@ -1957,7 +1957,7 @@ function renderSearch(){
 function renderManager(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
   var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div>'+MENU_BTN_2+'</div></div>';
-  h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle","Nachrichten"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
+  h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div><div class="content">';
   if(tab==="\u00dcbersicht"){
     h+='<div class="mgr-stats"><div class="mgr-stat"><div class="num" style="color:var(--navy)">'+totalPat+'</div><div class="label">Patienten</div><div class="trend trend-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> +12 Monat</div></div>'
@@ -2008,28 +2008,6 @@ function renderManager(){
     h+='</tbody></table></div></div>';
   }
   if(tab==="F\u00e4lle"){h+='<div style="padding:0 20px"><div class="mgr-section"><div class="mgr-section-title">Alle ZE-F\u00e4lle ('+zeC+')</div>';PATIENTS.filter(function(p){return p.ze}).sort(function(a,b){var ua=urg(a.ze.exp)==="expired"?0:1;var ub=urg(b.ze.exp)==="expired"?0:1;return ua-ub}).forEach(function(p){var u2=urg(p.ze.exp);h+='<div class="card" onclick="mgrDrillPat('+p.id+')"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+bhdlName(p.ze.bh)+'</div></div>'+badge(u2==="expired"?"urgent":u2==="urgent"?"warning":"active",ZE_STATES[p.ze.st])+'</div></div>'});h+='</div>';h+='<div class="mgr-section"><div class="mgr-section-title">Alle PA-F\u00e4lle ('+paC+')</div>';PATIENTS.filter(function(p){return p.pa}).forEach(function(p){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(!ps)return;h+='<div class="card" onclick="mgrDrillPat('+p.id+')"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+ps.label+'</div></div>'+badge("purple",ps.label)+'</div></div>'});h+='</div></div>'}
-  if(tab==="Nachrichten"){
-    var msgs=getMyMessages();var uc=getUnreadCount();
-    h+='<div style="padding:0 20px">';
-    h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="mgr-section-title" style="margin:0">E-Mail-Posteingang</div><span style="font-size:11px;color:var(--text-3);font-weight:600">'+msgs.length+' gesamt \u2014 '+uc+' ungelesen</span></div>';
-    if(msgs.length===0)h+='<div style="padding:20px;text-align:center;color:var(--text-4);font-size:12px">Keine E-Mails</div>';
-    else msgs.forEach(function(m){
-      var senderEmail=msgSenderEmail(m);
-      var initials=msgSenderInitials(m);
-      h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')" style="border-bottom:1px solid var(--surface-2)">';
-      if(!m.read)h+='<div class="msg-unread-dot"></div>';
-      h+='<div class="em-avatar">'+initials+'</div>'
-        +'<div class="msg-body">'
-          +'<div class="em-sender">'+m.from+' <span style="font-weight:400;color:var(--text-4)">&lt;'+senderEmail+'&gt;</span></div>'
-          +'<div class="em-subject">'+m.title+'</div>'
-          +'<div class="msg-preview">'+m.body.substring(0,80)+'\u2026</div>'
-        +'</div>'
-        +'<div class="em-date">'+fmtEmailDate(m.time)+'</div>'
-      +'</div>';
-    });
-    h+='<button style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Neue E-Mail verfassen</button>';
-    h+='</div></div>';
-  }
   h+='</div>';return h;
 }
 
@@ -2481,7 +2459,7 @@ function renderDesktopSidebar(){
   /* Management dropdown */
   h+='<button class="dk-nav-item '+(S.dkPage==='manager'?'active':'')+'" onclick="toggleDkGroup(\'manager\')" style="padding-right:10px">'+ICO.chart+'<span>Management</span>'+(isMgrOpen?chevUp:chevDown)+'</button>';
   if(isMgrOpen){
-    ['\u00dcbersicht','Behandler','Heime','Planung','F\u00e4lle','Nachrichten'].forEach(function(t){
+    ['\u00dcbersicht','Behandler','Heime','Planung','F\u00e4lle'].forEach(function(t){
       var active=(S.dkPage==='manager'&&S.mgrTab===t)?'active':'';
       h+='<button class="dk-nav-item '+active+'" style="padding-left:44px;font-size:12px" onclick="goDesktopMgrTab(\''+t+'\')"><span>'+t+'</span></button>';
     });
@@ -2528,7 +2506,7 @@ function renderDesktopManagerBody(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
   /* Tabs */
   var h='<div class="dk-tabs">';
-  ["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle","Nachrichten"].forEach(function(t){h+='<button class="'+(tab===t?"active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
+  ["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="'+(tab===t?"active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div>';
   /* Scrollable body */
   h+='<div class="dk-body">';
@@ -2567,26 +2545,6 @@ function renderDesktopManagerBody(){
   if(tab==="Heime"){h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="mgr-section-title" style="margin:0">Heim-\u00dcbersicht</div></div><table class="mgr-table"><thead><tr><th>Heim</th><th>Pat.</th><th>ZE</th><th>PA</th><th>Dring.</th></tr></thead><tbody>';HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});var ze=pts.filter(function(p){return p.ze}).length;var pa=pts.filter(function(p){return p.pa}).length;var ug=pts.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;h+='<tr style="cursor:pointer"><td style="font-weight:600">'+hm.name+'</td><td>'+pts.length+'</td><td>'+ze+'</td><td>'+pa+'</td><td>'+(ug>0?badge("urgent",ug):badge("done","0"))+'</td></tr>'});h+='</tbody></table></div>'}
   if(tab==="Planung"){var days=["Mo","Di","Mi","Do","Fr"];var bIds=[{id:"hFeld",name:"Dr. Feld"},{id:"hHess",name:"Dr. Hess"},{id:"hGomez",name:"Dr. Gomez"}];h+='<div class="mgr-section"><div class="mgr-section-title">Wochenplan</div><table class="mgr-table"><thead><tr><th>Behandler</th>';days.forEach(function(d){h+='<th>'+d+'</th>'});h+='</tr></thead><tbody>';bIds.forEach(function(b){h+='<tr><td style="font-weight:600">'+b.name+'</td>';days.forEach(function(d,di){var val=SCHEDULE[b.id]?SCHEDULE[b.id][di]||"":"";var isEditing=S.scheduleEdit&&S.scheduleEdit.bId===b.id&&S.scheduleEdit.day===di;if(isEditing){h+='<td style="padding:2px"><select id="schedSel" style="width:100%;font-size:11px;padding:4px;border:1.5px solid var(--blue);border-radius:4px;font-family:inherit;background:var(--blue-25)" onchange="scheduleSave(\''+b.id+'\','+di+')"><option value="">\u2014</option>';HEIME.forEach(function(hm){h+='<option value="'+hm.name+'"'+(val===hm.name?' selected':'')+'>'+hm.name+'</option>'});h+='</select></td>'}else{h+='<td style="cursor:pointer;'+(val?'color:var(--navy);font-weight:600':'color:var(--text-4)')+'" onclick="scheduleEdit(\''+b.id+'\','+di+')">'+(val||'\u2014')+'</td>'}});h+='</tr>'});h+='</tbody></table></div>'}
   if(tab==="F\u00e4lle"){h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';h+='<div class="mgr-section"><div class="mgr-section-title">Alle ZE-F\u00e4lle ('+zeC+')</div>';PATIENTS.filter(function(p){return p.ze}).sort(function(a,b){var ua=urg(a.ze.exp)==="expired"?0:1;var ub=urg(b.ze.exp)==="expired"?0:1;return ua-ub}).forEach(function(p){var u2=urg(p.ze.exp);h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+bhdlName(p.ze.bh)+'</div></div>'+badge(u2==="expired"?"urgent":u2==="urgent"?"warning":"active",ZE_STATES[p.ze.st])+'</div></div>'});h+='</div>';h+='<div class="mgr-section"><div class="mgr-section-title">Alle PA-F\u00e4lle ('+paC+')</div>';PATIENTS.filter(function(p){return p.pa}).forEach(function(p){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(!ps)return;h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+ps.label+'</div></div>'+badge("purple",ps.label)+'</div></div>'});h+='</div></div>'}
-  if(tab==="Nachrichten"){
-    var msgs=getMyMessages();var uc=getUnreadCount();
-    h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="mgr-section-title" style="margin:0">E-Mail-Posteingang</div><div style="display:flex;gap:12px;align-items:center"><span style="font-size:12px;color:var(--text-3);font-weight:600">'+msgs.length+' gesamt \u2014 '+uc+' ungelesen</span><button style="padding:10px 18px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;gap:6px" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Neue E-Mail</button></div></div>';
-    if(msgs.length===0)h+='<div style="padding:30px;text-align:center;color:var(--text-4);font-size:13px">Keine E-Mails</div>';
-    else msgs.forEach(function(m){
-      var senderEmail=msgSenderEmail(m);
-      var initials=msgSenderInitials(m);
-      h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')" style="border-bottom:1px solid var(--surface-2);border-radius:0">';
-      if(!m.read)h+='<div class="msg-unread-dot"></div>';
-      h+='<div class="em-avatar">'+initials+'</div>'
-        +'<div class="msg-body">'
-          +'<div class="em-sender">'+m.from+' <span style="font-weight:400;color:var(--text-4)">&lt;'+senderEmail+'&gt;</span></div>'
-          +'<div class="em-subject">'+m.title+'</div>'
-          +'<div class="msg-preview">'+m.body.substring(0,120)+'\u2026</div>'
-        +'</div>'
-        +'<div class="em-date">'+fmtEmailDate(m.time)+'</div>'
-      +'</div>';
-    });
-    h+='</div>';
-  }
   h+='</div>';
   return h;
 }
