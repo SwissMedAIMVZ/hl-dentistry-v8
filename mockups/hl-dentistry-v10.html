@@ -1411,6 +1411,7 @@ function openBehandelnModal(k){
   var parts=k.split('|');var patId=parseInt(parts[0],10);
   var p=PATIENTS.find(function(x){return x.id===patId});
   if(!p)return;
+  S._behandelnReturn=null;
   S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
   var defVerw=USERS.find(function(u){return u.role==='verwaltung'&&u.name!=='Verwaltung'});
   var nextWeek=new Date(TODAY.getTime()+7*D);
@@ -1418,7 +1419,7 @@ function openBehandelnModal(k){
   S.behandelnForm={notes:'',manualNote:'',weiterBeh:'',weiterDate:iso,weiterBhId:defVerw?defVerw.email:'',transcribed:false};
   render();
 }
-function closeBehandelnModal(){S.behandelnModal=null;render()}
+function closeBehandelnModal(){S.behandelnModal=null;S._behandelnReturn=null;render()}
 function behandelnOpenOdoEdit(){
   var m=S.behandelnModal;if(!m)return;
   /* Snapshot current field values so the Behandeln popup can be resumed later */
@@ -1436,6 +1437,8 @@ function behandelnOpenOdoEdit(){
     weiterBhId:wbh?wbh.value:(f.weiterBhId||''),
     transcribed:f.transcribed||false
   };
+  /* Remember that the odontogram edit was launched from the Behandeln popup; odoSaveAndClose will restore it */
+  S._behandelnReturn={modal:S.behandelnModal,form:S.behandelnForm};
   /* Navigate to the patient's odontogram in Status-Bearbeiten mode */
   S.patId=m.patId;
   S.screen='patient';
@@ -2510,7 +2513,14 @@ function clearToothState(){/* placeholder - in editor context, would clear selec
 function odoSaveAndClose(){
   var p=PATIENTS.find(function(x){return x.id===S.patId});
   if(p)odoAutoSave(p);
-  S.odoEdit=false;render();
+  S.odoEdit=false;
+  /* If the user came from the Behandeln popup, re-open it with the preserved form state */
+  if(S._behandelnReturn){
+    S.behandelnModal=S._behandelnReturn.modal;
+    S.behandelnForm=S._behandelnReturn.form;
+    S._behandelnReturn=null;
+  }
+  render();
 }
 function odoAutoSave(p){
   if(!p)return;

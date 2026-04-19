@@ -145,6 +145,36 @@ Verwaltung delegations get the " (Verwaltung)" suffix so the user can tell at a 
 
 ---
 
+### 2026-04-19 — Odontogram "Fertig" returns to the Behandeln popup when launched from it
+
+**Why:** After clicking "Odontogram bearbeiten" in the Behandeln popup, the user updates tooth states and clicks "Fertig" on the odontogram editor. Previously this dropped them on the bare patient page — losing the Behandeln flow context. Now "Fertig" detects whether the edit session was launched from the popup and bounces back into it (with all Weiterbehandlung / KI-Diktat / Beschreibung fields preserved); otherwise it behaves the same as before (saves + closes to the patient file).
+
+**Mechanism — `S._behandelnReturn`:** a transient "breadcrumb" slot holding `{modal, form}` — set when the user leaves the popup for the odontogram, consumed when they click "Fertig".
+
+**Lifecycle:**
+- **Set** in `behandelnOpenOdoEdit()` right before navigating: `S._behandelnReturn = {modal: S.behandelnModal, form: S.behandelnForm}`. Captures the snapshotted Behandeln state so nothing the user already typed gets lost.
+- **Consumed** in `odoSaveAndClose()` — after `odoAutoSave(p)` writes the snapshot to `p.odoHist` and `S.odoEdit=false`:
+  ```js
+  if (S._behandelnReturn) {
+    S.behandelnModal = S._behandelnReturn.modal;
+    S.behandelnForm  = S._behandelnReturn.form;
+    S._behandelnReturn = null;
+  }
+  render();
+  ```
+  The next render sees `S.behandelnModal` set, so `renderBehandelnModal()` puts the popup back on top of the patient file.
+- **Cleared defensively** in `openBehandelnModal()` (fresh popup opens shouldn't inherit a stale return slot) and in `closeBehandelnModal()` (user dismissed the popup via ×, they don't want a surprise bounce-back later).
+
+**User-visible flow:**
+1. Behandeln popup open → click "Odontogram bearbeiten" → popup closes, odontogram editor opens.
+2. User edits teeth (palette clicks write into `p.odo` in real time, same as before).
+3. Click "Fertig" → `odoAutoSave` captures today's snapshot to `p.odoHist`, `S.odoEdit=false`, **popup re-appears** with everything the user had typed still in place (KI transcript, Beschreibung, Weiterbehandlung treatment/date/assignee).
+4. If the user had opened the odontogram editor via any other path (inline "Status bearbeiten" link, direct patient-page navigation), "Fertig" behaves exactly as it did before — save + close, stay on patient page.
+
+**Unchanged:** the edit-mode odontogram palette, `odoAutoSave` snapshot logic, and the other Behandeln popup affordances (Behandlung abschließen, Erledigt button, etc.).
+
+---
+
 ### 2026-04-19 — Behandeln popup: "Beschreibung" rename + "Odontogram bearbeiten" shortcut
 
 **Why:** The user wants a faster way to update the tooth status while documenting a treatment. Relabelling the manual-note section to just "Beschreibung" tightens the UI, and a dedicated button lets the behandler jump straight into the odontogram editor without closing the popup and digging through tabs.
