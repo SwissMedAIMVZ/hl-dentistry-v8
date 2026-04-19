@@ -45,6 +45,633 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+**Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
+
+### 2026-04-19 — Patient file → Aktive Behandlungen: use Wochenplan > Meine Aufgaben card layout
+
+**Commit:** `(current)` — *Patient file → Aktive Behandlungen: render via Meine Aufgaben card style*
+
+**Why:** The previous iteration used the Verwaltung `taskCard()` renderer (flat card with patient name, date, heim, status badge). User wanted the *Klinik Wochenplan > Meine Aufgaben* card style instead — the richer card with checkbox, treatment badge, action buttons (Behandeln / Neu planen), and sub-line with heim + date + behandler name.
+
+**Change:** Replaced `taskCard(t)` calls with inline markup that mirrors lines `~1670–1683` in `renderHome()` (Klinik Heute > Meine Aufgaben). Each open TASK connected to the patient now renders as:
+
+- `.task-card` wrapper with `flex-direction: column; align-items: stretch; gap: 10px`
+- **Top row** (flex):
+  - Checkbox circle (`.task-check`, checked/unchecked) tracking `S.doneTaskIds[key]`
+  - Treatment name as primary label (12 px, bold) + subline with `date · behandler name`
+  - Treatment badge on the right (same `badge("treat", …)` used in Meine Aufgaben) + heim text below
+- **Action row** (bottom, separated by 1 px border-top):
+  - **Behandeln** button → `openBehandelnModal(key)` — identical to Klinik Heute
+  - **Neu planen** button → `openRescheduleModal(key)` — identical to Klinik Heute
+  - If done: **Zurück zu Offen** button → `markTaskUndone(key)`
+
+**Assignee display**: if the task has `assignedToEmail` (Verwaltung delegation), looks up the user name; otherwise uses `bhdlName(t.bh)`.
+
+**Task key**: uses the same `patId|treat|behandlung` pattern as the Klinik Heute tasks so that `S.doneTaskIds` / `S.rescheduledTaskIds` / the Behandeln modal all interoperate correctly.
+
+**Removed:** the `taskCard(t)` calls (Verwaltung Wochenplanung style) and the "OFFENE BEHANDLER-AUFGABEN" overline (already removed in prior commit).
+
+---
+
+### 2026-04-19 — Patient file → Aktive Behandlungen: use shared `taskCard` renderer, drop custom overline
+
+**Why:** The first iteration rendered open tasks as bespoke mini-cards with a "Offene Behandler-Aufgaben" overline. User wanted them to look exactly like the tasks in Verwaltung > Behandler-Aufgaben > Wochenplanung — same visual language, same click target, no separate section header.
+
+**Change:** In `renderPat()`, the Historie tab's per-task rendering is reduced to a direct call into the shared `taskCard(t)` function (defined at `~3371`):
+```js
+patTasks.forEach(function(t){ h += taskCard(t); });
+```
+
+Dropped:
+- The `"OFFENE BEHANDLER-AUFGABEN"` uppercase overline.
+- The custom mini-card markup (border-colored left edge, treatment + meta row, amber "Offen" pill).
+- The assignee-resolution logic with "(Verwaltung)" suffix and `← Dr. Feld` origin label — `taskCard` doesn't show those fields and that's intentional now.
+
+**What `taskCard` renders** (for reference — this is what shows up in the patient file now):
+- `.task-card` with status-class left-border (amber `tc-o` for Offen, emerald `tc-e` for Erledigt).
+- Patient name (big, first line).
+- Date (second line, right-aligned in the original layout).
+- Pin-icon + heim on its own row.
+- Treatment badge (`tb-beh`) + status badge (Offen/Erledigt clock/check) on a bottom row.
+- `onclick="goPatFromAdmin(patId)"` when the patient exists — self-navigation on the patient page is a no-op.
+
+**Empty-state logic unchanged:** still only shows "Keine aktiven Behandlungen" when both `p.tx` is empty AND no open tasks reference the patient. Bottom 10 px spacer retained to keep the rhythm before "Behandlungsverlauf".
+
+**Visual consistency payoff:** the tasks look identical whether a user sees them in the Verwaltung weekly plan or on a patient detail page — same component, same layout, same click affordance. No more "why is this card styled differently?" cognitive load.
+
+---
+
+### 2026-04-19 — Patient file → Aktive Behandlungen: list connected open Behandler-Aufgaben
+
+**Why:** The patient file's "Aktive Behandlungen" section on the Historie tab previously only showed the treatment-code badges from `p.tx` (shorthand codes like CO, ZE, PA). When the user schedules follow-up tasks via the Behandeln popup — or when tasks exist in `TASKS` that reference this patient by name — there was no visibility of them on the patient file itself. The patient page is where a behandler looks when prepping for a visit; they need to see what's already on the schedule for this person.
+
+**Where:** `renderPat()` — the `tab==="Historie"` branch, directly below the `p.tx` badges (around line 1795).
+
+**Query:**
+```js
+var patTasks = TASKS.filter(t => t.name === p.name && t.status === 'offen');
+```
+Matches on the task's `name` field (string match to patient's `p.name`) — the same convention the Verwaltung Behandler-Aufgaben list already uses to group tasks under a Behandler's heim visits. Only tasks still `status === 'offen'` are shown; completed tasks live in the Behandlungsverlauf below via `p.visits`.
+
+**Rendering:** mini-card per open task (margin-bottom 6 px between them) under a small uppercase "OFFENE BEHANDLER-AUFGABEN" overline (10 px, `var(--text-3)`). Each card:
+- **Left-border color encodes assignment type:**
+  - Violet (`var(--violet)`) — task is delegated to a Verwaltung user (`t.assignedToEmail` is set).
+  - Navy (`var(--navy)`) — task assigned to a Behandler normally.
+- **Body (left column):** treatment name (12 px, bold), then a meta row with a small calendar icon + date + ` · ` + assignee name + (if delegated) ` ← Dr. Feld` origin label.
+- **Right column:** amber "Offen" badge.
+- `cursor: default` — not clickable for now (we're already on the patient page so navigating anywhere else would be surprising).
+
+**Assignee resolution:**
+```js
+if (t.assignedToEmail) {
+  var u = USERS.find(x => x.email === t.assignedToEmail);
+  toWho = u ? u.name + ' (Verwaltung)' : 'Verwaltung';
+} else {
+  toWho = bhdlName(t.bh) || t.bh;
+}
+```
+Verwaltung delegations get the " (Verwaltung)" suffix so the user can tell at a glance whether this is a Behandler-owned task or something sitting in the admin queue.
+
+**Empty-state logic updated:** the old `p.tx.length > 0` check with an else branch now only triggers "Keine aktiven Behandlungen" when *both* the treatment-code badges AND the open-tasks list are empty — so a patient with no `p.tx` but active tasks doesn't get the misleading empty state, and a patient with `p.tx` but no tasks doesn't see a bare badges row with no section break.
+
+**Layout tidy-up:** a 10 px spacer div is appended below the section to maintain the old `margin-bottom:16px` visual gap before "Behandlungsverlauf" — keeps the existing rhythm regardless of which sub-sections rendered.
+
+**End-to-end demo flow:**
+1. Log in as Dr. Feld → any task on the Heute tab → click Behandeln.
+2. Fill Weiterbehandlung ("UPT-Sitzung", next week, C. Weigert — Verwaltung default) → Erledigt.
+3. Toast confirms. Scroll to the same patient's file (or pick them from Pipeline / Search) → open the Historie tab.
+4. Under "Aktive Behandlungen", below the treatment code badges, a new violet-bordered card appears: **"UPT-Sitzung · 26.04. · C. Weigert (Verwaltung) ← Dr. Feld"** with an amber "Offen" pill on the right.
+5. Once C. Weigert reassigns that task to a real Behandler (via Meine Aufgaben > Offen > Zuweisen), the card's left border switches to navy and the arrow origin drops — the delegation completed its handoff.
+
+---
+
+### 2026-04-19 — Einverständnis PDF: SwissMedAI letterhead + mandatory attachment banner
+
+**Why:** The generated Einverständnis PDF previously dropped straight into the recipient address block — no clinic letterhead, no visual identity, and the consent-form attachment had no signposting that it was the page that must be returned by post/fax. Brought it in line with the Word-doc original the user shared (SwissMedAI Bundesallee letterhead + the explicit "WICHTIG: Bitte zurückschicken…" banner ahead of the consent form).
+
+**Changes in `buildEinvLetterPages()`** (`~4505`):
+
+*New shared letterhead block — `EINV_LETTERHEAD_HTML`* (declared once, reused on both pages):
+- Flex container with text on the left, HL gradient mark (54×54 px inline SVG) on the right.
+- Left column shows:
+  - `SwissMedAI Medizinisches Versorgungszentrum (MVZ)` (bold 11 pt)
+  - `Zahnärztliche Leitung: Jesus Gomez Rossi`
+  - `Praxis-Standort: Bundesallee 140, 12161 Berlin`
+  - Contact line: `Email: info@mvz-arzt.de · Tel: 030-8531362 · Fax: 030-8549524`
+- Right column: same HL monogram with the navy gradient + signal-green dot used in the favicon and login screen.
+- 1.5 px navy hairline border underneath, 1.2 cm bottom margin → reads as a proper Briefkopf.
+
+*Insertion points:*
+- Page 1 (cover letter): `EINV_LETTERHEAD_HTML` prepended above the recipient `.addr` block.
+- Page 2 (consent form / mandatory attachment): `EINV_LETTERHEAD_HTML` repeated, then a new `.attach-banner` (amber background `#FFF8E1`, 1.5 px gold border) carrying the verbatim instruction from the source doc:
+  > **WICHTIG:** Bitte schicken Sie diese Seite im Original und vollständig ausgefüllt an SwissMedAI MVZ, Bundesallee 140, 12161 Berlin. Zur schnelleren Bearbeitung können Sie das Formular zusätzlich auch an info@mvz-arzt.de oder per Fax 030-8549524 schicken. Vielen Dank!
+
+**CSS additions in `EINV_PDF_CSS`:**
+- `.letterhead`, `.lh-text`, `.lh-clinic`, `.lh-contact`, `.lh-logo` — flex layout, navy text, hairline divider.
+- `.attach-banner` — amber callout for the page-2 instruction.
+- Tweaked `table.cost` colors to use the Ledger navy (`#0A2E9E`) instead of the older slate `#1e3a5f`, and the alternating row tint to `#EFF3FF` to match the brand palette.
+
+**Why repeat the letterhead on page 2:** the consent form is a tear-off return document — when the recipient mails it back, that page needs to stand on its own with the clinic identity visible. Standard practice for German Briefkopf attachments.
+
+**No changes to:** `EINV_LETTER_TEXTS` (body content already matches the source doc), the cost table content, the form field layout, the A/B checkbox section, or the print-window opener.
+
+---
+
+### 2026-04-19 — Odontogram "Fertig" returns to the Behandeln popup when launched from it
+
+**Why:** After clicking "Odontogram bearbeiten" in the Behandeln popup, the user updates tooth states and clicks "Fertig" on the odontogram editor. Previously this dropped them on the bare patient page — losing the Behandeln flow context. Now "Fertig" detects whether the edit session was launched from the popup and bounces back into it (with all Weiterbehandlung / KI-Diktat / Beschreibung fields preserved); otherwise it behaves the same as before (saves + closes to the patient file).
+
+**Mechanism — `S._behandelnReturn`:** a transient "breadcrumb" slot holding `{modal, form}` — set when the user leaves the popup for the odontogram, consumed when they click "Fertig".
+
+**Lifecycle:**
+- **Set** in `behandelnOpenOdoEdit()` right before navigating: `S._behandelnReturn = {modal: S.behandelnModal, form: S.behandelnForm}`. Captures the snapshotted Behandeln state so nothing the user already typed gets lost.
+- **Consumed** in `odoSaveAndClose()` — after `odoAutoSave(p)` writes the snapshot to `p.odoHist` and `S.odoEdit=false`:
+  ```js
+  if (S._behandelnReturn) {
+    S.behandelnModal = S._behandelnReturn.modal;
+    S.behandelnForm  = S._behandelnReturn.form;
+    S._behandelnReturn = null;
+  }
+  render();
+  ```
+  The next render sees `S.behandelnModal` set, so `renderBehandelnModal()` puts the popup back on top of the patient file.
+- **Cleared defensively** in `openBehandelnModal()` (fresh popup opens shouldn't inherit a stale return slot) and in `closeBehandelnModal()` (user dismissed the popup via ×, they don't want a surprise bounce-back later).
+
+**User-visible flow:**
+1. Behandeln popup open → click "Odontogram bearbeiten" → popup closes, odontogram editor opens.
+2. User edits teeth (palette clicks write into `p.odo` in real time, same as before).
+3. Click "Fertig" → `odoAutoSave` captures today's snapshot to `p.odoHist`, `S.odoEdit=false`, **popup re-appears** with everything the user had typed still in place (KI transcript, Beschreibung, Weiterbehandlung treatment/date/assignee).
+4. If the user had opened the odontogram editor via any other path (inline "Status bearbeiten" link, direct patient-page navigation), "Fertig" behaves exactly as it did before — save + close, stay on patient page.
+
+**Unchanged:** the edit-mode odontogram palette, `odoAutoSave` snapshot logic, and the other Behandeln popup affordances (Behandlung abschließen, Erledigt button, etc.).
+
+---
+
+### 2026-04-19 — Behandeln popup: "Beschreibung" rename + "Odontogram bearbeiten" shortcut
+
+**Why:** The user wants a faster way to update the tooth status while documenting a treatment. Relabelling the manual-note section to just "Beschreibung" tightens the UI, and a dedicated button lets the behandler jump straight into the odontogram editor without closing the popup and digging through tabs.
+
+**Changes in `renderBehandelnModal()`:**
+- `"Manuelle Beschreibung"` label → `"Beschreibung"`.
+- New button immediately below the `#bhManualText` textarea, spanning full-width:
+  - Style: `var(--blue-50)` background, navy text, `rgba(10,46,158,0.2)` hairline border, 12 px bold.
+  - Icon: pencil-on-paper SVG (same icon the patient file's inline "Status bearbeiten" link uses).
+  - Label: `"Odontogram bearbeiten"`.
+  - `onclick="behandelnOpenOdoEdit()"`.
+
+**New function `behandelnOpenOdoEdit()`:**
+1. Snapshots current DOM values into `S.behandelnForm` — dict textarea, manual textarea, Weiterbehandlung treatment/date/assignee. This preserves what the user typed even though the modal is about to close (a future return flow could re-open the popup without data loss).
+2. Navigates to the target patient's file:
+   - `S.patId = m.patId`
+   - `S.screen = 'patient'`
+   - `S.odoTab = 'status'` (odontogram sub-tab — same value the `renderOdo()` default uses)
+   - `S.odoEdit = true`, `S.odoQ = 1`, `S.odoSelTooth = 0` — identical to the existing "Status bearbeiten" link at line `~1192`, so the user lands in the same first-quadrant editor state.
+3. Clears `S.behandelnModal` so the popup closes cleanly.
+4. `render()`.
+
+**Net effect:** clicking "Odontogram bearbeiten" transitions directly into the existing status-edit UI on the patient page. Current Behandeln form state is preserved in `S.behandelnForm` (not yet surfaced anywhere — reserved for a future "Zurück zur Behandlung" return flow if needed).
+
+---
+
+### 2026-04-19 — Meine Aufgaben > Offen: surface Behandeln follow-ups delegated to Verwaltung
+
+**Commit:** `69c3170` — *Show Verwaltung-delegated Behandeln follow-ups in Meine Aufgaben > Offen*
+
+**Why:** When a Behandler assigns a Weiterbehandlung to a Verwaltung user via the Behandeln popup, the delegated task needs to appear in that user's own queue so they can actually see it and schedule it. Before this change, the task was pushed to `TASKS` but had no way to show up under the Verwaltung user's "Meine Aufgaben" view — it would only appear in the Behandler-Aufgaben grouped list under whatever fallback doctor it landed on.
+
+**Data-model additions to follow-up tasks.** In `erledigtBehandlung()`, when the selected assignee has `role === 'verwaltung'`, the new TASK object now carries two extra fields:
+- `assignedToEmail` — the Verwaltung user's email (`c.weigert@mvz-arzt.de` in demo data); used as the query key for "is this task mine?"
+- `delegatedFromBh` — the `bId` of the Behandler who triggered the delegation (read from `S.user.bId`); used to render the "← Dr. Feld" origin label on the card
+
+The task's `bh` field still holds a Behandler id (falls back to the original task's doctor if the assignee has no `bId`) so the TASKS list doesn't break anywhere that expects a doctor to exist — Verwaltung assignment is layered on top, not a replacement.
+
+**Rendering in `renderMeineAufgaben()` > `mt==='offen'`:**
+
+New section inserted before the existing `OFFEN_PAT` cards:
+
+```js
+var myEmail = S.user ? S.user.email : '';
+var delegated = TASKS.filter(t =>
+  t.assignedToEmail === myEmail && t.status === 'offen'
+);
+```
+
+For each delegated task:
+- `.mini-card` with a **violet left border** (3 px, `var(--violet)`) to distinguish from OFFEN_PAT's plain white cards
+- Body: patient name + pin-icon heim subline + a meta row containing
+  - violet-tinted badge with the treatment name (`var(--violet-bg)` / `var(--violet)`)
+  - scheduled date in `var(--text-3)`
+  - origin label: `"← Dr. Feld"` (using `bhdlName(task.delegatedFromBh)`)
+- Right column: amber "Offen" status badge + **"Zuweisen →"** action button
+
+Section header: uppercase 11 px "Von Behandler zugewiesen". When both the delegated list and `OFFEN_PAT` have entries, a second subhead ("Offene Patienten") is rendered between them.
+
+**Empty-state handling:** `Keine offenen Patienten` is only shown when both `delegated.length === 0` and `OFFEN_PAT.length === 0` — so a Verwaltung user with no incoming delegations but no hardcoded open patients still gets a clean empty state, while users with only delegations don't see the empty string pop underneath.
+
+**Zuweisen action — new `openReassignTask(taskId)` function:**
+
+Adds a `'delegated'` source type to the existing reassign flow:
+
+```js
+function openReassignTask(taskId) {
+  var t = TASKS.find(x => x.id === taskId);
+  if (!t) return;
+  S._reassignTaskId = taskId;
+  S.reassignIdx_2 = -1;              // sentinel — not indexing into any array
+  S.reassignSrc_2 = 'delegated';
+  // Convert display date (e.g. "24.04.") back to ISO yyyy-mm-dd for the date input
+  var iso = '';
+  var m = t.date && t.date.match(/^(\d{1,2})\.(\d{1,2})\.?/);
+  if (m) {
+    var yr = TODAY.getFullYear();
+    iso = yr + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[1]).padStart(2,'0');
+  }
+  S.reassignForm_2 = { bh: '', date: iso, behandlung: t.behandlung || '' };
+  S.reassignErr_2 = '';
+  render();
+}
+```
+
+**`renderReassign()` extension:** the patient lookup (line `~3922`) gains a `'delegated'` branch that pulls the task straight from `TASKS` via the stored `_reassignTaskId`. The modal title resolves to "Behandler zuweisen" for this source.
+
+**`saveReassign()` extension:** a new branch at the top handles `src2 === 'delegated'`:
+- Finds the task by `_reassignTaskId`
+- Updates `task.bh` to the selected real Behandler id
+- Rewrites `task.date` from ISO back to `"dd.mm."` display format
+- Re-evaluates `task.week` (`'next'` if date ≥ TODAY + 7 days else `'current'`)
+- **Deletes** `assignedToEmail` and `delegatedFromBh` so the task moves out of the Verwaltung queue into the regular Behandler-Aufgaben list
+- Fires toast: `"Aufgabe zugewiesen an <bhdlName>"`
+
+**`closeReassign()`:** also clears `_reassignTaskId` (harmless for other sources).
+
+**End-to-end demo flow after this change:**
+1. Log in as "Dr. Feld" → Klinik Heute → click "Behandeln" on any task.
+2. Fill Weiterbehandlung (e.g. "UPT-Sitzung"), pick a future date, leave Behandler on the default "C. Weigert — Verwaltung".
+3. Click "Erledigt" → toast confirms, task disappears from Feld's list.
+4. Log out, log in as "C. Weigert" → Verwaltung → Behandler-Aufgaben → Meine Aufgaben → Offen.
+5. The new task shows at the top under "Von Behandler zugewiesen" with the violet border + "← Dr. Feld" origin label.
+6. Click "Zuweisen →" → reassign modal opens pre-filled with the treatment + date → pick a real Behandler → Save.
+7. Task now appears in that Behandler's grouped list at the bottom of Behandler-Aufgaben (tab "Behandler Aufgaben"), no longer in C. Weigert's Meine Aufgaben > Offen.
+
+---
+
+### 2026-04-19 — Behandeln popup: drop generic "Verwaltung" account from Behandler dropdown
+
+**Commit:** `77e1c13` — *Behandeln popup: drop generic 'Verwaltung' account from Behandler dropdown*
+
+**Why:** The seed `USERS` array contains two verwaltung-role entries — a generic `"Verwaltung"` account (`verwaltung@swissmedai.com`, intended as a role placeholder) and a named `"C. Weigert"` account (`c.weigert@mvz-arzt.de`). Showing both in the Weiterbehandlung assignee dropdown was confusing ("Verwaltung — Verwaltung" reads as redundant) and made the default assignee a shared mailbox rather than a real person.
+
+**Two one-line filters:**
+
+*In `openBehandelnModal()`:*
+```js
+// was: USERS.find(u => u.role === 'verwaltung');
+var defVerw = USERS.find(u => u.role === 'verwaltung' && u.name !== 'Verwaltung');
+```
+
+*In `renderBehandelnModal()`, the assignee list build:*
+```js
+// was: USERS.filter(u => u.role === 'behandler' || u.role === 'verwaltung');
+var assigneeUsers = USERS.filter(u =>
+  (u.role === 'behandler' || u.role === 'verwaltung') && u.name !== 'Verwaltung'
+);
+```
+
+**Resulting dropdown (with demo data):**
+- Dr. Feld — Behandler
+- Dr. Hess — Behandler
+- **C. Weigert — Verwaltung** ← default
+
+The generic `verwaltung@swissmedai.com` is still a valid login (the account itself isn't deleted), it's just excluded from this one picker.
+
+---
+
+### 2026-04-19 — Behandeln popup: restructure buttons + date field + Erledigt
+
+**Commit:** `362072b` — *Behandeln popup: restructure buttons + add date field + Erledigt*
+
+**Why:** The previous single-button layout tangled two different decisions — "has the KI finished transcribing?" and "is the whole treatment done?" — into one control. The user wanted them split: the "Behandlung abschließen" button goes back inside the KI-Diktat card as its own confirmation, a date field joins the Weiterbehandlung section, and a dedicated green "Erledigt" button sits at the bottom of the modal as the final commit.
+
+**Three layout changes:**
+
+1. **"Behandlung abschließen" moved back inside the KI-Diktat card.** Sits directly below the transcription textarea (12 px gap). Scoped to the card so its role is visually obvious: it's about the KI dictation, nothing else.
+   - Pre-click state: blue gradient button, label "Behandlung abschließen".
+   - Post-click state: emerald-tinted pill with checkmark ("Transkription gespeichert"), `cursor: default`, no onclick — one-shot reveal.
+
+2. **"Datum" date field added between Behandlung and Behandler** in the Weiterbehandlung section. `<input type="date">` with id `bhWeiterDate`, bound to `S.behandelnForm.weiterDate`. Default populated in `openBehandelnModal` as today + 7 days in ISO format (`yyyy-mm-dd`).
+
+3. **"Erledigt" green button at the bottom of the modal.** Uses `.save-btn` with inline emerald background override (`background: var(--emerald)` + matching shadow), checkmark icon, full-width. Calls a new `erledigtBehandlung()` function.
+
+**State-shape change in `openBehandelnModal`:** `S.behandelnForm` gains `weiterDate` (ISO string) in addition to the existing fields. Default computed as:
+```js
+var nextWeek = new Date(TODAY.getTime() + 7 * D);
+var iso = nextWeek.getFullYear() + '-'
+        + String(nextWeek.getMonth() + 1).padStart(2, '0') + '-'
+        + String(nextWeek.getDate()).padStart(2, '0');
+```
+
+**`saveBehandelnModal()` simplified to one-shot reveal.** No longer handles commit. Now just:
+- If `transcribed === true`, return early (idempotent).
+- Otherwise snapshot any currently-typed manual note / Weiterbehandlung values from the DOM (so the re-render doesn't wipe them), fill `notes` with `mockDictText(m)`, flip `transcribed = true`, `render()`.
+
+**New `erledigtBehandlung()` function** takes over the commit responsibilities from the old single button:
+
+1. Reads all four text/select inputs from the DOM (`bhDictText`, `bhManualText`, `bhWeiterBeh`, `bhWeiterDate`, `bhWeiterBhId`).
+2. Combines dict + manual into one visit entry and `unshift`s it onto `p.visits` as `{voice: true}` — so the transcription + manual description appear at the top of the patient file's Historie tab (Behandlungsverlauf).
+3. Flags `S.doneTaskIds[m.key] = true` → the current task card's checkbox fills in and it drops out of the "Offen" filter in Klinik Heute.
+4. If Weiterbehandlung is selected, pushes a new TASK with `bh: assigneeBhId`, `date: <picked date>` (converted from ISO to `dd.mm.` display), `status: 'offen'`, and `week: 'next'` / `'current'` based on how far out the date is. The `assignedToEmail` / `delegatedFromBh` tagging (added in the commit described above) happens here.
+5. Closes the modal + fires summary toast: `"<patient>: Erledigt · <treatment>: <date> (<assignee>)"`.
+
+**Behavioural invariant:** the KI-Diktat transcription and manual description are written to the patient's `p.visits` even if no Weiterbehandlung is chosen — the treatment documentation is independent of whether a follow-up gets scheduled.
+
+---
+
+### 2026-04-19 — Behandeln popup: manual note + Weiterbehandlung (follow-up) scheduler
+
+**Why:** After the KI transcription, the behandler often needs to (a) add a short manual clarification that isn't worth dictating, and (b) schedule a follow-up ("Weiterbehandlung") — pick the next treatment type and the person responsible for it. The Verwaltung role is the default assignee because they coordinate the scheduling downstream.
+
+**State additions in `S.behandelnForm`:**
+- `manualNote` (string) — plain-text field for non-voice additions.
+- `weiterBeh` (string) — chosen treatment from `BEHANDLUNG_OPTIONS`, or `''` = no follow-up.
+- `weiterBhId` (string) — email of the assignee; defaults to the first `USERS` entry with `role==='verwaltung'` (i.e. `verwaltung@swissmedai.com` → "Verwaltung"). If that user doesn't exist in this deploy, falls back to empty.
+
+**`openBehandelnModal` init:**
+```js
+var defVerw = USERS.find(u => u.role === 'verwaltung');
+S.behandelnForm = {
+  notes: '', manualNote: '',
+  weiterBeh: '', weiterBhId: defVerw ? defVerw.email : '',
+  transcribed: false
+};
+```
+
+**New modal sections (below the existing KI-Diktat card):**
+
+1. **Manuelle Beschreibung** — a plain `<textarea#bhManualText>` (70 px min-height, resizable vertically) under a `.form-label` styled "MANUELLE BESCHREIBUNG". Placeholder: *"Zusätzliche Notizen, Hinweise für die Verwaltung…"*. Binds to `S.behandelnForm.manualNote`.
+
+2. **Weiterbehandlung** — section separated by a top border + 18 px padding. Header row has a small refresh-arrow SVG + "Weiterbehandlung" title + helper subline *"Optional — Folgetermin planen und zuweisen"*. Contains two `.form-select` dropdowns:
+   - **Behandlung** — `<select#bhWeiterBeh>` with options `["— keine Weiterbehandlung —", ...BEHANDLUNG_OPTIONS]` (14 entries from the canonical list: ZE-Eingliederung, ZE-Befund, ZE-Abnahme, PA-Befund, PA-Therapie, UPT-Sitzung, Kontrolle, Extraktion, Röntgen, Füllungstherapie, HKP-Einreichung, Erstuntersuchung, Prothesenkontrolle, Abdrucknahme).
+   - **Behandler** — `<select#bhWeiterBhId>` filtered to `USERS` with role `behandler` *or* `verwaltung`. Each option displays `{name} — {roleLabel}`. Example values in demo data:
+     - "Dr. Feld — Behandler" (`feld@swissmedai.com`)
+     - "Dr. Hess — Behandler" (`hess@swissmedai.com`)
+     - "Verwaltung — Verwaltung" (`verwaltung@swissmedai.com`) ← **default**
+     - "C. Weigert — Verwaltung" (`c.weigert@mvz-arzt.de`)
+
+**Button moved to bottom of modal.** The blue gradient "Behandlung abschließen" button is no longer inside the KI-Diktat card — it sits at the very bottom as the single commit action for the whole form (KI dict + manual note + Weiterbehandlung). Uses the standard `.save-btn` class (15 px padding, `margin-top:24px` built in).
+
+**Commit behaviour in `saveBehandelnModal`:**
+- **First click** (transcribed === false) — same as before: fills `notes` with `mockDictText(m)`, flips `transcribed=true`, relabels button to "Speichern & Abschließen". The re-render now also reads the current manual-note / Weiterbehandlung field values from the DOM (via `getElementById`) and preserves them in state so switching into the transcribed view doesn't wipe what the user already typed.
+- **Second click** — combines KI transcription + manual note into one visit entry: `{text: dict + "\n\nManuelle Ergänzung: " + manual, voice: true}`. Pushes to `p.visits.unshift(...)`.
+- **Weiterbehandlung commit** — if `weiterBeh !== ''`:
+  - Resolves the assignee: if the selected user has `bId` (behandler), uses it as the new task's `bh`; otherwise (Verwaltung) falls back to the original task's `bh` (or `'hFeld'` if nothing matches — the TASKS list needs a valid doctor id to show in Behandler-Aufgaben).
+  - Pushes `{id: nextId++, bh: assigneeBhId, name: p.name, heim: heimName(p.heim), behandlung: wBeh, status: 'offen', week: 'next', date: fmtShort(TODAY + 7d)}` to `TASKS`.
+  - Toast becomes: `"<patient>: Behandlung dokumentiert · Weiterbehandlung: <treatment> (<assignee name>)"`.
+
+**Rationale for listing Verwaltung in a field labeled "Behandler":** the dropdown answers the question *"who should drive the next step?"* — often the Verwaltung, because they schedule the slot before a doctor actually treats. The role suffix in each option (`— Behandler` / `— Verwaltung`) makes the distinction explicit without inventing a new UI pattern.
+
+---
+
+### 2026-04-19 — Behandeln popup: two-step KI-Diktat transcription flow
+
+**Commit:** `0291782` — *Behandeln popup: first click reveals KI transcription, second saves*
+
+**Why:** A single click that instantly marked the task done hid the whole point of the demo — the KI transcription never got to be seen. Users need to *watch* the KI "listen" and then *review* the transcribed text before it's committed to the patient's record. So the "Behandlung abschließen" button becomes a two-step flow.
+
+**State model:** `S.behandelnForm = {notes: '', transcribed: false}`. The `transcribed` boolean is the gate between the two steps. `openBehandelnModal` always initialises it to `false`.
+
+**Step 1 — reveal the transcription.** First click on "Behandlung abschließen":
+- `saveBehandelnModal()` detects `f.transcribed === false`.
+- Calls `mockDictText(m)` (context-aware keyword matcher) and stuffs the result into `S.behandelnForm.notes` while flipping `transcribed` to `true`.
+- `render()` rebuilds the overlay: the pulse "Aufnahme aktiv…" bar is swapped for a green-tinted `--emerald-bg` badge with a checkmark saying **"Transkription abgeschlossen"**, the textarea comes back populated with the mock text, and the button relabels to **"Speichern & Abschließen"**.
+- Textarea `min-height` lifted to 110 px (from 90) so the full transcription fits without scroll.
+
+**Step 2 — commit.** Second click on the same button:
+- Reads the textarea's current value (user may have edited the draft transcription) via `document.getElementById('bhDictText')`.
+- Unshifts a visit into the patient's history: `p.visits.unshift({date: Date.now(), behandler: S.user.bId || 'hFeld', codes: [], text: note, voice: true})` — identical shape to what `saveDictation()` writes from the patient-file dict panel.
+- Flags `S.doneTaskIds[m.key] = true` (same global dedup store the Heute task list reads) → the task card's checkmark fills in.
+- Clears `S.behandelnModal` and fires the standard green toast: `"<patient>: Behandlung dokumentiert"`.
+
+**`mockDictText(m)` — keyword library.** Lives directly above `saveBehandelnModal`. Lowercases `m.label` and matches:
+
+| Keyword(s) in task label | Generated transcription (abridged) |
+|---|---|
+| `pa`, `upt`, `ait` | *"Parodontaler Status kontrolliert. Taschensondierungstiefen überwiegend 3–4 mm, lokal 5 mm regio 36… subgingivale Instrumentierung an Quadrant 3… nächste UPT-Sitzung in 3 Monaten."* |
+| `ze`, `abnahme`, `befund`, `prothes` | *"Zahnersatz eingegliedert und adjustiert. Statik und Okklusion kontrolliert… Pflegehinweise zur Prothesenhygiene gegeben. Kontrolltermin in 2 Wochen."* |
+| `hkp` | *"Heil- und Kostenplan mit Patient bzw. Betreuer besprochen… Unterschrift eingeholt, HKP zur Genehmigung an Krankenkasse eingereicht."* |
+| `kontrolle` | *"Routinekontrolle durchgeführt. Zahn- und Schleimhautbefund unauffällig, Prothesenhalt gut… Nächste Kontrolle in 6 Monaten."* |
+| *(fallback)* | *"Patient klinisch untersucht, Befund dokumentiert. Behandlung gemäß Planung durchgeführt… Nachkontrolle terminiert."* |
+
+The transcription text is editable between the two clicks; the user can tweak wording before the save. Aborting via the `×` button (`closeBehandelnModal`) discards everything — the task stays open.
+
+---
+
+### 2026-04-19 — Behandeln popup: patient name on top, treatment card, embedded KI-Diktat
+
+**Commit:** `4227ce5` — *Behandeln popup: patient name on top, treatment highlighted, KI-Diktat*
+
+**Why:** The first iteration of the Behandeln modal was a plain "Neue Notiz"-style form (generic title + textarea). The behandler needs to see *who* they're treating and *what* the planned treatment is — right at the top — and have the same KI-Diktat affordance they already know from the patient file.
+
+**Layout (top to bottom) inside `.overlay-sheet`:**
+
+1. **Header row**
+   - `overlay-title` = **patient name** (e.g. "Schmidt, Maria"), bold 17 px navy-black.
+   - `overlay-close` × button — closes without committing.
+2. **Heim subline** — pin icon + heim name, `var(--text-3)`, 12 px, pulled up with `margin-top:-10px` so it sits under the title like a subtitle.
+3. **"Geplante Behandlung" card** — a `--blue-50` tinted box (border `rgba(10,46,158,0.15)`) with:
+   - small uppercase overline "GEPLANTE BEHANDLUNG" (`var(--text-3)`, 10 px, letter-spacing 0.8 px)
+   - treatment label (`m.label` — e.g. "PA-Therapie", "ZE-Abnahme", "UPT-Sitzung") in **navy 14 px bold**.
+4. **KI-Diktat panel** — white card with `--border`, `--sh-sm`, `--r-lg`, 16 px padding. Inside:
+   - Header row: mic icon + "KI-Diktat" title (14 px bold).
+   - `.dict-bar` (same class as the patient-file dict panel) with `animation: pulse 1.5s infinite`, showing `ICO.mic` + "Aufnahme aktiv…".
+   - Textarea `#bhDictText` — 12 px, 110 px min-height, `--border`, no resize.
+   - Submit button = navy→blue gradient, full-width, 12 px padding, "Behandlung abschließen".
+
+**Persistence on input:** `oninput="S.behandelnForm.notes=this.value"` on the textarea keeps the draft synced into state so a re-render (e.g. from the two-step flow below) doesn't clobber what the user typed.
+
+**Why "mirror the patient-file dict panel" and not reuse it?** The patient dict panel (`.dict-panel`) is positioned absolutely at the bottom of the phone frame and targeted by `insertDictation()` / `saveDictation()` — it writes to `S.patId`. We needed a variant that:
+- is scoped to a task (not a patient screen),
+- writes via `saveBehandelnModal` (task-key-aware),
+- sits inside an overlay sheet rather than fixed-bottom.
+
+So the classes (`.dict-bar`, textarea styling, submit button styling) are intentionally copied for visual identity but the event handlers are distinct.
+
+---
+
+### 2026-04-19 — Task card: rename "Erledigt" → "Behandeln", opens popup
+
+**Commit:** `d61899f` — *Rename Erledigt task button to Behandeln with popup modal*
+
+**Why:** Marking a task "Erledigt" with no documentation misses the core interaction the app is designed for — a behandler should *treat* (Behandeln) and have the KI capture the voice note as proof-of-service. The button label should match the action.
+
+**Changes to `mockups/hl-dentistry-v10.html`:**
+
+*Klinik Heute task card (`renderHome`, `~line 1508`)*
+- Before: `<button … onclick="markTaskDone('+key+')">…Erledigt</button>` (check icon).
+- After: `<button … onclick="openBehandelnModal('+key+')">…Behandeln</button>` (sun/radial icon, 8-spoke SVG).
+- Colors, padding, and flex layout kept identical so the button still slots in next to "Neu planen" without visual disruption.
+
+*New modal plumbing (~line 1409)*
+- `openBehandelnModal(k)` — parses the task key (`patId|date|label`), looks up the patient, builds `S.behandelnModal = {key, patId, patName, heim, label}` + `S.behandelnForm = {notes: '', transcribed: false}`, then `render()`.
+- `closeBehandelnModal()` — clears `S.behandelnModal` and re-renders.
+- `saveBehandelnModal()` — initial single-step version (later refactored into the two-step flow documented above).
+- `renderBehandelnModal()` — builds the overlay sheet HTML.
+
+*Render pipeline wiring* (near `renderRescheduleModal` hookup, `~line 2765`):
+```js
+if(S.rescheduleModal)html+=renderRescheduleModal();
+if(S.behandelnModal)html+=renderBehandelnModal();
+```
+Placed at the same nesting level as the reschedule modal so z-index and overlay stacking match.
+
+**Unchanged behavior:**
+- `markTaskDone(key)` still exists (used by other flows like the Verwaltung admin checkbox) — not deleted.
+- `Neu planen` button still opens `openRescheduleModal`.
+- Task cards in the Verwaltung admin "Behandler-Aufgaben" (uses `taskCard`, not the `renderHome` inline markup) still show the status badge, no Behandeln button — intentional, admin isn't treating.
+
+---
+
+### 2026-04-19 — Verwaltung bottom nav: Abrechnung added as 6th item
+
+**Commits:** `45ff125` (Pflegeheime → renamed) → `73ad7a6` (Heime → Abrechnung)
+
+**Why:** The admin bottom nav (Übersicht / Labor / Einverständnis / Archiv / Behandler) was missing a direct entry point to the Abrechnung hub, forcing users to dig through the menu. User first asked for "Pflegeheime" after Behandler, then immediately revised to "Abrechnung" — which is the hub page that itself contains Pflegeheime alongside Preisliste and Texteditor.
+
+**Change to `renderAdminBottomNav_2` (`~line 4004`):**
+
+Before (5 buttons):
+```js
+return '<div class="bottom-nav">'
+  + btn('uebersicht', ICO.chart, 'Übersicht')
+  + btn('labor', ICO.lab, 'Labor')
+  + btn('einverstaendnis', ICO.doc, 'Einverständnis')
+  + btn('archiv', ICO.archive, 'Archiv')
+  + btn('behandler', usersIcon, 'Behandler')
++ '</div>';
+```
+
+After (6 buttons, Abrechnung appended):
+```js
+  + btn('behandler', usersIcon, 'Behandler')
+  + btn('abrechnung', euroIcon, 'Abrechnung')
++ '</div>';
+```
+
+**Icon:** inline 24×24 SVG — vertical bar with the "€"-shaped double stroke (`M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6`) — the same icon the "Preisliste" sub-nav already uses, so it reads consistently as "money/billing".
+
+**Behavior:** Tapping Abrechnung sets `S.adminPage_2 = 'abrechnung'`, which `renderAdmin_2` routes to `renderAbrechnung()` — the existing hub page (title "Abrechnung", subtitle "Preisliste & Dokumente") showing three card-style entry points into Preisliste, Texteditor, and Pflegeheime.
+
+**Intermediate state worth noting:** The first commit (`45ff125`) added the entry as `btn('pflegeheime', houseIcon, 'Heime')` pointing directly at `renderPflegeheime()`. User immediately asked to rename it — second commit (`73ad7a6`) swapped the page id, icon, and label to `abrechnung` / euro / "Abrechnung". Only the second state is current.
+
+---
+
+### 2026-04-19 — Verwaltung Behandler-Aufgaben dots: derive initials via `bhInitials()` helper
+
+**Commits:** `0c529ce` (hardcoded initials field) → `4fa58f7` (helper function)
+
+**Why:** The `.bh-avatar` circles in the Verwaltung "Behandler-Aufgaben" section header (one per Behandler) rendered empty because the `BEHANDLER` data objects had no `initials` field — the code did `+bh.initials+` and got `undefined` → empty circle with just the gradient background showing.
+
+**Two-step fix:**
+
+*First attempt (commit `0c529ce`) — hardcoded:*
+```js
+var BEHANDLER=[
+  {id:"hFeld", name:"Dr. Feld", initials:"DF", cases:298, …},
+  {id:"hHess", name:"Dr. Hess", initials:"DH", cases:231, …},
+  {id:"hGomez", name:"Dr. Gomez", initials:"DG", cases:52, …}
+];
+```
+This worked but required manual upkeep if a Behandler was renamed or added via the admin UI.
+
+*Second attempt (commit `4fa58f7`) — derived:*
+Added a helper right below the `BEHANDLER` array:
+```js
+function bhInitials(b){
+  var parts=(b.name||'').split(/\s+/).filter(Boolean);
+  if(parts.length>1) return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+  return (b.name||'').slice(0,2).toUpperCase();
+}
+```
+And rewired usage in two places:
+- `bhSection(bh, …)` (~line 3220): `+ '<div class="bh-avatar">' + bhInitials(bh) + '</div>'`
+- `renderBehandler_2()` (~line 4014): replaced the 2-line inline split logic with `var initials = bhInitials(b);`
+
+Removed the hardcoded `initials` field from the three `BEHANDLER` objects.
+
+**Behaviour for the demo users:**
+- "Dr. Feld" → **DF**
+- "Dr. Hess" → **DH**
+- "Dr. Gomez" → **DG**
+- (added via the admin form) "Dr. Schmidt" → **DS**
+- single-word edge case (e.g. "Gomez") → first two chars → **GO**
+
+**Side benefit:** the `renderBehandler_2` inline duplicate (previously `var parts=b.name.split(' '); var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();`) is now a one-liner via the same helper. One source of truth for Behandler initials across the whole app.
+
+---
+
+### 2026-04-19 — Remove Nachrichten tab from Management section (mobile + desktop)
+
+**Commit:** `6d42faa` — *Remove Nachrichten tab from Management section (mobile + desktop)*
+
+**Why:** Nachrichten was duplicated: once as its own top-level page (bottom-nav on mobile, sidebar on desktop) and once as a tab inside Management. The Management duplicate added visual noise without adding reachability — the top-level entry point was always one tap away. User asked to drop the sub-tab.
+
+**Three surgical removals in `mockups/hl-dentistry-v10.html`:**
+
+1. **Mobile Management tab list (`renderManager`, ~line 1960):**
+   ```js
+   // Before:
+   ["Übersicht","Behandler","Heime","Planung","Fälle","Nachrichten"].forEach(…)
+   // After:
+   ["Übersicht","Behandler","Heime","Planung","Fälle"].forEach(…)
+   ```
+   Also removed the entire `if(tab==="Nachrichten"){ … }` block that rendered the inline email list (~25 lines of `msg-item` markup, unread dot, compose button).
+
+2. **Desktop Management tab list (`renderDesktopManagerBody`, ~line 2531):** Same 6→5 element trim. Also removed the matching `if(tab==="Nachrichten")` rendering block (wider layout variant with inline compose button).
+
+3. **Desktop sidebar Management dropdown (`~line 2484`):**
+   ```js
+   // Before:
+   ['Übersicht','Behandler','Heime','Planung','Fälle','Nachrichten'].forEach(…)
+   // After:
+   ['Übersicht','Behandler','Heime','Planung','Fälle'].forEach(…)
+   ```
+   The collapsible dropdown under the Management nav item now lists only the 5 real sub-tabs.
+
+**What still exists:**
+- Standalone **Nachrichten** sidebar item (desktop) — `goDesktopPage('nachrichten')` → `S.screen = 'messages'` → `renderMessages()`. Unchanged.
+- Standalone **Nachr.** button in mobile bottom nav — `goMessages()`. Unchanged.
+- `DK_TITLES.nachrichten = 'Nachrichten'` mapping. Unchanged.
+- `getMyMessages()`, `getUnreadCount()`, compose / detail overlays. Unchanged.
+
+**Net effect:** 45 lines removed from `hl-dentistry-v10.html`, 3 lines modified. No functional regression — email access paths remain the two top-level entry points.
+
+---
+
+### 2026-04-19 — Brand Guidelines fully applied across mobile app + deployment CSS
+
+**Why:** Final pass to ensure the entire app — both the v10 mockup and the standalone deployment CSS — adheres to the Ledger brand palette established in `assets/hl-brand-guidelines.html`. Hunting down legacy hex codes left over from earlier iterations.
+
+**What changed:**
+
+*v10 mockup (`mockups/hl-dentistry-v10.html`)*
+- `:root` tooth state variables aligned with Ledger palette: `--t-healthy: #14C295` (was `#0D9276`), `--t-composite: #2D5BF5` (was `#3D66FE`).
+- Login background gradients (mobile + desktop): `#041347` → `#061F6E` (Ledger `--ink-deep`), 3 occurrences.
+- Mobile login version label updated from `v5.0` → `v10.0`.
+- All hardcoded JS palette references in `PA_STATES` and `LAB_COLORS` swept via sed: 12 replacements (`#082A99` → `#0A2E9E`, `#0D9276` → `#14C295`, `#3D66FE` → `#2D5BF5`).
+- View-picker popup redesigned with Ledger typography: navy title with green signal dot, uppercase subtitle, refined button gradient using `linear-gradient(135deg,#0E3ABF,#0A2E9E 55%,#061F6E)`, neutral secondary button.
+
+*Deployment CSS (`assets/hl-dentistry.css`)*
+- `--t-healthy: #0D9276` → `#14C295` (line 71)
+- `--t-composite: #3D66FE` → `#2D5BF5` (line 75)
+- `.login-bg` gradient: `#041347` → `#061F6E` (line 299)
+- `.dk-sidebar` gradient: `#041347` → `#061F6E` (line 480)
+- `.phone.desktop-login` gradient: `#041347` → `#061F6E` (line 527)
+
+**Verification:** `grep -nE "#041347|#082A99|#0D9276|#3D66FE"` against the active files (`mockups/hl-dentistry-v10.html` and `assets/hl-dentistry.css`) returns zero matches. Remaining occurrences live only in frozen earlier versions (v7, v8, v9, admin-v3) and historical handoff docs, which is intentional.
+
+**Result:** The mobile and desktop layouts now render with the unified Ledger palette: navy `#0A2E9E` (with `#061F6E` deep gradient stops), signal green `#14C295`, ink black `#1D1D1F`, neutral grays `#6E6E73 / #86868B`. Tooth state, lab kanban, and PA pipeline colors all match the brand guidelines.
+
+---
+
 ### 2026-04-12 — Elegant cross-platform logo (Ledger-inspired)
 
 **Why:** User wants an elegant logo that works on any device, matching the Ledger aesthetic.

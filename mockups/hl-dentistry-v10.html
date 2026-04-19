@@ -38,21 +38,21 @@
   --surface:    #F5F5F7;
   --surface-2:  #EEEEEF;
   --white:      #FFFFFF;
-  /* Tooth States */
-  --t-healthy:  #0D9276;
+  /* Tooth States — aligned with Ledger semantics */
+  --t-healthy:  #14C295;
   --t-caries:   #D97706;
   --t-extract:  #C9313D;
   --t-crown:    #6C47FF;
-  --t-composite:#3D66FE;
+  --t-composite:#2D5BF5;
   --t-bridge:   #DB2777;
-  --t-other:    #94A3B8;
+  --t-other:    #86868B;
   --t-teleskop: #0891B2;
   --t-wurzelrest:#92400E;
   --t-zerstoert: #7F1D1D;
   --t-stift:    #B45309;
   --t-halte:    #E11D48;
   --t-retiniert:#475569;
-  --t-fehlt:    #E2E8F0;
+  --t-fehlt:    #D2D2D7;
   /* Shadows — tuned for Ledger neutrals */
   --sh-sm: 0 1px 2px rgba(29,29,31,0.05);
   --sh-md: 0 4px 12px rgba(29,29,31,0.08);
@@ -267,7 +267,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 .dict-panel .submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)}
 
 /* ===== LOGIN ===== */
-.login-bg{display:flex;flex-direction:column;height:100%;background:linear-gradient(155deg,#041347 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
+.login-bg{display:flex;flex-direction:column;height:100%;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
 .login-bg::before{content:'';position:absolute;top:-20%;right:-30%;width:500px;height:500px;background:radial-gradient(circle,rgba(61,102,254,0.15) 0%,transparent 60%);border-radius:50%}
 .login-bg::after{content:'';position:absolute;bottom:-20%;left:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(108,71,255,0.1) 0%,transparent 60%);border-radius:50%}
 .login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;z-index:1}
@@ -448,7 +448,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
   body{padding:0;background:var(--surface)}
   .phone.desktop-mode{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;flex-direction:row;overflow:hidden}
   /* Sidebar */
-  .dk-sidebar{width:240px;min-width:240px;height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#041347 100%);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+  .dk-sidebar{width:240px;min-width:240px;height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#061F6E 100%);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
   .dk-sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:12px}
   .dk-sidebar-logo svg{width:32px;height:32px;color:#fff}
   .dk-sidebar-logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px}
@@ -495,7 +495,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
   .dk-verw-content .einv-tabs{border-bottom:1px solid var(--border)}
   .dk-verw-content .card{box-shadow:none;border:1px solid var(--border)}
   /* Desktop login — full viewport, centered card */
-  .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#041347 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
+  .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
   .phone.desktop-login::before{content:'';position:absolute;top:-10%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(61,102,254,0.12) 0%,transparent 60%);border-radius:50%}
   .phone.desktop-login::after{content:'';position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(108,71,255,0.08) 0%,transparent 60%);border-radius:50%}
   .dk-login-card{background:var(--white);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.25);width:420px;max-width:90%;padding:40px;position:relative;z-index:1}
@@ -871,22 +871,23 @@ button:focus-visible,.tab:focus-visible,.card:focus-visible,.nav-btn:focus-visib
 var ZE_STATES=["Befund","Zustimmung angefragt","Zugestimmt","HKP erstellt","HKP eingereicht","HKP bewilligt","Abdruck","Labor","Anprobe","Eingliederung","Fertig"];
 var PA_STATES=[
   {id:"sondierung",label:"Sondierung gemacht",short:"Sond.",color:"#6C47FF"},
-  {id:"antrag",label:"Antrag geschickt",short:"5e",color:"#082A99"},
+  {id:"antrag",label:"Antrag geschickt",short:"5e",color:"#0A2E9E"},
   {id:"ait_geplant",label:"AIT geplant",short:"AIT-P",color:"#D97706"},
-  {id:"ait",label:"AIT durchgeführt",short:"AIT",color:"#0D9276"},
-  {id:"nachkontrolle",label:"Nachkontrolle",short:"NK",color:"#0D9276"},
-  {id:"upt1",label:"UPT 1",short:"U1",color:"#082A99"},
+  {id:"ait",label:"AIT durchgeführt",short:"AIT",color:"#14C295"},
+  {id:"nachkontrolle",label:"Nachkontrolle",short:"NK",color:"#14C295"},
+  {id:"upt1",label:"UPT 1",short:"U1",color:"#0A2E9E"},
   {id:"recall1",label:"Recall 1 (174a/b)",short:"R1",color:"#6C47FF"},
-  {id:"upt2",label:"UPT 2",short:"U2",color:"#082A99"},
+  {id:"upt2",label:"UPT 2",short:"U2",color:"#0A2E9E"},
   {id:"recall2",label:"Recall 2 (174a/b)",short:"R2",color:"#6C47FF"},
-  {id:"upt3",label:"UPT 3",short:"U3",color:"#082A99"},
+  {id:"upt3",label:"UPT 3",short:"U3",color:"#0A2E9E"},
   {id:"recall3",label:"Recall 3 (174a/b)",short:"R3",color:"#6C47FF"},
-  {id:"upt4",label:"UPT 4",short:"U4",color:"#082A99"},
-  {id:"abgeschlossen",label:"Abgeschlossen",short:"\u2713",color:"#0D9276"},
+  {id:"upt4",label:"UPT 4",short:"U4",color:"#0A2E9E"},
+  {id:"abgeschlossen",label:"Abgeschlossen",short:"\u2713",color:"#14C295"},
   {id:"abgelehnt",label:"Abgelehnt",short:"\u2717",color:"#C9313D"}
 ];
 var HEIME=[{id:1,name:"Alexa Lichtenrade",addr:"Berlin Lichterfelde"},{id:2,name:"Haus am Weigandufer",addr:"Berlin K\u00f6penick"},{id:3,name:"Vitanas M\u00e4rkisches V.",addr:"Berlin Prenzlberg"},{id:4,name:"Senterra Alloheim",addr:"Berlin Spandau"}];
 var BEHANDLER=[{id:"hFeld",name:"Dr. Feld",cases:298,avgDays:42,done:185},{id:"hHess",name:"Dr. Hess",cases:231,avgDays:38,done:156},{id:"hGomez",name:"Dr. Gomez",cases:52,avgDays:51,done:31}];
+function bhInitials(b){var parts=(b.name||'').split(/\s+/).filter(Boolean);if(parts.length>1)return(parts[0][0]+parts[parts.length-1][0]).toUpperCase();return(b.name||'').slice(0,2).toUpperCase()}
 var D=86400000,N=Date.now();
 var PATIENTS=[
   {id:1,name:"M\u00fcller, Hans",heim:1,room:"203",age:78,ins:"TK",insNr:"123456789",z1Nr:"Z1-2024-0001",rel:true,odo:{tl:["ex","ex","g","g","g","g","g","ex"],tr:["g","g","f","f","f","ex","ex","ex"],bl:["ex","ex","g","g","g","g","f+b","ex"],br:["f","g","f+II","f","f","ex","ex","ex"]},tx:["druck","co"],txPlan:{14:["ta"],23:["fu"]},ze:{st:5,type:"Voll OK",zs:75,exp:N+30*D,bh:"hFeld"},pa:{step:"upt",befund:{date:N-300*D,spiegel:{16:[4,3],15:[2,2],14:[3,3],13:[2,1],12:[2,1],21:[2,2],22:[3,2],23:[2,2],24:[3,3],25:[4,4],46:[4,3],45:[3,2],44:[2,2],43:[3,2],42:[2,1],31:[2,2],32:[2,1],33:[3,2],34:[3,3],35:[4,3]},bop:{16:1,25:1,46:1},lockerung:{25:1,46:2},furkation:{16:1,26:0,46:2}},stoer:{date:N-298*D,items:[{l:"Rauchen",s:"beseitigt"},{l:"Diabetes mellitus",s:"nb"},{l:"Mundtrockenheit",s:"nein"},{l:"Immunsuppression",s:"nein"},{l:"Sonstige",s:"nein"}]},vordruck:{date:N-296*D},anzeige:{date:N-295*D},einwilligung:{date:N-295*D},atg:{date:N-294*D,text:"Generalisierte chronische Parodontitis Grad B/C. AIT in 4 Quadranten-Sitzungen geplant."},mhu:{date:N-292*D,pi:42,bop:35,notes:"Interdentalbuersten empfohlen"},ait:{sessions:[{date:N-290*D,q:1,an:true,anType:"I",notes:"Scaling Q1"},{date:N-287*D,q:2,an:true,anType:"I",notes:"Scaling+WG Q2"},{date:N-284*D,q:3,an:false,notes:"Scaling Q3"},{date:N-281*D,q:4,an:true,anType:"L1",notes:"Scaling+WG Q4"}]},beva:{date:N-270*D,spiegel:{16:[3,2],15:[2,2],14:[2,2],13:[2,1],12:[2,1],21:[2,2],22:[2,2],23:[2,2],24:[2,2],25:[3,3],46:[3,2],45:[2,2],44:[2,2],43:[2,2],42:[2,1],31:[2,2],32:[2,1],33:[2,2],34:[2,2],35:[3,2]},bop:{},ergebnis:"besserung"},upts:[{nr:1,date:N-210*D,done:true,type:"e"},{nr:2,date:N-120*D,done:true,type:"e"},{nr:3,date:N-30*D,done:false,type:"e"},{nr:4,date:N+60*D,done:false,type:"f"}],recalls:[{nr:1,date:N-165*D,done:true,type:"174a"},{nr:2,date:N-75*D,done:true,type:"174a"}],comment:"Guter Verlauf, UPT3 steht an",behandler:"hFeld",risks:{diabetes:true,raucher10:false,blutverduennend:true,bisphosphonat:false,perioVerlust:true,herzklappe:false}},odoHist:[{date:N-30*D,odo:{tl:["ex","ex","g","g","g","g","g","ex"],tr:["g","g","f","f","f","ex","ex","ex"],bl:["ex","ex","g","g","g","g","f","ex"],br:["f","g","f","f","f","ex","ex","ex"]}}],visits:[{date:N-30*D,behandler:"hFeld",codes:["druck","co"],text:"Druckstelle OK Prothese angepasst. Patient toleriert gut.",voice:false},{date:N-90*D,behandler:"hHess",codes:["fu"],text:"F\u00fcllungstherapie 26 MOD. Composite, Lokalan\u00e4sthesie.",voice:true},{date:N-180*D,behandler:"hFeld",codes:["pa","174a"],text:"Erstbefund 174a durchgef\u00fchrt. Sondierung gemacht. PA-Fall eingeleitet.",voice:false}],photos:[{date:N-10*D,name:"20260324_Muller_Hans_OK.jpg"},{date:N-90*D,name:"20260103_Muller_Hans_Befund.jpg"}],forms174a:[{date:N-30*D,id:"f1"},{date:N-180*D,id:"f2"}],notes:"Allergien: Penicillin. Betreuer: Sohn (Tel. 0176-1234567). Braucht Rollstuhl-Transport."},
@@ -907,7 +908,7 @@ var USERS=[
   {email:"c.weigert@mvz-arzt.de",pw:"admin",name:"C. Weigert",role:"verwaltung"}
 ];
 var LAB_STAGES=["Abdruck","Druck/Guss","Politur/Montage","Abholbereit"];
-var LAB_COLORS=["#D97706","#082A99","#6C47FF","#0D9276"];
+var LAB_COLORS=["#D97706","#0A2E9E","#6C47FF","#14C295"];
 var LAB_BG=["#FFFBEB","#EBF0FF","#F3F0FF","#ECFDF5"];
 var VITA_SHADES=["A1","A2","A3","A3.5","B1","B2","B3","B4","C1","C2","C3","C4","D2","D3","D4"];
 var PROTH_TYPES=["Totalprothese","Teilprothese","Schiene","Br\u00fccke","Krone","Sonstiges"];
@@ -1116,7 +1117,7 @@ function renderLogin(){
     +'<button class="login-btn" onclick="doLogin()">Anmelden</button>'
     +'<div class="login-forgot">Passwort vergessen?</div>'
     +'</div>'
-    +'<div class="login-version">v5.0 \u2014 SwissMedAI GmbH</div>'
+    +'<div class="login-version">v10.0 \u2014 SwissMedAI GmbH</div>'
     +'</div>';
 }
 function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":"home";S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
@@ -1405,6 +1406,201 @@ function renderRescheduleModal(){
   return h;
 }
 
+/* Behandeln flow: click "Behandeln" on a task card → openBehandelnModal → modal with treatment type + KI-Diktat + manual note + Weiterbehandlung → first "Behandlung abschließen" click reveals the transcription, second click commits it (and optionally schedules a follow-up) */
+function openBehandelnModal(k){
+  var parts=k.split('|');var patId=parseInt(parts[0],10);
+  var p=PATIENTS.find(function(x){return x.id===patId});
+  if(!p)return;
+  S._behandelnReturn=null;
+  S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
+  var defVerw=USERS.find(function(u){return u.role==='verwaltung'&&u.name!=='Verwaltung'});
+  var nextWeek=new Date(TODAY.getTime()+7*D);
+  var iso=nextWeek.getFullYear()+'-'+String(nextWeek.getMonth()+1).padStart(2,'0')+'-'+String(nextWeek.getDate()).padStart(2,'0');
+  S.behandelnForm={notes:'',manualNote:'',weiterBeh:'',weiterDate:iso,weiterBhId:defVerw?defVerw.email:'',transcribed:false};
+  render();
+}
+function closeBehandelnModal(){S.behandelnModal=null;S._behandelnReturn=null;render()}
+function behandelnOpenOdoEdit(){
+  var m=S.behandelnModal;if(!m)return;
+  /* Snapshot current field values so the Behandeln popup can be resumed later */
+  var mta=document.getElementById('bhManualText');
+  var wb=document.getElementById('bhWeiterBeh');
+  var wd=document.getElementById('bhWeiterDate');
+  var wbh=document.getElementById('bhWeiterBhId');
+  var ta=document.getElementById('bhDictText');
+  var f=S.behandelnForm||{};
+  S.behandelnForm={
+    notes:ta?ta.value:(f.notes||''),
+    manualNote:mta?mta.value:(f.manualNote||''),
+    weiterBeh:wb?wb.value:(f.weiterBeh||''),
+    weiterDate:wd?wd.value:(f.weiterDate||''),
+    weiterBhId:wbh?wbh.value:(f.weiterBhId||''),
+    transcribed:f.transcribed||false
+  };
+  /* Remember that the odontogram edit was launched from the Behandeln popup; odoSaveAndClose will restore it */
+  S._behandelnReturn={modal:S.behandelnModal,form:S.behandelnForm};
+  /* Navigate to the patient's odontogram in Status-Bearbeiten mode */
+  S.patId=m.patId;
+  S.screen='patient';
+  S.odoTab='status';
+  S.odoEdit=true;S.odoQ=1;S.odoSelTooth=0;
+  S.behandelnModal=null;
+  render();
+}
+function mockDictText(m){
+  var t=(m.label||'').toLowerCase();
+  if(t.indexOf('pa')!==-1||t.indexOf('upt')!==-1||t.indexOf('ait')!==-1){
+    return'Parodontaler Status kontrolliert. Taschensondierungstiefen \u00fcberwiegend 3\u20134 mm, lokal 5 mm regio 36. Plaque- und Blutungsindex reduziert. Subgingivale Instrumentierung an Quadrant 3 durchgef\u00fchrt. Mundhygieneinstruktion wiederholt. N\u00e4chste UPT-Sitzung in 3 Monaten geplant.';
+  }
+  if(t.indexOf('ze')!==-1||t.indexOf('abnahme')!==-1||t.indexOf('befund')!==-1||t.indexOf('prothes')!==-1){
+    return'Zahnersatz eingegliedert und adjustiert. Statik und Okklusion kontrolliert, Passung klinisch einwandfrei. Patient beschwerdefrei. Pflegehinweise zur Prothesenhygiene gegeben. Kontrolltermin in 2 Wochen vereinbart.';
+  }
+  if(t.indexOf('hkp')!==-1){
+    return'Heil- und Kostenplan mit Patient bzw. Betreuer besprochen. Befund und geplante Versorgung erl\u00e4utert. Unterschrift eingeholt, HKP zur Genehmigung an Krankenkasse eingereicht.';
+  }
+  if(t.indexOf('kontrolle')!==-1){
+    return'Routinekontrolle durchgef\u00fchrt. Zahn- und Schleimhautbefund unauff\u00e4llig, Prothesenhalt gut. Keine akuten Beschwerden. N\u00e4chste Kontrolle in 6 Monaten.';
+  }
+  return'Patient klinisch untersucht, Befund dokumentiert. Behandlung gem\u00e4\u00df Planung durchgef\u00fchrt, Verlauf komplikationslos. Patient beschwerdefrei entlassen, Nachkontrolle terminiert.';
+}
+function saveBehandelnModal(){
+  var m=S.behandelnModal;if(!m)return;
+  var f=S.behandelnForm||{};
+  if(f.transcribed)return;
+  /* Reveal the transcription; preserve any manual note / Weiterbehandlung the user already filled */
+  var mta0=document.getElementById('bhManualText');
+  var wb0=document.getElementById('bhWeiterBeh');
+  var wd0=document.getElementById('bhWeiterDate');
+  var wbh0=document.getElementById('bhWeiterBhId');
+  S.behandelnForm={
+    notes:mockDictText(m),
+    manualNote:mta0?mta0.value:(f.manualNote||''),
+    weiterBeh:wb0?wb0.value:(f.weiterBeh||''),
+    weiterDate:wd0?wd0.value:(f.weiterDate||''),
+    weiterBhId:wbh0?wbh0.value:(f.weiterBhId||''),
+    transcribed:true
+  };
+  render();
+}
+function erledigtBehandlung(){
+  var m=S.behandelnModal;if(!m)return;
+  var f=S.behandelnForm||{};
+  var ta=document.getElementById('bhDictText');
+  var mta=document.getElementById('bhManualText');
+  var wb=document.getElementById('bhWeiterBeh');
+  var wd=document.getElementById('bhWeiterDate');
+  var wbh=document.getElementById('bhWeiterBhId');
+  var dict=ta?ta.value.trim():(f.notes||'');
+  var manual=mta?mta.value.trim():(f.manualNote||'');
+  var wBeh=wb?wb.value:(f.weiterBeh||'');
+  var wDate=wd?wd.value:(f.weiterDate||'');
+  var wBhId=wbh?wbh.value:(f.weiterBhId||'');
+  /* Save combined dict + manual note to patient visit history */
+  var combined=dict;
+  if(manual)combined+=(combined?'\n\nManuelle Erg\u00e4nzung: ':'Manuelle Erg\u00e4nzung: ')+manual;
+  var p=PATIENTS.find(function(x){return x.id===m.patId});
+  if(p&&combined){
+    if(!p.visits)p.visits=[];
+    p.visits.unshift({date:Date.now(),behandler:S.user?S.user.bId||'hFeld':'hFeld',codes:[],text:combined,voice:true});
+  }
+  /* Mark current task done */
+  if(!S.doneTaskIds)S.doneTaskIds={};
+  S.doneTaskIds[m.key]=true;
+  /* Create follow-up task if Weiterbehandlung selected */
+  var toastText=m.patName+': Erledigt';
+  if(wBeh&&p){
+    var assignee=USERS.find(function(u){return u.email===wBhId});
+    var assigneeBhId=(assignee&&assignee.bId)?assignee.bId:(function(){
+      var orig=TASKS.find(function(t){return t.name===p.name});
+      return orig?orig.bh:'hFeld';
+    })();
+    var taskDate=wDate||fmtShort(new Date(TODAY.getTime()+7*D));
+    var dateParts=taskDate.split('-');
+    var prettyDate=dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':taskDate;
+    var taskDateObj=new Date(taskDate);
+    var isNextWeek=taskDateObj.getTime()>TODAY.getTime()+D;
+    var newTask={
+      id:nextId++,
+      bh:assigneeBhId,
+      name:p.name,
+      heim:heimName(p.heim),
+      behandlung:wBeh,
+      status:'offen',
+      week:isNextWeek?'next':'current',
+      date:dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':fmtShort(new Date(TODAY.getTime()+7*D))
+    };
+    /* If assigned to a Verwaltung user, tag the task so it shows up in their "Meine Aufgaben > Offen" list */
+    if(assignee&&assignee.role==='verwaltung'){
+      newTask.assignedToEmail=assignee.email;
+      newTask.delegatedFromBh=S.user?S.user.bId||null:null;
+    }
+    TASKS.push(newTask);
+    var who=assignee?assignee.name:'Behandler';
+    toastText+=' \u00b7 '+wBeh+': '+prettyDate+' ('+who+')';
+  }
+  S.behandelnModal=null;
+  showToast(toastText,'var(--emerald)');
+}
+function renderBehandelnModal(){
+  var m=S.behandelnModal;if(!m)return'';
+  var f=S.behandelnForm||{notes:'',manualNote:'',weiterBeh:'',weiterDate:'',weiterBhId:'',transcribed:false};
+  var statusBar=f.transcribed
+    ?'<div class="dict-bar" style="background:linear-gradient(135deg,var(--emerald-bg),#E6FAF3);color:var(--emerald);animation:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Transkription abgeschlossen</div>'
+    :'<div class="dict-bar" style="animation:pulse 1.5s infinite">'+ICO.mic+' Aufnahme aktiv\u2026</div>';
+  var dictBtnStyle=f.transcribed
+    ?'width:100%;padding:12px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(20,194,149,0.3);border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:default;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px'
+    :'width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)';
+  var dictBtnLabel=f.transcribed
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>Transkription gespeichert'
+    :'Behandlung abschlie\u00dfen';
+  var dictBtnClick=f.transcribed?'':'onclick="saveBehandelnModal()"';
+  /* Behandler options = real people only (Behandler + named Verwaltung users); skip generic "Verwaltung" account */
+  var assigneeUsers=USERS.filter(function(u){return (u.role==='behandler'||u.role==='verwaltung')&&u.name!=='Verwaltung'});
+  var bhOpts=assigneeUsers.map(function(u){
+    var role=u.role==='verwaltung'?'Verwaltung':'Behandler';
+    return'<option value="'+u.email+'"'+(f.weiterBhId===u.email?' selected':'')+'>'+u.name+' \u2014 '+role+'</option>';
+  }).join('');
+  var behOpts='<option value="">\u2014 keine Weiterbehandlung \u2014</option>'
+    +BEHANDLUNG_OPTIONS.map(function(b){return'<option value="'+b+'"'+(f.weiterBeh===b?' selected':'')+'>'+b+'</option>';}).join('');
+  var h='<div class="overlay-bg" onclick="closeBehandelnModal()">'
+    +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+      +'<div class="overlay-header">'
+        +'<div class="overlay-title">'+m.patName+'</div>'
+        +'<button class="overlay-close" onclick="closeBehandelnModal()">\u00d7</button>'
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--text-3);margin-top:-10px;margin-bottom:14px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+m.heim+'</div>'
+      +'<div style="background:var(--blue-50);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-md);padding:12px 14px;margin-bottom:18px">'
+        +'<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Geplante Behandlung</div>'
+        +'<div style="font-size:14px;font-weight:700;color:var(--navy)">'+m.label+'</div>'
+      +'</div>'
+      +'<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-sm);margin-bottom:14px">'
+        +'<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px">'+ICO.mic+'<span>KI-Diktat</span></div>'
+        +statusBar
+        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:110px;resize:none;outline:none;transition:border .2s;line-height:1.5;margin-bottom:12px" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+        +'<button style="'+dictBtnStyle+'" '+dictBtnClick+'>'+dictBtnLabel+'</button>'
+      +'</div>'
+      +'<label class="form-label" style="margin-top:4px">Beschreibung</label>'
+      +'<textarea id="bhManualText" placeholder="Zus\u00e4tzliche Notizen, Hinweise f\u00fcr die Verwaltung\u2026" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;min-height:70px;resize:vertical;outline:none;background:var(--surface);color:var(--text);line-height:1.5" oninput="S.behandelnForm.manualNote=this.value">'+(f.manualNote||'')+'</textarea>'
+      +'<button style="width:100%;margin-top:10px;padding:10px 14px;background:var(--blue-50);color:var(--navy);border:1.5px solid rgba(10,46,158,0.2);border-radius:var(--r-md);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px" onclick="behandelnOpenOdoEdit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Odontogram bearbeiten</button>'
+      +'<div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border)">'
+        +'<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px">'
+          +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><polyline points="21 3 21 8 16 8"/></svg>'
+          +'<span>Weiterbehandlung</span>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--text-3);margin-bottom:12px">Optional \u2014 Folgetermin planen und zuweisen</div>'
+        +'<label class="form-label" style="margin-top:0">Behandlung</label>'
+        +'<select class="form-select" id="bhWeiterBeh" onchange="S.behandelnForm.weiterBeh=this.value">'+behOpts+'</select>'
+        +'<label class="form-label">Datum</label>'
+        +'<input type="date" class="form-input" id="bhWeiterDate" value="'+(f.weiterDate||'')+'" oninput="S.behandelnForm.weiterDate=this.value">'
+        +'<label class="form-label">Behandler</label>'
+        +'<select class="form-select" id="bhWeiterBhId" onchange="S.behandelnForm.weiterBhId=this.value">'+bhOpts+'</select>'
+      +'</div>'
+      +'<button class="save-btn" style="background:var(--emerald);box-shadow:0 4px 12px rgba(20,194,149,0.3)" onclick="erledigtBehandlung()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="14" height="14" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
+    +'</div>'
+  +'</div>';
+  return h;
+}
+
 /* Home route — distance matrix & nearest-neighbor renderer for the 4 home HEIME */
 var HOME_HEIM_T={
   "Alexa Lichtenrade":       {"Alexa Lichtenrade":0,"Haus am Weigandufer":25,"Vitanas M\u00e4rkisches V.":30,"Senterra Alloheim":35},
@@ -1504,7 +1700,7 @@ function renderHome(){
       var key=taskKey(t);
       var actions=t.done
         ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
-        :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="markTaskDone(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
+        :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openBehandelnModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Behandeln</button>'
          +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openRescheduleModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
       h+='<div class="task-card'+(t.done?" done":"")+'" style="flex-direction:column;align-items:stretch;gap:10px" onclick="goPat('+t.patId+')">'
         +'<div style="display:flex;align-items:center;gap:10px">'
@@ -1625,7 +1821,33 @@ function renderPatient(){
 
   if(tab==="Historie"){
     h+='<div class="section-title">Aktive Behandlungen</div>';
-    if(p.tx.length>0){h+='<div class="badges" style="margin-bottom:16px">';p.tx.forEach(function(t){h+=badge("treat",t.toUpperCase())});h+='</div>'}else h+='<div style="color:var(--text-3);font-size:12px;margin-bottom:16px">Keine aktiven Behandlungen</div>';
+    if(p.tx.length>0){h+='<div class="badges" style="margin-bottom:10px">';p.tx.forEach(function(t){h+=badge("treat",t.toUpperCase())});h+='</div>'}
+    /* Open Behandler-Aufgaben connected to this patient — rendered exactly like Wochenplan > Meine Aufgaben task cards */
+    var patTasks=TASKS.filter(function(t){return t.name===p.name&&t.status==='offen'});
+    if(patTasks.length>0){
+      var doneSet=S.doneTaskIds||{};
+      patTasks.forEach(function(t){
+        var pat=PATIENTS.find(function(x){return x.name===t.name});
+        var patId=pat?pat.id:0;
+        var key=patId+'|treat|'+t.behandlung;
+        var isDone=!!doneSet[key];
+        var bhName=t.assignedToEmail?(function(){var u=USERS.find(function(x){return x.email===t.assignedToEmail});return u?u.name:'Verwaltung'})():bhdlName(t.bh);
+        var actions=isDone
+          ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
+          :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openBehandelnModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Behandeln</button>'
+           +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openRescheduleModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
+        h+='<div class="task-card'+(isDone?' done':'')+'" style="flex-direction:column;align-items:stretch;gap:10px">'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+            +'<div class="task-check'+(isDone?' checked':'')+'">'+(isDone?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+            +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">'+t.behandlung+'</div><div style="font-size:10px;color:var(--text-3);margin-top:1px">'+t.date+' \u00b7 '+bhName+'</div></div>'
+            +'<div style="text-align:right"><div>'+badge("treat",t.behandlung)+'</div><div style="font-size:9px;color:var(--text-4);margin-top:2px">'+t.heim+'</div></div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">'+actions+'</div>'
+        +'</div>';
+      });
+    }
+    if(p.tx.length===0&&patTasks.length===0)h+='<div style="color:var(--text-3);font-size:12px;margin-bottom:16px">Keine aktiven Behandlungen</div>';
+    h+='<div style="height:10px"></div>';
     h+='<div class="section-title">Behandlungsverlauf</div>';
     h+='<button style="width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:6px" onclick="toggleNewVisit()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Neuer Eintrag</button>';
     if(S.showNewVisit){h+='<div class="card" style="cursor:default;border:1.5px solid var(--blue);background:var(--blue-25)"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">Behandlungs-Codes</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';["druck","prep","fit","co","teng","peng","pa","ex","za","o1","fu","uf","not","g","174a"].forEach(function(c){h+='<button style="padding:6px 12px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-full);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;color:var(--text-2)" onmouseover="this.style.borderColor=\'var(--navy)\';this.style.background=\'var(--blue-50)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--white)\'">'+c.toUpperCase()+'</button>'});h+='</div><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">Notizen</div><textarea style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:12px;font-family:inherit;min-height:50px;resize:none;outline:none;transition:border .2s" placeholder="Behandlung beschreiben\u2026" onfocus="this.style.borderColor=\'var(--blue)\'" onblur="this.style.borderColor=\'var(--border)\'"></textarea><div style="display:flex;gap:8px;margin-top:10px"><button style="flex:1;padding:10px;background:var(--blue-50);color:var(--navy);border:none;border-radius:var(--r-md);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:4px" onclick="toggleDictActive()">'+ICO.mic+' Aufnahme</button><button style="flex:1;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:var(--r-md);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Speichern</button></div></div>'}
@@ -1957,7 +2179,7 @@ function renderSearch(){
 function renderManager(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
   var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div>'+MENU_BTN_2+'</div></div>';
-  h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle","Nachrichten"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
+  h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div><div class="content">';
   if(tab==="\u00dcbersicht"){
     h+='<div class="mgr-stats"><div class="mgr-stat"><div class="num" style="color:var(--navy)">'+totalPat+'</div><div class="label">Patienten</div><div class="trend trend-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> +12 Monat</div></div>'
@@ -2008,28 +2230,6 @@ function renderManager(){
     h+='</tbody></table></div></div>';
   }
   if(tab==="F\u00e4lle"){h+='<div style="padding:0 20px"><div class="mgr-section"><div class="mgr-section-title">Alle ZE-F\u00e4lle ('+zeC+')</div>';PATIENTS.filter(function(p){return p.ze}).sort(function(a,b){var ua=urg(a.ze.exp)==="expired"?0:1;var ub=urg(b.ze.exp)==="expired"?0:1;return ua-ub}).forEach(function(p){var u2=urg(p.ze.exp);h+='<div class="card" onclick="mgrDrillPat('+p.id+')"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+bhdlName(p.ze.bh)+'</div></div>'+badge(u2==="expired"?"urgent":u2==="urgent"?"warning":"active",ZE_STATES[p.ze.st])+'</div></div>'});h+='</div>';h+='<div class="mgr-section"><div class="mgr-section-title">Alle PA-F\u00e4lle ('+paC+')</div>';PATIENTS.filter(function(p){return p.pa}).forEach(function(p){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(!ps)return;h+='<div class="card" onclick="mgrDrillPat('+p.id+')"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+ps.label+'</div></div>'+badge("purple",ps.label)+'</div></div>'});h+='</div></div>'}
-  if(tab==="Nachrichten"){
-    var msgs=getMyMessages();var uc=getUnreadCount();
-    h+='<div style="padding:0 20px">';
-    h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="mgr-section-title" style="margin:0">E-Mail-Posteingang</div><span style="font-size:11px;color:var(--text-3);font-weight:600">'+msgs.length+' gesamt \u2014 '+uc+' ungelesen</span></div>';
-    if(msgs.length===0)h+='<div style="padding:20px;text-align:center;color:var(--text-4);font-size:12px">Keine E-Mails</div>';
-    else msgs.forEach(function(m){
-      var senderEmail=msgSenderEmail(m);
-      var initials=msgSenderInitials(m);
-      h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')" style="border-bottom:1px solid var(--surface-2)">';
-      if(!m.read)h+='<div class="msg-unread-dot"></div>';
-      h+='<div class="em-avatar">'+initials+'</div>'
-        +'<div class="msg-body">'
-          +'<div class="em-sender">'+m.from+' <span style="font-weight:400;color:var(--text-4)">&lt;'+senderEmail+'&gt;</span></div>'
-          +'<div class="em-subject">'+m.title+'</div>'
-          +'<div class="msg-preview">'+m.body.substring(0,80)+'\u2026</div>'
-        +'</div>'
-        +'<div class="em-date">'+fmtEmailDate(m.time)+'</div>'
-      +'</div>';
-    });
-    h+='<button style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Neue E-Mail verfassen</button>';
-    h+='</div></div>';
-  }
   h+='</div>';return h;
 }
 
@@ -2313,7 +2513,14 @@ function clearToothState(){/* placeholder - in editor context, would clear selec
 function odoSaveAndClose(){
   var p=PATIENTS.find(function(x){return x.id===S.patId});
   if(p)odoAutoSave(p);
-  S.odoEdit=false;render();
+  S.odoEdit=false;
+  /* If the user came from the Behandeln popup, re-open it with the preserved form state */
+  if(S._behandelnReturn){
+    S.behandelnModal=S._behandelnReturn.modal;
+    S.behandelnForm=S._behandelnReturn.form;
+    S._behandelnReturn=null;
+  }
+  render();
 }
 function odoAutoSave(p){
   if(!p)return;
@@ -2481,7 +2688,7 @@ function renderDesktopSidebar(){
   /* Management dropdown */
   h+='<button class="dk-nav-item '+(S.dkPage==='manager'?'active':'')+'" onclick="toggleDkGroup(\'manager\')" style="padding-right:10px">'+ICO.chart+'<span>Management</span>'+(isMgrOpen?chevUp:chevDown)+'</button>';
   if(isMgrOpen){
-    ['\u00dcbersicht','Behandler','Heime','Planung','F\u00e4lle','Nachrichten'].forEach(function(t){
+    ['\u00dcbersicht','Behandler','Heime','Planung','F\u00e4lle'].forEach(function(t){
       var active=(S.dkPage==='manager'&&S.mgrTab===t)?'active':'';
       h+='<button class="dk-nav-item '+active+'" style="padding-left:44px;font-size:12px" onclick="goDesktopMgrTab(\''+t+'\')"><span>'+t+'</span></button>';
     });
@@ -2528,7 +2735,7 @@ function renderDesktopManagerBody(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
   /* Tabs */
   var h='<div class="dk-tabs">';
-  ["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle","Nachrichten"].forEach(function(t){h+='<button class="'+(tab===t?"active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
+  ["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="'+(tab===t?"active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div>';
   /* Scrollable body */
   h+='<div class="dk-body">';
@@ -2567,26 +2774,6 @@ function renderDesktopManagerBody(){
   if(tab==="Heime"){h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="mgr-section-title" style="margin:0">Heim-\u00dcbersicht</div></div><table class="mgr-table"><thead><tr><th>Heim</th><th>Pat.</th><th>ZE</th><th>PA</th><th>Dring.</th></tr></thead><tbody>';HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});var ze=pts.filter(function(p){return p.ze}).length;var pa=pts.filter(function(p){return p.pa}).length;var ug=pts.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;h+='<tr style="cursor:pointer"><td style="font-weight:600">'+hm.name+'</td><td>'+pts.length+'</td><td>'+ze+'</td><td>'+pa+'</td><td>'+(ug>0?badge("urgent",ug):badge("done","0"))+'</td></tr>'});h+='</tbody></table></div>'}
   if(tab==="Planung"){var days=["Mo","Di","Mi","Do","Fr"];var bIds=[{id:"hFeld",name:"Dr. Feld"},{id:"hHess",name:"Dr. Hess"},{id:"hGomez",name:"Dr. Gomez"}];h+='<div class="mgr-section"><div class="mgr-section-title">Wochenplan</div><table class="mgr-table"><thead><tr><th>Behandler</th>';days.forEach(function(d){h+='<th>'+d+'</th>'});h+='</tr></thead><tbody>';bIds.forEach(function(b){h+='<tr><td style="font-weight:600">'+b.name+'</td>';days.forEach(function(d,di){var val=SCHEDULE[b.id]?SCHEDULE[b.id][di]||"":"";var isEditing=S.scheduleEdit&&S.scheduleEdit.bId===b.id&&S.scheduleEdit.day===di;if(isEditing){h+='<td style="padding:2px"><select id="schedSel" style="width:100%;font-size:11px;padding:4px;border:1.5px solid var(--blue);border-radius:4px;font-family:inherit;background:var(--blue-25)" onchange="scheduleSave(\''+b.id+'\','+di+')"><option value="">\u2014</option>';HEIME.forEach(function(hm){h+='<option value="'+hm.name+'"'+(val===hm.name?' selected':'')+'>'+hm.name+'</option>'});h+='</select></td>'}else{h+='<td style="cursor:pointer;'+(val?'color:var(--navy);font-weight:600':'color:var(--text-4)')+'" onclick="scheduleEdit(\''+b.id+'\','+di+')">'+(val||'\u2014')+'</td>'}});h+='</tr>'});h+='</tbody></table></div>'}
   if(tab==="F\u00e4lle"){h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">';h+='<div class="mgr-section"><div class="mgr-section-title">Alle ZE-F\u00e4lle ('+zeC+')</div>';PATIENTS.filter(function(p){return p.ze}).sort(function(a,b){var ua=urg(a.ze.exp)==="expired"?0:1;var ub=urg(b.ze.exp)==="expired"?0:1;return ua-ub}).forEach(function(p){var u2=urg(p.ze.exp);h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+bhdlName(p.ze.bh)+'</div></div>'+badge(u2==="expired"?"urgent":u2==="urgent"?"warning":"active",ZE_STATES[p.ze.st])+'</div></div>'});h+='</div>';h+='<div class="mgr-section"><div class="mgr-section-title">Alle PA-F\u00e4lle ('+paC+')</div>';PATIENTS.filter(function(p){return p.pa}).forEach(function(p){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(!ps)return;h+='<div class="card"><div class="card-row"><div><div class="card-title">'+p.name+'</div><div class="card-sub">'+heimName(p.heim)+' \u2014 '+ps.label+'</div></div>'+badge("purple",ps.label)+'</div></div>'});h+='</div></div>'}
-  if(tab==="Nachrichten"){
-    var msgs=getMyMessages();var uc=getUnreadCount();
-    h+='<div class="mgr-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="mgr-section-title" style="margin:0">E-Mail-Posteingang</div><div style="display:flex;gap:12px;align-items:center"><span style="font-size:12px;color:var(--text-3);font-weight:600">'+msgs.length+' gesamt \u2014 '+uc+' ungelesen</span><button style="padding:10px 18px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;gap:6px" onclick="S.msgCompose=true;render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Neue E-Mail</button></div></div>';
-    if(msgs.length===0)h+='<div style="padding:30px;text-align:center;color:var(--text-4);font-size:13px">Keine E-Mails</div>';
-    else msgs.forEach(function(m){
-      var senderEmail=msgSenderEmail(m);
-      var initials=msgSenderInitials(m);
-      h+='<div class="msg-item'+(m.read?'':' unread')+'" onclick="openMsg('+m.id+')" style="border-bottom:1px solid var(--surface-2);border-radius:0">';
-      if(!m.read)h+='<div class="msg-unread-dot"></div>';
-      h+='<div class="em-avatar">'+initials+'</div>'
-        +'<div class="msg-body">'
-          +'<div class="em-sender">'+m.from+' <span style="font-weight:400;color:var(--text-4)">&lt;'+senderEmail+'&gt;</span></div>'
-          +'<div class="em-subject">'+m.title+'</div>'
-          +'<div class="msg-preview">'+m.body.substring(0,120)+'\u2026</div>'
-        +'</div>'
-        +'<div class="em-date">'+fmtEmailDate(m.time)+'</div>'
-      +'</div>';
-    });
-    h+='</div>';
-  }
   h+='</div>';
   return h;
 }
@@ -2764,6 +2951,8 @@ function render(){
   if(S.toast)html+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
   /* Home task reschedule modal */
   if(S.rescheduleModal)html+=renderRescheduleModal();
+  /* Home task Behandeln modal */
+  if(S.behandelnModal)html+=renderBehandelnModal();
   /* Horizontal odontogram zoom overlay */
   if(S.odoZoom)html+=renderOdoZoom();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */
@@ -3076,13 +3265,13 @@ function showViewPicker(){
   el.id='viewPicker';
   el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
   el.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 36px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;max-width:340px;width:90%">'
-    +'<div style="font-size:18px;font-weight:800;color:#082A99;margin-bottom:6px">HL-Dentistry v10</div>'
-    +'<div style="font-size:12px;color:#64748B;margin-bottom:24px">Welche Ansicht m\u00f6chten Sie testen?</div>'
+    +'<div style="font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#0A2E9E;margin-bottom:8px;display:flex;align-items:baseline;justify-content:center;gap:1px">HL-Dentistry<span style="color:#14C295">.</span></div>'
+    +'<div style="font-size:11px;color:#6E6E73;margin-bottom:28px;text-transform:uppercase;letter-spacing:1.5px;font-weight:500">Welche Ansicht m\u00f6chten Sie testen?</div>'
     +'<div style="display:flex;gap:12px">'
-      +'<button onclick="pickView(\'desktop\')" style="flex:1;padding:16px 12px;background:linear-gradient(135deg,#082A99,#3D66FE);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(8,42,153,0.3)">'
+      +'<button onclick="pickView(\'desktop\')" style="flex:1;padding:16px 12px;background:linear-gradient(135deg,#0E3ABF,#0A2E9E 55%,#061F6E);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,46,158,0.3)">'
         +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
         +'Desktop</button>'
-      +'<button onclick="pickView(\'mobile\')" style="flex:1;padding:16px 12px;background:#F8FAFC;color:#082A99;border:2px solid #E2E8F0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">'
+      +'<button onclick="pickView(\'mobile\')" style="flex:1;padding:16px 12px;background:#F5F5F7;color:#0A2E9E;border:1.5px solid #D2D2D7;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">'
         +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
         +'Mobile</button>'
     +'</div>'
@@ -3259,7 +3448,7 @@ function bhSection(bh,tasks,badgeClass,badgeLabel,weekParam){
   }
   return '<div class="bh-section">'
     +'<div class="bh-header" onclick="toggleBh(\''+bh.id+'\')">'
-      +'<div class="bh-avatar">'+bh.initials+'</div>'
+      +'<div class="bh-avatar">'+bhInitials(bh)+'</div>'
       +'<div class="bh-name">'+bh.name+'</div>'
       +'<div class="bh-badge '+badgeClass+'">'+badgeLabel+'</div>'
       +'<span class="'+chevCls+'">&#9660;</span>'
@@ -3613,7 +3802,34 @@ function renderMeineAufgaben(){
   +'</div>';
   h+='<div class="mein-content">';
   if(mt==='offen'){
-    if(OFFEN_PAT.length===0){h+='<div class="mein-empty">Keine offenen Patienten</div>';}
+    /* Tasks delegated from Behandler-Aufgaben to the current Verwaltung user */
+    var myEmail=S.user?S.user.email:'';
+    var delegated=TASKS.filter(function(t){return t.assignedToEmail===myEmail&&t.status==='offen'});
+    if(delegated.length>0){
+      h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:4px 0 8px 2px">Von Behandler zugewiesen</div>';
+      delegated.forEach(function(t){
+        var pid=PATIENTS.find(function(x){return x.name===t.name});
+        var oc=pid?'onclick="goPatFromAdmin('+pid.id+')" style="cursor:pointer"':'';
+        var fromBh=t.delegatedFromBh?bhdlName(t.delegatedFromBh):'';
+        h+='<div class="mini-card" '+oc+' style="border-left:3px solid var(--violet)">'
+          +'<div class="mini-card-body">'
+            +'<div class="mini-name">'+t.name+'</div>'
+            +'<div class="mini-sub">'+ICO.pin+' '+t.heim+'</div>'
+            +'<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap">'
+              +'<span class="mini-badge" style="background:var(--violet-bg);color:var(--violet)">'+t.behandlung+'</span>'
+              +'<span style="font-size:10px;color:var(--text-3);font-weight:600">'+t.date+'</span>'
+              +(fromBh?'<span style="font-size:10px;color:var(--text-4)">\u2190 '+fromBh+'</span>':'')
+            +'</div>'
+          +'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">'
+            +'<span class="mini-badge" style="background:var(--amber-bg);color:var(--amber)">Offen</span>'
+            +'<button class="reassign-btn" onclick="event.stopPropagation();openReassignTask('+t.id+')">Zuweisen \u2192</button>'
+          +'</div>'
+        +'</div>';
+      });
+      if(OFFEN_PAT.length>0)h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:14px 0 8px 2px">Offene Patienten</div>';
+    }
+    if(OFFEN_PAT.length===0&&delegated.length===0){h+='<div class="mein-empty">Keine offenen Patienten</div>';}
     else{
       OFFEN_PAT.forEach(function(p,i){
         var pid=PATIENTS.find(function(x){return x.name===p.name});
@@ -3625,7 +3841,7 @@ function renderMeineAufgaben(){
           +'</div>'
           +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">'
             +'<span class="mini-badge mb-late">Vor '+p.since+' Tagen</span>'
-            +'<button class="reassign-btn" onclick="openReassign('+i+',\'offen\')">Zuweisen →</button>'
+            +'<button class="reassign-btn" onclick="openReassign('+i+',\'offen\')">Zuweisen \u2192</button>'
           +'</div>'
         +'</div>';
       });
@@ -3765,10 +3981,10 @@ function setMeinTab(t){S.meinTab_2=t;render()}
 function renderReassign(){
   var src=S.reassignSrc_2||'offen';
   var isZE=src==='ze', isEX=src==='ex';
-  var p=isZE?ZE_FAELLE[S.reassignIdx_2]:isEX?EX_PATIENTEN[S.reassignIdx_2]:src==='pa'?PA_FAELLE[S.reassignIdx_2]:src==='weiterfuehrend'?WEITERFUEHREND_PAT[S.reassignIdx_2]:OFFEN_PAT[S.reassignIdx_2];
+  var p=src==='delegated'?TASKS.find(function(t){return t.id===S._reassignTaskId}):isZE?ZE_FAELLE[S.reassignIdx_2]:isEX?EX_PATIENTEN[S.reassignIdx_2]:src==='pa'?PA_FAELLE[S.reassignIdx_2]:src==='weiterfuehrend'?WEITERFUEHREND_PAT[S.reassignIdx_2]:OFFEN_PAT[S.reassignIdx_2];
   if(!p)return'';
   var f=S.reassignForm_2;
-  var title=(isZE||isEX)?(S._zeMode==='termin'?'Termin planen':'Behandler zuweisen'):src==='pa'?'PA-Aufgabe zuweisen':src==='weiterfuehrend'?'Weiterf\u00fchrende Behandlung zuweisen':'Aufgabe zuweisen';
+  var title=(isZE||isEX)?(S._zeMode==='termin'?'Termin planen':'Behandler zuweisen'):src==='pa'?'PA-Aufgabe zuweisen':src==='weiterfuehrend'?'Weiterf\u00fchrende Behandlung zuweisen':src==='delegated'?'Behandler zuweisen':'Aufgabe zuweisen';
   var bhSelect='<label class="form-label">Behandler</label>'
     +'<select class="form-select" id="rBh" onchange="S.reassignForm_2.bh=this.value">'
       +'<option value="">Behandler w\u00e4hlen\u2026</option>'
@@ -3815,7 +4031,22 @@ function openZEEdit(idx,mode,src){
   S.reassignErr_2='';
   render();
 }
-function closeReassign(){S.reassignIdx_2=null;render();}
+function openReassignTask(taskId){
+  var t=TASKS.find(function(x){return x.id===taskId});
+  if(!t)return;
+  S._reassignTaskId=taskId;
+  S.reassignIdx_2=-1;
+  S.reassignSrc_2='delegated';
+  /* Try to convert display date like "24.04." back to ISO yyyy-mm-dd for the date input */
+  var iso='';
+  var dm=/^(\d{1,2})\.(\d{1,2})\.?/;
+  var m=t.date&&t.date.match(dm);
+  if(m){var yr=TODAY.getFullYear();iso=yr+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');}
+  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||''};
+  S.reassignErr_2='';
+  render();
+}
+function closeReassign(){S.reassignIdx_2=null;S._reassignTaskId=null;render();}
 function saveReassign(){
   var f=S.reassignForm_2;
   var src2=S.reassignSrc_2||'offen';
@@ -3823,6 +4054,22 @@ function saveReassign(){
   if(!f.bh){S.reassignErr_2='Bitte Behandler ausw\u00e4hlen.';render();return;}
   if(!isZE&&!isEX&&!f.behandlung){S.reassignErr_2='Bitte Behandlung ausw\u00e4hlen.';render();return;}
   var dateStr=f.date?new Date(f.date).toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'}):fmtShort(TODAY);
+  if(src2==='delegated'){
+    var t=TASKS.find(function(x){return x.id===S._reassignTaskId});
+    if(t){
+      t.bh=f.bh;
+      t.date=f.date?new Date(f.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+'.':t.date;
+      t.behandlung=f.behandlung||t.behandlung;
+      var tDate=f.date?new Date(f.date):TODAY;
+      t.week=tDate.getTime()>=TODAY.getTime()+7*D?'next':'current';
+      delete t.assignedToEmail;
+      delete t.delegatedFromBh;
+    }
+    S.reassignIdx_2=null;S._reassignTaskId=null;
+    showToast('Aufgabe zugewiesen an '+bhdlName(f.bh),'var(--emerald)');
+    render();
+    return;
+  }
   if(isZE||isEX){
     var rec=isEX?EX_PATIENTEN[S.reassignIdx_2]:ZE_FAELLE[S.reassignIdx_2];
     if(rec){rec.bh=f.bh;rec.date=dateStr;}
@@ -4042,6 +4289,7 @@ function renderAdminBottomNav_2(active){
     +btn('einverstaendnis', ICO.doc, 'Einverst\u00e4ndnis')
     +btn('archiv', ICO.archive, 'Archiv')
     +btn('behandler', usersIcon, 'Behandler')
+    +btn('abrechnung', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', 'Abrechnung')
   +'</div>';
 }
 /* === BEHANDLER OVERVIEW (Verwaltung > Behandler tab) === */
@@ -4053,8 +4301,7 @@ function renderBehandler_2(){
   +'</div></div>';
   h+='<div class="content">';
   BEHANDLER.forEach(function(b){
-    var parts=b.name.split(' ');
-    var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();
+    var initials=bhInitials(b);
     var user=USERS.find(function(u){return u.bId===b.id});
     var email=user?user.email:'\u2014 kein Account';
     var role=user?user.role:null;
@@ -4240,21 +4487,47 @@ var EINV_LETTER_TEXTS={
 var EINV_PDF_CSS='*{margin:0;padding:0;box-sizing:border-box}'
   +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.55;color:#000;background:#fff}'
   +'.page{width:21cm;min-height:29.7cm;margin:0 auto;padding:2.5cm 2.5cm 2cm}'
+  +'.letterhead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding-bottom:10px;border-bottom:1.5px solid #0A2E9E;margin-bottom:1.2cm}'
+  +'.letterhead .lh-text{font-size:9.5pt;line-height:1.45;color:#0A2E9E}'
+  +'.letterhead .lh-text .lh-clinic{font-weight:700;font-size:11pt;letter-spacing:-0.2px;margin-bottom:2px}'
+  +'.letterhead .lh-text .lh-contact{margin-top:6px;color:#3A3A3C;font-size:9pt}'
+  +'.letterhead .lh-logo{flex-shrink:0;width:54px;height:54px}'
   +'.addr{margin-bottom:1.4cm;font-size:10.5pt;line-height:1.6}'
   +'.dateline{text-align:right;margin-bottom:1cm;font-size:10.5pt}'
   +'.betreff{font-weight:bold;margin-bottom:1cm}'
   +'h2{font-size:11pt;font-weight:bold;margin:1em 0 0.3em;text-decoration:underline}'
   +'p{margin-bottom:0.6em;font-size:10.5pt}'
   +'table.cost{width:100%;border-collapse:collapse;margin:0.7em 0;font-size:9.5pt}'
-  +'table.cost th{background:#1e3a5f;color:#fff;padding:5px 7px;text-align:left;border:1px solid #1e3a5f}'
+  +'table.cost th{background:#0A2E9E;color:#fff;padding:5px 7px;text-align:left;border:1px solid #0A2E9E}'
   +'table.cost td{padding:5px 7px;border:1px solid #bbb}'
-  +'table.cost tr:nth-child(even) td{background:#f0f4ff}'
+  +'table.cost tr:nth-child(even) td{background:#EFF3FF}'
   +'.sig{margin-top:1.5cm}'
   +'.box{margin-top:0.8cm;padding:8px 10px;border:2px solid #c00;font-size:9.5pt}'
   +'.field{display:inline-block;vertical-align:top;padding:0 6px 0 0}'
   +'.field-line{border-bottom:1px solid #000;min-height:22px;padding-bottom:3px}'
   +'.field-label{font-size:7.5pt;color:#666;margin-top:2px}'
+  +'.attach-banner{margin-bottom:1.2cm;padding:10px 14px;background:#FFF8E1;border:1.5px solid #C9A227;font-size:10pt;line-height:1.5}'
   +'@media print{.no-print{display:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+var EINV_LETTERHEAD_HTML='<div class="letterhead">'
+  +'<div class="lh-text">'
+    +'<div class="lh-clinic">SwissMedAI Medizinisches Versorgungszentrum (MVZ)</div>'
+    +'<div>Zahn\u00e4rztliche Leitung: Jesus Gomez Rossi</div>'
+    +'<div>Praxis-Standort: Bundesallee 140, 12161 Berlin</div>'
+    +'<div class="lh-contact">Email: info@mvz-arzt.de \u00b7 Tel: 030-8531362 \u00b7 Fax: 030-8549524</div>'
+  +'</div>'
+  +'<svg class="lh-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">'
+    +'<defs><linearGradient id="lhg" x1="0%" y1="0%" x2="100%" y2="100%">'
+      +'<stop offset="0%" stop-color="#0E3ABF"/><stop offset="55%" stop-color="#0A2E9E"/><stop offset="100%" stop-color="#061F6E"/>'
+    +'</linearGradient></defs>'
+    +'<rect x="2" y="2" width="44" height="44" rx="12" fill="url(#lhg)"/>'
+    +'<g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none">'
+      +'<line x1="14" y1="15" x2="14" y2="33"/><line x1="24" y1="15" x2="24" y2="33"/>'
+      +'<line x1="14" y1="24" x2="24" y2="24"/><line x1="24" y1="33" x2="34" y2="33"/>'
+    +'</g>'
+    +'<circle cx="37" cy="11" r="1.8" fill="#14C295"/>'
+  +'</svg>'
++'</div>';
 function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
   var costs=Object.assign({},PROTH_COSTS,extraCosts||{});
   var parts=p.name.split(', '),lastName=parts[0]||'',firstName=parts[1]||'',fullName=firstName+' '+lastName;
@@ -4268,6 +4541,7 @@ function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
   var pb=firstPatient?'':' style="page-break-before:always"';
   function txt(key){return(EINV_LETTER_TEXTS[key]||'').replace(/\{\{behandlung\}\}/g,'<strong>'+treatStr+'</strong>');}
   return '<div class="page"'+pb+'>'
+    +EINV_LETTERHEAD_HTML
     +'<div class="addr"><div>'+fullName+'</div><div>'+p.heim+'</div><div>'+street+'</div><div>'+pcCity+'</div></div>'
     +'<div class="dateline">Berlin, den '+dateStr+'</div>'
     +'<div class="betreff">Betreff: Neuer Zahnersatz ('+treatStr+')</div>'
@@ -4290,8 +4564,10 @@ function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
     +'<div class="sig"><p>Mit freundlichen Gr\u00fc\u00dfen,</p><br><p><strong>'+txt('signatur')+'</strong></p></div>'
     +'<div class="box"><strong>WICHTIG:</strong> '+txt('wichtig')+'</div>'
     +'</div>'
-    /* page 2 – form */
+    /* page 2 – mandatory attachment: Einverständniserklärung */
     +'<div class="page" style="page-break-before:always">'
+    +EINV_LETTERHEAD_HTML
+    +'<div class="attach-banner"><strong>WICHTIG:</strong> Bitte schicken Sie diese Seite im Original und vollst\u00e4ndig ausgef\u00fcllt an SwissMedAI MVZ, Bundesallee 140, 12161 Berlin. Zur schnelleren Bearbeitung k\u00f6nnen Sie das Formular zus\u00e4tzlich auch an info@mvz-arzt.de oder per Fax 030-8549524 schicken. Vielen Dank!</div>'
     +'<h1 style="font-size:13pt;text-align:center;margin-bottom:1.2cm">Einverst\u00e4ndniserkl\u00e4rung zur Herstellung des Zahnersatzes</h1>'
     +'<p>Hiermit erkl\u00e4re ich mich einverstanden, dass bei Patient/in</p>'
     +'<div style="display:flex;gap:12px;margin:10px 0 6px">'
