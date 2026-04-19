@@ -4487,21 +4487,47 @@ var EINV_LETTER_TEXTS={
 var EINV_PDF_CSS='*{margin:0;padding:0;box-sizing:border-box}'
   +'body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.55;color:#000;background:#fff}'
   +'.page{width:21cm;min-height:29.7cm;margin:0 auto;padding:2.5cm 2.5cm 2cm}'
+  +'.letterhead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding-bottom:10px;border-bottom:1.5px solid #0A2E9E;margin-bottom:1.2cm}'
+  +'.letterhead .lh-text{font-size:9.5pt;line-height:1.45;color:#0A2E9E}'
+  +'.letterhead .lh-text .lh-clinic{font-weight:700;font-size:11pt;letter-spacing:-0.2px;margin-bottom:2px}'
+  +'.letterhead .lh-text .lh-contact{margin-top:6px;color:#3A3A3C;font-size:9pt}'
+  +'.letterhead .lh-logo{flex-shrink:0;width:54px;height:54px}'
   +'.addr{margin-bottom:1.4cm;font-size:10.5pt;line-height:1.6}'
   +'.dateline{text-align:right;margin-bottom:1cm;font-size:10.5pt}'
   +'.betreff{font-weight:bold;margin-bottom:1cm}'
   +'h2{font-size:11pt;font-weight:bold;margin:1em 0 0.3em;text-decoration:underline}'
   +'p{margin-bottom:0.6em;font-size:10.5pt}'
   +'table.cost{width:100%;border-collapse:collapse;margin:0.7em 0;font-size:9.5pt}'
-  +'table.cost th{background:#1e3a5f;color:#fff;padding:5px 7px;text-align:left;border:1px solid #1e3a5f}'
+  +'table.cost th{background:#0A2E9E;color:#fff;padding:5px 7px;text-align:left;border:1px solid #0A2E9E}'
   +'table.cost td{padding:5px 7px;border:1px solid #bbb}'
-  +'table.cost tr:nth-child(even) td{background:#f0f4ff}'
+  +'table.cost tr:nth-child(even) td{background:#EFF3FF}'
   +'.sig{margin-top:1.5cm}'
   +'.box{margin-top:0.8cm;padding:8px 10px;border:2px solid #c00;font-size:9.5pt}'
   +'.field{display:inline-block;vertical-align:top;padding:0 6px 0 0}'
   +'.field-line{border-bottom:1px solid #000;min-height:22px;padding-bottom:3px}'
   +'.field-label{font-size:7.5pt;color:#666;margin-top:2px}'
+  +'.attach-banner{margin-bottom:1.2cm;padding:10px 14px;background:#FFF8E1;border:1.5px solid #C9A227;font-size:10pt;line-height:1.5}'
   +'@media print{.no-print{display:none}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+var EINV_LETTERHEAD_HTML='<div class="letterhead">'
+  +'<div class="lh-text">'
+    +'<div class="lh-clinic">SwissMedAI Medizinisches Versorgungszentrum (MVZ)</div>'
+    +'<div>Zahn\u00e4rztliche Leitung: Jesus Gomez Rossi</div>'
+    +'<div>Praxis-Standort: Bundesallee 140, 12161 Berlin</div>'
+    +'<div class="lh-contact">Email: info@mvz-arzt.de \u00b7 Tel: 030-8531362 \u00b7 Fax: 030-8549524</div>'
+  +'</div>'
+  +'<svg class="lh-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">'
+    +'<defs><linearGradient id="lhg" x1="0%" y1="0%" x2="100%" y2="100%">'
+      +'<stop offset="0%" stop-color="#0E3ABF"/><stop offset="55%" stop-color="#0A2E9E"/><stop offset="100%" stop-color="#061F6E"/>'
+    +'</linearGradient></defs>'
+    +'<rect x="2" y="2" width="44" height="44" rx="12" fill="url(#lhg)"/>'
+    +'<g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none">'
+      +'<line x1="14" y1="15" x2="14" y2="33"/><line x1="24" y1="15" x2="24" y2="33"/>'
+      +'<line x1="14" y1="24" x2="24" y2="24"/><line x1="24" y1="33" x2="34" y2="33"/>'
+    +'</g>'
+    +'<circle cx="37" cy="11" r="1.8" fill="#14C295"/>'
+  +'</svg>'
++'</div>';
 function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
   var costs=Object.assign({},PROTH_COSTS,extraCosts||{});
   var parts=p.name.split(', '),lastName=parts[0]||'',firstName=parts[1]||'',fullName=firstName+' '+lastName;
@@ -4515,6 +4541,7 @@ function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
   var pb=firstPatient?'':' style="page-break-before:always"';
   function txt(key){return(EINV_LETTER_TEXTS[key]||'').replace(/\{\{behandlung\}\}/g,'<strong>'+treatStr+'</strong>');}
   return '<div class="page"'+pb+'>'
+    +EINV_LETTERHEAD_HTML
     +'<div class="addr"><div>'+fullName+'</div><div>'+p.heim+'</div><div>'+street+'</div><div>'+pcCity+'</div></div>'
     +'<div class="dateline">Berlin, den '+dateStr+'</div>'
     +'<div class="betreff">Betreff: Neuer Zahnersatz ('+treatStr+')</div>'
@@ -4537,8 +4564,10 @@ function buildEinvLetterPages(p,dateStr,firstPatient,extraCosts){
     +'<div class="sig"><p>Mit freundlichen Gr\u00fc\u00dfen,</p><br><p><strong>'+txt('signatur')+'</strong></p></div>'
     +'<div class="box"><strong>WICHTIG:</strong> '+txt('wichtig')+'</div>'
     +'</div>'
-    /* page 2 – form */
+    /* page 2 – mandatory attachment: Einverständniserklärung */
     +'<div class="page" style="page-break-before:always">'
+    +EINV_LETTERHEAD_HTML
+    +'<div class="attach-banner"><strong>WICHTIG:</strong> Bitte schicken Sie diese Seite im Original und vollst\u00e4ndig ausgef\u00fcllt an SwissMedAI MVZ, Bundesallee 140, 12161 Berlin. Zur schnelleren Bearbeitung k\u00f6nnen Sie das Formular zus\u00e4tzlich auch an info@mvz-arzt.de oder per Fax 030-8549524 schicken. Vielen Dank!</div>'
     +'<h1 style="font-size:13pt;text-align:center;margin-bottom:1.2cm">Einverst\u00e4ndniserkl\u00e4rung zur Herstellung des Zahnersatzes</h1>'
     +'<p>Hiermit erkl\u00e4re ich mich einverstanden, dass bei Patient/in</p>'
     +'<div style="display:flex;gap:12px;margin:10px 0 6px">'

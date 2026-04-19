@@ -145,6 +145,38 @@ Verwaltung delegations get the " (Verwaltung)" suffix so the user can tell at a 
 
 ---
 
+### 2026-04-19 — Einverständnis PDF: SwissMedAI letterhead + mandatory attachment banner
+
+**Why:** The generated Einverständnis PDF previously dropped straight into the recipient address block — no clinic letterhead, no visual identity, and the consent-form attachment had no signposting that it was the page that must be returned by post/fax. Brought it in line with the Word-doc original the user shared (SwissMedAI Bundesallee letterhead + the explicit "WICHTIG: Bitte zurückschicken…" banner ahead of the consent form).
+
+**Changes in `buildEinvLetterPages()`** (`~4505`):
+
+*New shared letterhead block — `EINV_LETTERHEAD_HTML`* (declared once, reused on both pages):
+- Flex container with text on the left, HL gradient mark (54×54 px inline SVG) on the right.
+- Left column shows:
+  - `SwissMedAI Medizinisches Versorgungszentrum (MVZ)` (bold 11 pt)
+  - `Zahnärztliche Leitung: Jesus Gomez Rossi`
+  - `Praxis-Standort: Bundesallee 140, 12161 Berlin`
+  - Contact line: `Email: info@mvz-arzt.de · Tel: 030-8531362 · Fax: 030-8549524`
+- Right column: same HL monogram with the navy gradient + signal-green dot used in the favicon and login screen.
+- 1.5 px navy hairline border underneath, 1.2 cm bottom margin → reads as a proper Briefkopf.
+
+*Insertion points:*
+- Page 1 (cover letter): `EINV_LETTERHEAD_HTML` prepended above the recipient `.addr` block.
+- Page 2 (consent form / mandatory attachment): `EINV_LETTERHEAD_HTML` repeated, then a new `.attach-banner` (amber background `#FFF8E1`, 1.5 px gold border) carrying the verbatim instruction from the source doc:
+  > **WICHTIG:** Bitte schicken Sie diese Seite im Original und vollständig ausgefüllt an SwissMedAI MVZ, Bundesallee 140, 12161 Berlin. Zur schnelleren Bearbeitung können Sie das Formular zusätzlich auch an info@mvz-arzt.de oder per Fax 030-8549524 schicken. Vielen Dank!
+
+**CSS additions in `EINV_PDF_CSS`:**
+- `.letterhead`, `.lh-text`, `.lh-clinic`, `.lh-contact`, `.lh-logo` — flex layout, navy text, hairline divider.
+- `.attach-banner` — amber callout for the page-2 instruction.
+- Tweaked `table.cost` colors to use the Ledger navy (`#0A2E9E`) instead of the older slate `#1e3a5f`, and the alternating row tint to `#EFF3FF` to match the brand palette.
+
+**Why repeat the letterhead on page 2:** the consent form is a tear-off return document — when the recipient mails it back, that page needs to stand on its own with the clinic identity visible. Standard practice for German Briefkopf attachments.
+
+**No changes to:** `EINV_LETTER_TEXTS` (body content already matches the source doc), the cost table content, the form field layout, the A/B checkbox section, or the print-window opener.
+
+---
+
 ### 2026-04-19 — Odontogram "Fertig" returns to the Behandeln popup when launched from it
 
 **Why:** After clicking "Odontogram bearbeiten" in the Behandeln popup, the user updates tooth states and clicks "Fertig" on the odontogram editor. Previously this dropped them on the bare patient page — losing the Behandeln flow context. Now "Fertig" detects whether the edit session was launched from the popup and bounces back into it (with all Weiterbehandlung / KI-Diktat / Beschreibung fields preserved); otherwise it behaves the same as before (saves + closes to the patient file).
