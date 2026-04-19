@@ -1412,7 +1412,7 @@ function openBehandelnModal(k){
   var p=PATIENTS.find(function(x){return x.id===patId});
   if(!p)return;
   S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
-  var defVerw=USERS.find(function(u){return u.role==='verwaltung'});
+  var defVerw=USERS.find(function(u){return u.role==='verwaltung'&&u.name!=='Verwaltung'});
   var nextWeek=new Date(TODAY.getTime()+7*D);
   var iso=nextWeek.getFullYear()+'-'+String(nextWeek.getMonth()+1).padStart(2,'0')+'-'+String(nextWeek.getDate()).padStart(2,'0');
   S.behandelnForm={notes:'',manualNote:'',weiterBeh:'',weiterDate:iso,weiterBhId:defVerw?defVerw.email:'',transcribed:false};
@@ -1520,8 +1520,8 @@ function renderBehandelnModal(){
     ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>Transkription gespeichert'
     :'Behandlung abschlie\u00dfen';
   var dictBtnClick=f.transcribed?'':'onclick="saveBehandelnModal()"';
-  /* Behandler options = Behandler + Verwaltung users; Verwaltung as default */
-  var assigneeUsers=USERS.filter(function(u){return u.role==='behandler'||u.role==='verwaltung'});
+  /* Behandler options = real people only (Behandler + named Verwaltung users); skip generic "Verwaltung" account */
+  var assigneeUsers=USERS.filter(function(u){return (u.role==='behandler'||u.role==='verwaltung')&&u.name!=='Verwaltung'});
   var bhOpts=assigneeUsers.map(function(u){
     var role=u.role==='verwaltung'?'Verwaltung':'Behandler';
     return'<option value="'+u.email+'"'+(f.weiterBhId===u.email?' selected':'')+'>'+u.name+' \u2014 '+role+'</option>';
