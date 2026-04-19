@@ -145,6 +145,32 @@ Verwaltung delegations get the " (Verwaltung)" suffix so the user can tell at a 
 
 ---
 
+### 2026-04-19 — Behandeln popup: "Beschreibung" rename + "Odontogram bearbeiten" shortcut
+
+**Why:** The user wants a faster way to update the tooth status while documenting a treatment. Relabelling the manual-note section to just "Beschreibung" tightens the UI, and a dedicated button lets the behandler jump straight into the odontogram editor without closing the popup and digging through tabs.
+
+**Changes in `renderBehandelnModal()`:**
+- `"Manuelle Beschreibung"` label → `"Beschreibung"`.
+- New button immediately below the `#bhManualText` textarea, spanning full-width:
+  - Style: `var(--blue-50)` background, navy text, `rgba(10,46,158,0.2)` hairline border, 12 px bold.
+  - Icon: pencil-on-paper SVG (same icon the patient file's inline "Status bearbeiten" link uses).
+  - Label: `"Odontogram bearbeiten"`.
+  - `onclick="behandelnOpenOdoEdit()"`.
+
+**New function `behandelnOpenOdoEdit()`:**
+1. Snapshots current DOM values into `S.behandelnForm` — dict textarea, manual textarea, Weiterbehandlung treatment/date/assignee. This preserves what the user typed even though the modal is about to close (a future return flow could re-open the popup without data loss).
+2. Navigates to the target patient's file:
+   - `S.patId = m.patId`
+   - `S.screen = 'patient'`
+   - `S.odoTab = 'status'` (odontogram sub-tab — same value the `renderOdo()` default uses)
+   - `S.odoEdit = true`, `S.odoQ = 1`, `S.odoSelTooth = 0` — identical to the existing "Status bearbeiten" link at line `~1192`, so the user lands in the same first-quadrant editor state.
+3. Clears `S.behandelnModal` so the popup closes cleanly.
+4. `render()`.
+
+**Net effect:** clicking "Odontogram bearbeiten" transitions directly into the existing status-edit UI on the patient page. Current Behandeln form state is preserved in `S.behandelnForm` (not yet surfaced anywhere — reserved for a future "Zurück zur Behandlung" return flow if needed).
+
+---
+
 ### 2026-04-19 — Meine Aufgaben > Offen: surface Behandeln follow-ups delegated to Verwaltung
 
 **Commit:** `69c3170` — *Show Verwaltung-delegated Behandeln follow-ups in Meine Aufgaben > Offen*
