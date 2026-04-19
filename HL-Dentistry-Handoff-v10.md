@@ -47,6 +47,50 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patient file → Aktive Behandlungen: list connected open Behandler-Aufgaben
+
+**Why:** The patient file's "Aktive Behandlungen" section on the Historie tab previously only showed the treatment-code badges from `p.tx` (shorthand codes like CO, ZE, PA). When the user schedules follow-up tasks via the Behandeln popup — or when tasks exist in `TASKS` that reference this patient by name — there was no visibility of them on the patient file itself. The patient page is where a behandler looks when prepping for a visit; they need to see what's already on the schedule for this person.
+
+**Where:** `renderPat()` — the `tab==="Historie"` branch, directly below the `p.tx` badges (around line 1795).
+
+**Query:**
+```js
+var patTasks = TASKS.filter(t => t.name === p.name && t.status === 'offen');
+```
+Matches on the task's `name` field (string match to patient's `p.name`) — the same convention the Verwaltung Behandler-Aufgaben list already uses to group tasks under a Behandler's heim visits. Only tasks still `status === 'offen'` are shown; completed tasks live in the Behandlungsverlauf below via `p.visits`.
+
+**Rendering:** mini-card per open task (margin-bottom 6 px between them) under a small uppercase "OFFENE BEHANDLER-AUFGABEN" overline (10 px, `var(--text-3)`). Each card:
+- **Left-border color encodes assignment type:**
+  - Violet (`var(--violet)`) — task is delegated to a Verwaltung user (`t.assignedToEmail` is set).
+  - Navy (`var(--navy)`) — task assigned to a Behandler normally.
+- **Body (left column):** treatment name (12 px, bold), then a meta row with a small calendar icon + date + ` · ` + assignee name + (if delegated) ` ← Dr. Feld` origin label.
+- **Right column:** amber "Offen" badge.
+- `cursor: default` — not clickable for now (we're already on the patient page so navigating anywhere else would be surprising).
+
+**Assignee resolution:**
+```js
+if (t.assignedToEmail) {
+  var u = USERS.find(x => x.email === t.assignedToEmail);
+  toWho = u ? u.name + ' (Verwaltung)' : 'Verwaltung';
+} else {
+  toWho = bhdlName(t.bh) || t.bh;
+}
+```
+Verwaltung delegations get the " (Verwaltung)" suffix so the user can tell at a glance whether this is a Behandler-owned task or something sitting in the admin queue.
+
+**Empty-state logic updated:** the old `p.tx.length > 0` check with an else branch now only triggers "Keine aktiven Behandlungen" when *both* the treatment-code badges AND the open-tasks list are empty — so a patient with no `p.tx` but active tasks doesn't get the misleading empty state, and a patient with `p.tx` but no tasks doesn't see a bare badges row with no section break.
+
+**Layout tidy-up:** a 10 px spacer div is appended below the section to maintain the old `margin-bottom:16px` visual gap before "Behandlungsverlauf" — keeps the existing rhythm regardless of which sub-sections rendered.
+
+**End-to-end demo flow:**
+1. Log in as Dr. Feld → any task on the Heute tab → click Behandeln.
+2. Fill Weiterbehandlung ("UPT-Sitzung", next week, C. Weigert — Verwaltung default) → Erledigt.
+3. Toast confirms. Scroll to the same patient's file (or pick them from Pipeline / Search) → open the Historie tab.
+4. Under "Aktive Behandlungen", below the treatment code badges, a new violet-bordered card appears: **"UPT-Sitzung · 26.04. · C. Weigert (Verwaltung) ← Dr. Feld"** with an amber "Offen" pill on the right.
+5. Once C. Weigert reassigns that task to a real Behandler (via Meine Aufgaben > Offen > Zuweisen), the card's left border switches to navy and the arrow origin drops — the delegation completed its handoff.
+
+---
+
 ### 2026-04-19 — Meine Aufgaben > Offen: surface Behandeln follow-ups delegated to Verwaltung
 
 **Commit:** `69c3170` — *Show Verwaltung-delegated Behandeln follow-ups in Meine Aufgaben > Offen*
