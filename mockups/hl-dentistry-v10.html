@@ -1406,20 +1406,44 @@ function renderRescheduleModal(){
   return h;
 }
 
-/* Behandeln flow: click "Behandeln" on a task card → openBehandelnModal → modal with treatment type + notes → saveBehandelnModal marks the task done */
+/* Behandeln flow: click "Behandeln" on a task card → openBehandelnModal → modal with treatment type + KI-Diktat → first "Behandlung abschließen" click reveals the transcription, second click commits it */
 function openBehandelnModal(k){
   var parts=k.split('|');var patId=parseInt(parts[0],10);
   var p=PATIENTS.find(function(x){return x.id===patId});
   if(!p)return;
   S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
-  S.behandelnForm={notes:''};
+  S.behandelnForm={notes:'',transcribed:false};
   render();
 }
 function closeBehandelnModal(){S.behandelnModal=null;render()}
+function mockDictText(m){
+  var t=(m.label||'').toLowerCase();
+  if(t.indexOf('pa')!==-1||t.indexOf('upt')!==-1||t.indexOf('ait')!==-1){
+    return'Parodontaler Status kontrolliert. Taschensondierungstiefen \u00fcberwiegend 3\u20134 mm, lokal 5 mm regio 36. Plaque- und Blutungsindex reduziert. Subgingivale Instrumentierung an Quadrant 3 durchgef\u00fchrt. Mundhygieneinstruktion wiederholt. N\u00e4chste UPT-Sitzung in 3 Monaten geplant.';
+  }
+  if(t.indexOf('ze')!==-1||t.indexOf('abnahme')!==-1||t.indexOf('befund')!==-1||t.indexOf('prothes')!==-1){
+    return'Zahnersatz eingegliedert und adjustiert. Statik und Okklusion kontrolliert, Passung klinisch einwandfrei. Patient beschwerdefrei. Pflegehinweise zur Prothesenhygiene gegeben. Kontrolltermin in 2 Wochen vereinbart.';
+  }
+  if(t.indexOf('hkp')!==-1){
+    return'Heil- und Kostenplan mit Patient bzw. Betreuer besprochen. Befund und geplante Versorgung erl\u00e4utert. Unterschrift eingeholt, HKP zur Genehmigung an Krankenkasse eingereicht.';
+  }
+  if(t.indexOf('kontrolle')!==-1){
+    return'Routinekontrolle durchgef\u00fchrt. Zahn- und Schleimhautbefund unauff\u00e4llig, Prothesenhalt gut. Keine akuten Beschwerden. N\u00e4chste Kontrolle in 6 Monaten.';
+  }
+  return'Patient klinisch untersucht, Befund dokumentiert. Behandlung gem\u00e4\u00df Planung durchgef\u00fchrt, Verlauf komplikationslos. Patient beschwerdefrei entlassen, Nachkontrolle terminiert.';
+}
 function saveBehandelnModal(){
   var m=S.behandelnModal;if(!m)return;
+  var f=S.behandelnForm||{notes:'',transcribed:false};
+  /* First click: reveal the transcription in the textarea */
+  if(!f.transcribed){
+    S.behandelnForm={notes:mockDictText(m),transcribed:true};
+    render();
+    return;
+  }
+  /* Second click: commit the note and close */
   var ta=document.getElementById('bhDictText');
-  var note=ta?ta.value.trim():'';
+  var note=ta?ta.value.trim():(f.notes||'');
   var p=PATIENTS.find(function(x){return x.id===m.patId});
   if(p&&note){
     if(!p.visits)p.visits=[];
@@ -1432,7 +1456,11 @@ function saveBehandelnModal(){
 }
 function renderBehandelnModal(){
   var m=S.behandelnModal;if(!m)return'';
-  var f=S.behandelnForm||{notes:''};
+  var f=S.behandelnForm||{notes:'',transcribed:false};
+  var statusBar=f.transcribed
+    ?'<div class="dict-bar" style="background:linear-gradient(135deg,var(--emerald-bg),#E6FAF3);color:var(--emerald);animation:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Transkription abgeschlossen</div>'
+    :'<div class="dict-bar" style="animation:pulse 1.5s infinite">'+ICO.mic+' Aufnahme aktiv\u2026</div>';
+  var btnLabel=f.transcribed?'Speichern &amp; Abschlie\u00dfen':'Behandlung abschlie\u00dfen';
   var h='<div class="overlay-bg" onclick="closeBehandelnModal()">'
     +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
       +'<div class="overlay-header">'
@@ -1448,9 +1476,9 @@ function renderBehandelnModal(){
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
           +'<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text)">'+ICO.mic+'<span>KI-Diktat</span></div>'
         +'</div>'
-        +'<div class="dict-bar" style="animation:pulse 1.5s infinite">'+ICO.mic+' Aufnahme aktiv\u2026</div>'
-        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:90px;resize:none;margin-bottom:12px;outline:none;transition:border .2s" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
-        +'<button class="submit" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveBehandelnModal()">Behandlung abschlie\u00dfen</button>'
+        +statusBar
+        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:110px;resize:none;margin-bottom:12px;outline:none;transition:border .2s;line-height:1.5" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+        +'<button class="submit" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveBehandelnModal()">'+btnLabel+'</button>'
       +'</div>'
     +'</div>'
   +'</div>';
