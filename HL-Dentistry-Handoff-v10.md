@@ -45,6 +45,51 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-19 — Behandeln popup: manual note + Weiterbehandlung (follow-up) scheduler
+
+**Why:** After the KI transcription, the behandler often needs to (a) add a short manual clarification that isn't worth dictating, and (b) schedule a follow-up ("Weiterbehandlung") — pick the next treatment type and the person responsible for it. The Verwaltung role is the default assignee because they coordinate the scheduling downstream.
+
+**State additions in `S.behandelnForm`:**
+- `manualNote` (string) — plain-text field for non-voice additions.
+- `weiterBeh` (string) — chosen treatment from `BEHANDLUNG_OPTIONS`, or `''` = no follow-up.
+- `weiterBhId` (string) — email of the assignee; defaults to the first `USERS` entry with `role==='verwaltung'` (i.e. `verwaltung@swissmedai.com` → "Verwaltung"). If that user doesn't exist in this deploy, falls back to empty.
+
+**`openBehandelnModal` init:**
+```js
+var defVerw = USERS.find(u => u.role === 'verwaltung');
+S.behandelnForm = {
+  notes: '', manualNote: '',
+  weiterBeh: '', weiterBhId: defVerw ? defVerw.email : '',
+  transcribed: false
+};
+```
+
+**New modal sections (below the existing KI-Diktat card):**
+
+1. **Manuelle Beschreibung** — a plain `<textarea#bhManualText>` (70 px min-height, resizable vertically) under a `.form-label` styled "MANUELLE BESCHREIBUNG". Placeholder: *"Zusätzliche Notizen, Hinweise für die Verwaltung…"*. Binds to `S.behandelnForm.manualNote`.
+
+2. **Weiterbehandlung** — section separated by a top border + 18 px padding. Header row has a small refresh-arrow SVG + "Weiterbehandlung" title + helper subline *"Optional — Folgetermin planen und zuweisen"*. Contains two `.form-select` dropdowns:
+   - **Behandlung** — `<select#bhWeiterBeh>` with options `["— keine Weiterbehandlung —", ...BEHANDLUNG_OPTIONS]` (14 entries from the canonical list: ZE-Eingliederung, ZE-Befund, ZE-Abnahme, PA-Befund, PA-Therapie, UPT-Sitzung, Kontrolle, Extraktion, Röntgen, Füllungstherapie, HKP-Einreichung, Erstuntersuchung, Prothesenkontrolle, Abdrucknahme).
+   - **Behandler** — `<select#bhWeiterBhId>` filtered to `USERS` with role `behandler` *or* `verwaltung`. Each option displays `{name} — {roleLabel}`. Example values in demo data:
+     - "Dr. Feld — Behandler" (`feld@swissmedai.com`)
+     - "Dr. Hess — Behandler" (`hess@swissmedai.com`)
+     - "Verwaltung — Verwaltung" (`verwaltung@swissmedai.com`) ← **default**
+     - "C. Weigert — Verwaltung" (`c.weigert@mvz-arzt.de`)
+
+**Button moved to bottom of modal.** The blue gradient "Behandlung abschließen" button is no longer inside the KI-Diktat card — it sits at the very bottom as the single commit action for the whole form (KI dict + manual note + Weiterbehandlung). Uses the standard `.save-btn` class (15 px padding, `margin-top:24px` built in).
+
+**Commit behaviour in `saveBehandelnModal`:**
+- **First click** (transcribed === false) — same as before: fills `notes` with `mockDictText(m)`, flips `transcribed=true`, relabels button to "Speichern & Abschließen". The re-render now also reads the current manual-note / Weiterbehandlung field values from the DOM (via `getElementById`) and preserves them in state so switching into the transcribed view doesn't wipe what the user already typed.
+- **Second click** — combines KI transcription + manual note into one visit entry: `{text: dict + "\n\nManuelle Ergänzung: " + manual, voice: true}`. Pushes to `p.visits.unshift(...)`.
+- **Weiterbehandlung commit** — if `weiterBeh !== ''`:
+  - Resolves the assignee: if the selected user has `bId` (behandler), uses it as the new task's `bh`; otherwise (Verwaltung) falls back to the original task's `bh` (or `'hFeld'` if nothing matches — the TASKS list needs a valid doctor id to show in Behandler-Aufgaben).
+  - Pushes `{id: nextId++, bh: assigneeBhId, name: p.name, heim: heimName(p.heim), behandlung: wBeh, status: 'offen', week: 'next', date: fmtShort(TODAY + 7d)}` to `TASKS`.
+  - Toast becomes: `"<patient>: Behandlung dokumentiert · Weiterbehandlung: <treatment> (<assignee name>)"`.
+
+**Rationale for listing Verwaltung in a field labeled "Behandler":** the dropdown answers the question *"who should drive the next step?"* — often the Verwaltung, because they schedule the slot before a doctor actually treats. The role suffix in each option (`— Behandler` / `— Verwaltung`) makes the distinction explicit without inventing a new UI pattern.
+
+---
+
 ### 2026-04-19 — Behandeln popup: two-step KI-Diktat transcription flow
 
 **Commit:** `0291782` — *Behandeln popup: first click reveals KI transcription, second saves*
