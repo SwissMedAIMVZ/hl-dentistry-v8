@@ -45,42 +45,218 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
-### 2026-04-19 — Behandeln popup with KI-Diktat two-step transcription flow
+### 2026-04-19 — Behandeln popup: two-step KI-Diktat transcription flow
 
-**Why:** User wants the task-card "Erledigt" action reframed as the start of a documented treatment: click opens a popup that simulates the KI-Diktat flow from the patient file, showing who/what is being treated and capturing the transcription before the task is marked done.
+**Commit:** `0291782` — *Behandeln popup: first click reveals KI transcription, second saves*
 
-**What changed:**
+**Why:** A single click that instantly marked the task done hid the whole point of the demo — the KI transcription never got to be seen. Users need to *watch* the KI "listen" and then *review* the transcribed text before it's committed to the patient's record. So the "Behandlung abschließen" button becomes a two-step flow.
 
-*Task card button (`renderHome` — Klinik Heute, `mockups/hl-dentistry-v10.html:~1508`)*
-- Green "Erledigt ✓" action button relabelled to **"Behandeln"** with a sun/treatment icon.
-- `onclick` rewired from `markTaskDone(key)` → `openBehandelnModal(key)`.
-- "Neu planen" sibling button unchanged.
+**State model:** `S.behandelnForm = {notes: '', transcribed: false}`. The `transcribed` boolean is the gate between the two steps. `openBehandelnModal` always initialises it to `false`.
 
-*New Behandeln modal (`~1409`)*
-- State: `S.behandelnModal = {key, patId, patName, heim, label}` + `S.behandelnForm = {notes, transcribed}`.
-- Layout (top to bottom):
-  1. **Modal title = patient name**, heim in a subline (`ICO.pin` + heim name).
-  2. **"Geplante Behandlung"** card — small uppercase label + treatment type (`m.label`) in navy, sitting in a `--blue-50` tinted box.
-  3. **KI-Diktat panel** — mirrors the patient-file dict-panel: mic icon + "KI-Diktat" title, status bar, textarea, submit button.
-- Two-step submit flow driven by `S.behandelnForm.transcribed`:
-  - **First click on "Behandlung abschließen"** → `saveBehandelnModal()` detects `transcribed===false`, fills the textarea via `mockDictText(m)` (context-aware German transcription: PA/UPT, ZE, HKP, Kontrolle, or generic), swaps the "Aufnahme aktiv…" pulse bar for a green "Transkription abgeschlossen ✓" badge, and relabels the button to **"Speichern & Abschließen"**. `render()` is called so the overlay rebuilds with the new state.
-  - **Second click** → commits the (still editable) note to `p.visits.unshift({...voice:true})` exactly like `saveDictation()` does, flags `S.doneTaskIds[key] = true`, closes the modal, and fires the standard "Behandlung dokumentiert" toast.
-- `closeBehandelnModal()` aborts the flow without saving or marking the task done.
-- Wired into the render pipeline next to `renderRescheduleModal()`: `if(S.behandelnModal)html+=renderBehandelnModal();`
+**Step 1 — reveal the transcription.** First click on "Behandlung abschließen":
+- `saveBehandelnModal()` detects `f.transcribed === false`.
+- Calls `mockDictText(m)` (context-aware keyword matcher) and stuffs the result into `S.behandelnForm.notes` while flipping `transcribed` to `true`.
+- `render()` rebuilds the overlay: the pulse "Aufnahme aktiv…" bar is swapped for a green-tinted `--emerald-bg` badge with a checkmark saying **"Transkription abgeschlossen"**, the textarea comes back populated with the mock text, and the button relabels to **"Speichern & Abschließen"**.
+- Textarea `min-height` lifted to 110 px (from 90) so the full transcription fits without scroll.
 
-**Why two-step:** a single click would hide the transcription from the user — the point of the demo is to *show* that the KI captured the voice note. The second click is the explicit commit once the behandler has reviewed/edited the text.
+**Step 2 — commit.** Second click on the same button:
+- Reads the textarea's current value (user may have edited the draft transcription) via `document.getElementById('bhDictText')`.
+- Unshifts a visit into the patient's history: `p.visits.unshift({date: Date.now(), behandler: S.user.bId || 'hFeld', codes: [], text: note, voice: true})` — identical shape to what `saveDictation()` writes from the patient-file dict panel.
+- Flags `S.doneTaskIds[m.key] = true` (same global dedup store the Heute task list reads) → the task card's checkmark fills in.
+- Clears `S.behandelnModal` and fires the standard green toast: `"<patient>: Behandlung dokumentiert"`.
 
-**Mock transcription library (`mockDictText`):** keyword-matches the treatment label so the generated text feels plausible:
-- `pa` / `upt` / `ait` → parodontale Status + Taschensondierung + subgingivale Instrumentierung
-- `ze` / `abnahme` / `befund` / `prothes` → Zahnersatz eingegliedert + Okklusion + Pflegehinweise
-- `hkp` → HKP besprochen + Unterschrift + Krankenkasse
-- `kontrolle` → Routinekontrolle + Schleimhautbefund
-- fallback → generic "Behandlung gemäß Planung durchgeführt…"
+**`mockDictText(m)` — keyword library.** Lives directly above `saveBehandelnModal`. Lowercases `m.label` and matches:
 
-**Related cleanups in the same session:**
-- **Verwaltung "Behandler-Aufgaben" initials dots** — `BEHANDLER` objects had no `initials` field, so `bh-avatar` rendered empty circles. Added a shared `bhInitials(b)` helper that derives initials from the name (first + last word initial, fallback to first two chars). Used in both `bhSection` (the dots in Verwaltung Behandler-Aufgaben) and `renderBehandler_2` (the Behandler admin list). Renaming a Behandler now updates both places automatically.
-- **Nachrichten tab removed from Management** — `renderManager` + `renderDesktopManagerBody` tab lists trimmed from `[Übersicht, Behandler, Heime, Planung, Fälle, Nachrichten]` to `[Übersicht, Behandler, Heime, Planung, Fälle]`. The desktop sidebar Management dropdown also no longer lists Nachrichten. The standalone "Nachrichten" page (bottom-nav / sidebar top-level) still exists — the sub-tab was the only thing removed.
-- **Verwaltung bottom nav → Abrechnung added after Behandler** — `renderAdminBottomNav_2` gained a 6th button: `btn('abrechnung', euroIcon, 'Abrechnung')`. Links straight into the existing Abrechnung hub page (Pflegeheime / Preisliste / Texteditor). An earlier iteration briefly used "Heime" pointing at `pflegeheime`, then was renamed per user request.
+| Keyword(s) in task label | Generated transcription (abridged) |
+|---|---|
+| `pa`, `upt`, `ait` | *"Parodontaler Status kontrolliert. Taschensondierungstiefen überwiegend 3–4 mm, lokal 5 mm regio 36… subgingivale Instrumentierung an Quadrant 3… nächste UPT-Sitzung in 3 Monaten."* |
+| `ze`, `abnahme`, `befund`, `prothes` | *"Zahnersatz eingegliedert und adjustiert. Statik und Okklusion kontrolliert… Pflegehinweise zur Prothesenhygiene gegeben. Kontrolltermin in 2 Wochen."* |
+| `hkp` | *"Heil- und Kostenplan mit Patient bzw. Betreuer besprochen… Unterschrift eingeholt, HKP zur Genehmigung an Krankenkasse eingereicht."* |
+| `kontrolle` | *"Routinekontrolle durchgeführt. Zahn- und Schleimhautbefund unauffällig, Prothesenhalt gut… Nächste Kontrolle in 6 Monaten."* |
+| *(fallback)* | *"Patient klinisch untersucht, Befund dokumentiert. Behandlung gemäß Planung durchgeführt… Nachkontrolle terminiert."* |
+
+The transcription text is editable between the two clicks; the user can tweak wording before the save. Aborting via the `×` button (`closeBehandelnModal`) discards everything — the task stays open.
+
+---
+
+### 2026-04-19 — Behandeln popup: patient name on top, treatment card, embedded KI-Diktat
+
+**Commit:** `4227ce5` — *Behandeln popup: patient name on top, treatment highlighted, KI-Diktat*
+
+**Why:** The first iteration of the Behandeln modal was a plain "Neue Notiz"-style form (generic title + textarea). The behandler needs to see *who* they're treating and *what* the planned treatment is — right at the top — and have the same KI-Diktat affordance they already know from the patient file.
+
+**Layout (top to bottom) inside `.overlay-sheet`:**
+
+1. **Header row**
+   - `overlay-title` = **patient name** (e.g. "Schmidt, Maria"), bold 17 px navy-black.
+   - `overlay-close` × button — closes without committing.
+2. **Heim subline** — pin icon + heim name, `var(--text-3)`, 12 px, pulled up with `margin-top:-10px` so it sits under the title like a subtitle.
+3. **"Geplante Behandlung" card** — a `--blue-50` tinted box (border `rgba(10,46,158,0.15)`) with:
+   - small uppercase overline "GEPLANTE BEHANDLUNG" (`var(--text-3)`, 10 px, letter-spacing 0.8 px)
+   - treatment label (`m.label` — e.g. "PA-Therapie", "ZE-Abnahme", "UPT-Sitzung") in **navy 14 px bold**.
+4. **KI-Diktat panel** — white card with `--border`, `--sh-sm`, `--r-lg`, 16 px padding. Inside:
+   - Header row: mic icon + "KI-Diktat" title (14 px bold).
+   - `.dict-bar` (same class as the patient-file dict panel) with `animation: pulse 1.5s infinite`, showing `ICO.mic` + "Aufnahme aktiv…".
+   - Textarea `#bhDictText` — 12 px, 110 px min-height, `--border`, no resize.
+   - Submit button = navy→blue gradient, full-width, 12 px padding, "Behandlung abschließen".
+
+**Persistence on input:** `oninput="S.behandelnForm.notes=this.value"` on the textarea keeps the draft synced into state so a re-render (e.g. from the two-step flow below) doesn't clobber what the user typed.
+
+**Why "mirror the patient-file dict panel" and not reuse it?** The patient dict panel (`.dict-panel`) is positioned absolutely at the bottom of the phone frame and targeted by `insertDictation()` / `saveDictation()` — it writes to `S.patId`. We needed a variant that:
+- is scoped to a task (not a patient screen),
+- writes via `saveBehandelnModal` (task-key-aware),
+- sits inside an overlay sheet rather than fixed-bottom.
+
+So the classes (`.dict-bar`, textarea styling, submit button styling) are intentionally copied for visual identity but the event handlers are distinct.
+
+---
+
+### 2026-04-19 — Task card: rename "Erledigt" → "Behandeln", opens popup
+
+**Commit:** `d61899f` — *Rename Erledigt task button to Behandeln with popup modal*
+
+**Why:** Marking a task "Erledigt" with no documentation misses the core interaction the app is designed for — a behandler should *treat* (Behandeln) and have the KI capture the voice note as proof-of-service. The button label should match the action.
+
+**Changes to `mockups/hl-dentistry-v10.html`:**
+
+*Klinik Heute task card (`renderHome`, `~line 1508`)*
+- Before: `<button … onclick="markTaskDone('+key+')">…Erledigt</button>` (check icon).
+- After: `<button … onclick="openBehandelnModal('+key+')">…Behandeln</button>` (sun/radial icon, 8-spoke SVG).
+- Colors, padding, and flex layout kept identical so the button still slots in next to "Neu planen" without visual disruption.
+
+*New modal plumbing (~line 1409)*
+- `openBehandelnModal(k)` — parses the task key (`patId|date|label`), looks up the patient, builds `S.behandelnModal = {key, patId, patName, heim, label}` + `S.behandelnForm = {notes: '', transcribed: false}`, then `render()`.
+- `closeBehandelnModal()` — clears `S.behandelnModal` and re-renders.
+- `saveBehandelnModal()` — initial single-step version (later refactored into the two-step flow documented above).
+- `renderBehandelnModal()` — builds the overlay sheet HTML.
+
+*Render pipeline wiring* (near `renderRescheduleModal` hookup, `~line 2765`):
+```js
+if(S.rescheduleModal)html+=renderRescheduleModal();
+if(S.behandelnModal)html+=renderBehandelnModal();
+```
+Placed at the same nesting level as the reschedule modal so z-index and overlay stacking match.
+
+**Unchanged behavior:**
+- `markTaskDone(key)` still exists (used by other flows like the Verwaltung admin checkbox) — not deleted.
+- `Neu planen` button still opens `openRescheduleModal`.
+- Task cards in the Verwaltung admin "Behandler-Aufgaben" (uses `taskCard`, not the `renderHome` inline markup) still show the status badge, no Behandeln button — intentional, admin isn't treating.
+
+---
+
+### 2026-04-19 — Verwaltung bottom nav: Abrechnung added as 6th item
+
+**Commits:** `45ff125` (Pflegeheime → renamed) → `73ad7a6` (Heime → Abrechnung)
+
+**Why:** The admin bottom nav (Übersicht / Labor / Einverständnis / Archiv / Behandler) was missing a direct entry point to the Abrechnung hub, forcing users to dig through the menu. User first asked for "Pflegeheime" after Behandler, then immediately revised to "Abrechnung" — which is the hub page that itself contains Pflegeheime alongside Preisliste and Texteditor.
+
+**Change to `renderAdminBottomNav_2` (`~line 4004`):**
+
+Before (5 buttons):
+```js
+return '<div class="bottom-nav">'
+  + btn('uebersicht', ICO.chart, 'Übersicht')
+  + btn('labor', ICO.lab, 'Labor')
+  + btn('einverstaendnis', ICO.doc, 'Einverständnis')
+  + btn('archiv', ICO.archive, 'Archiv')
+  + btn('behandler', usersIcon, 'Behandler')
++ '</div>';
+```
+
+After (6 buttons, Abrechnung appended):
+```js
+  + btn('behandler', usersIcon, 'Behandler')
+  + btn('abrechnung', euroIcon, 'Abrechnung')
++ '</div>';
+```
+
+**Icon:** inline 24×24 SVG — vertical bar with the "€"-shaped double stroke (`M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6`) — the same icon the "Preisliste" sub-nav already uses, so it reads consistently as "money/billing".
+
+**Behavior:** Tapping Abrechnung sets `S.adminPage_2 = 'abrechnung'`, which `renderAdmin_2` routes to `renderAbrechnung()` — the existing hub page (title "Abrechnung", subtitle "Preisliste & Dokumente") showing three card-style entry points into Preisliste, Texteditor, and Pflegeheime.
+
+**Intermediate state worth noting:** The first commit (`45ff125`) added the entry as `btn('pflegeheime', houseIcon, 'Heime')` pointing directly at `renderPflegeheime()`. User immediately asked to rename it — second commit (`73ad7a6`) swapped the page id, icon, and label to `abrechnung` / euro / "Abrechnung". Only the second state is current.
+
+---
+
+### 2026-04-19 — Verwaltung Behandler-Aufgaben dots: derive initials via `bhInitials()` helper
+
+**Commits:** `0c529ce` (hardcoded initials field) → `4fa58f7` (helper function)
+
+**Why:** The `.bh-avatar` circles in the Verwaltung "Behandler-Aufgaben" section header (one per Behandler) rendered empty because the `BEHANDLER` data objects had no `initials` field — the code did `+bh.initials+` and got `undefined` → empty circle with just the gradient background showing.
+
+**Two-step fix:**
+
+*First attempt (commit `0c529ce`) — hardcoded:*
+```js
+var BEHANDLER=[
+  {id:"hFeld", name:"Dr. Feld", initials:"DF", cases:298, …},
+  {id:"hHess", name:"Dr. Hess", initials:"DH", cases:231, …},
+  {id:"hGomez", name:"Dr. Gomez", initials:"DG", cases:52, …}
+];
+```
+This worked but required manual upkeep if a Behandler was renamed or added via the admin UI.
+
+*Second attempt (commit `4fa58f7`) — derived:*
+Added a helper right below the `BEHANDLER` array:
+```js
+function bhInitials(b){
+  var parts=(b.name||'').split(/\s+/).filter(Boolean);
+  if(parts.length>1) return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+  return (b.name||'').slice(0,2).toUpperCase();
+}
+```
+And rewired usage in two places:
+- `bhSection(bh, …)` (~line 3220): `+ '<div class="bh-avatar">' + bhInitials(bh) + '</div>'`
+- `renderBehandler_2()` (~line 4014): replaced the 2-line inline split logic with `var initials = bhInitials(b);`
+
+Removed the hardcoded `initials` field from the three `BEHANDLER` objects.
+
+**Behaviour for the demo users:**
+- "Dr. Feld" → **DF**
+- "Dr. Hess" → **DH**
+- "Dr. Gomez" → **DG**
+- (added via the admin form) "Dr. Schmidt" → **DS**
+- single-word edge case (e.g. "Gomez") → first two chars → **GO**
+
+**Side benefit:** the `renderBehandler_2` inline duplicate (previously `var parts=b.name.split(' '); var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();`) is now a one-liner via the same helper. One source of truth for Behandler initials across the whole app.
+
+---
+
+### 2026-04-19 — Remove Nachrichten tab from Management section (mobile + desktop)
+
+**Commit:** `6d42faa` — *Remove Nachrichten tab from Management section (mobile + desktop)*
+
+**Why:** Nachrichten was duplicated: once as its own top-level page (bottom-nav on mobile, sidebar on desktop) and once as a tab inside Management. The Management duplicate added visual noise without adding reachability — the top-level entry point was always one tap away. User asked to drop the sub-tab.
+
+**Three surgical removals in `mockups/hl-dentistry-v10.html`:**
+
+1. **Mobile Management tab list (`renderManager`, ~line 1960):**
+   ```js
+   // Before:
+   ["Übersicht","Behandler","Heime","Planung","Fälle","Nachrichten"].forEach(…)
+   // After:
+   ["Übersicht","Behandler","Heime","Planung","Fälle"].forEach(…)
+   ```
+   Also removed the entire `if(tab==="Nachrichten"){ … }` block that rendered the inline email list (~25 lines of `msg-item` markup, unread dot, compose button).
+
+2. **Desktop Management tab list (`renderDesktopManagerBody`, ~line 2531):** Same 6→5 element trim. Also removed the matching `if(tab==="Nachrichten")` rendering block (wider layout variant with inline compose button).
+
+3. **Desktop sidebar Management dropdown (`~line 2484`):**
+   ```js
+   // Before:
+   ['Übersicht','Behandler','Heime','Planung','Fälle','Nachrichten'].forEach(…)
+   // After:
+   ['Übersicht','Behandler','Heime','Planung','Fälle'].forEach(…)
+   ```
+   The collapsible dropdown under the Management nav item now lists only the 5 real sub-tabs.
+
+**What still exists:**
+- Standalone **Nachrichten** sidebar item (desktop) — `goDesktopPage('nachrichten')` → `S.screen = 'messages'` → `renderMessages()`. Unchanged.
+- Standalone **Nachr.** button in mobile bottom nav — `goMessages()`. Unchanged.
+- `DK_TITLES.nachrichten = 'Nachrichten'` mapping. Unchanged.
+- `getMyMessages()`, `getUnreadCount()`, compose / detail overlays. Unchanged.
+
+**Net effect:** 45 lines removed from `hl-dentistry-v10.html`, 3 lines modified. No functional regression — email access paths remain the two top-level entry points.
 
 ---
 
