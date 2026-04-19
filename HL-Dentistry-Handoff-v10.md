@@ -45,6 +45,25 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Nachrichten tab added to Management (mobile + desktop)
+
+**Why:** User wants the email/messages UI accessible from the Management section too, not just from the bottom-nav/sidebar "Nachrichten" item.
+
+**What changed:**
+- `hl-dentistry-v10.html:1957` — mobile `renderManager` tab list extended: `[Übersicht, Behandler, Heime, Planung, Fälle, **Nachrichten**]`
+- `hl-dentistry-v10.html:2528` — desktop `renderDesktopManagerBody` tab list extended with the same `Nachrichten` item
+- `hl-dentistry-v10.html:2481` — desktop sidebar Management dropdown now lists all 6 sub-tabs including Nachrichten, so clicking from the sidebar takes you directly into the Management → Nachrichten view
+- `hl-dentistry-v10.html:2008` + `hl-dentistry-v10.html:2545` — new `tab==="Nachrichten"` branch in both renderers that shows:
+  - A section header with "E-Mail-Posteingang" title and counter ("N gesamt — N ungelesen")
+  - The full email list (same rendering as the standalone Nachrichten page: avatar, sender+email, subject, preview, date)
+  - A **"Neue E-Mail"** button that opens the compose overlay
+  - Each row is clickable → `openMsg(id)` opens the detail view
+  - On desktop, the "Neue E-Mail" button sits inline in the section header; on mobile, it's a full-width primary button below the list
+
+**Reuses existing code:** `getMyMessages`, `getUnreadCount`, `msgSenderEmail`, `msgSenderInitials`, `fmtEmailDate`, `openMsg`, `msgCompose` overlay, `renderMsgDetail`. No duplication — same inbox, just accessible from a different nav path.
+
+---
+
 ### 2026-04-12 — Patient detail works on both desktop + mobile from Verwaltung
 
 **Why:** Clicking a patient in Verwaltung Übersicht needs to open their detail screen on both mobile AND desktop. Previously the desktop dispatcher didn't handle `S.screen='patient'` so it fell through to the dkPage routing and showed the wrong page.
