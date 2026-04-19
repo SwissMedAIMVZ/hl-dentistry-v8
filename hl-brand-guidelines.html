@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Health Ledger — Brand Guidelines</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   HEALTH LEDGER — BRAND GUIDELINES
+   A4 print-optimised one-pager. Open in browser → Print to PDF.
+   ============================================================ */
+@page { size: A4 portrait; margin: 15mm; }
+
+:root {
+  --navy:   #0A2E9E;
+  --signal: #14C295;
+  --black:  #1D1D1F;
+  --gray:   #6E6E73;
+  --light:  #86868B;
+  --hair:   #D2D2D7;
+  --bg:     #F5F5F7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--black);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  font-size: 10pt;
+}
+
+.page {
+  max-width: 180mm;
+  margin: 0 auto;
+  padding: 10mm 0;
+}
+
+/* ===== COVER HEADER ===== */
+.cover {
+  border-bottom: 1.5pt solid var(--black);
+  padding-bottom: 6mm;
+  margin-bottom: 8mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.cover-title {
+  font-size: 24pt;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: var(--black);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.cover-title .dot {
+  width: 5pt; height: 5pt;
+  background: var(--signal);
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+.cover-sub {
+  font-size: 9pt;
+  color: var(--gray);
+  margin-top: 3mm;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.cover-meta {
+  text-align: right;
+  font-size: 8pt;
+  color: var(--light);
+  font-weight: 500;
+}
+.cover-meta strong { color: var(--black); display: block; font-size: 10pt; font-weight: 700; margin-bottom: 1mm; }
+
+/* ===== SECTION ===== */
+section { margin-bottom: 9mm; page-break-inside: avoid; }
+h2 {
+  font-size: 10pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray);
+  margin-bottom: 3mm;
+  padding-bottom: 2mm;
+  border-bottom: 0.5pt solid var(--hair);
+}
+
+/* ===== LOGO GRID ===== */
+.logos {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.8fr;
+  gap: 4mm;
+}
+.logo-box {
+  border: 0.5pt solid var(--hair);
+  border-radius: 4pt;
+  padding: 6mm 4mm 4mm;
+  text-align: center;
+}
+.logo-box .demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22mm;
+  margin-bottom: 3mm;
+}
+.logo-box .demo svg { max-width: 100%; max-height: 100%; }
+.logo-box .name { font-size: 9pt; font-weight: 700; color: var(--black); margin-bottom: 1mm; }
+.logo-box .use { font-size: 7.5pt; color: var(--gray); line-height: 1.4; }
+.logo-box .file { font-size: 7pt; color: var(--light); font-family: 'SF Mono', Menlo, Consolas, monospace; margin-top: 1.5mm; }
+
+/* ===== COLOR GRID ===== */
+.colors {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3mm;
+}
+.color {
+  border: 0.5pt solid var(--hair);
+  border-radius: 3pt;
+  overflow: hidden;
+}
+.color .swatch {
+  height: 14mm;
+  border-bottom: 0.5pt solid var(--hair);
+}
+.color .info {
+  padding: 2mm 3mm 3mm;
+}
+.color .name {
+  font-size: 8pt;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 1mm;
+}
+.color .hex {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 8pt;
+  color: var(--gray);
+}
+.color .rgb {
+  font-size: 7pt;
+  color: var(--light);
+  margin-top: 0.5mm;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.type-row {
+  display: grid;
+  grid-template-columns: 30mm 1fr 30mm;
+  gap: 4mm;
+  padding: 3mm 0;
+  border-bottom: 0.5pt solid var(--hair);
+  align-items: baseline;
+}
+.type-row:last-child { border-bottom: none; }
+.type-row .label {
+  font-size: 7.5pt;
+  color: var(--gray);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.type-row .sample { color: var(--black); }
+.type-row .spec {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 7.5pt;
+  color: var(--light);
+  text-align: right;
+}
+
+/* ===== TWO COLUMN ===== */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+.list {
+  list-style: none;
+  font-size: 9pt;
+  line-height: 1.8;
+  color: var(--black);
+}
+.list li {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  padding: 1.5mm 0;
+  border-bottom: 0.3pt solid var(--hair);
+}
+.list li:last-child { border-bottom: none; }
+.list .icon {
+  font-size: 10pt;
+  font-weight: 700;
+  flex-shrink: 0;
+  width: 5mm;
+  text-align: center;
+}
+.do .icon { color: var(--signal); }
+.dont .icon { color: #C9313D; }
+
+/* ===== SPEC BOX ===== */
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3mm;
+}
+.spec {
+  background: var(--bg);
+  padding: 3mm 4mm;
+  border-radius: 3pt;
+}
+.spec .k {
+  font-size: 7.5pt;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 1mm;
+}
+.spec .v {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--black);
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  margin-top: 10mm;
+  padding-top: 4mm;
+  border-top: 0.5pt solid var(--hair);
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  color: var(--light);
+}
+
+/* ===== PRINT BUTTON (screen only) ===== */
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(10,46,158,0.25);
+  z-index: 999;
+}
+.print-btn:hover { background: #0B3BC0; }
+
+@media print {
+  .print-btn { display: none !important; }
+  body { font-size: 9.5pt; }
+}
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">📄 Print to PDF</button>
+
+<div class="page">
+
+  <!-- ===== COVER ===== -->
+  <div class="cover">
+    <div>
+      <div class="cover-title">Health Ledger<span class="dot"></span></div>
+      <div class="cover-sub">Brand Guidelines · Print Specification</div>
+    </div>
+    <div class="cover-meta">
+      <strong>v10.0</strong>
+      SwissMedAI GmbH<br>
+      April 2026
+    </div>
+  </div>
+
+  <!-- ===== LOGO VARIANTS ===== -->
+  <section>
+    <h2>Logo Variants</h2>
+    <div class="logos">
+
+      <div class="logo-box">
+        <div class="demo">
+          <svg viewBox="0 0 48 48" width="48" height="48">
+            <defs><linearGradient id="mg1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0E3ABF"/><stop offset="55%" stop-color="#0A2E9E"/><stop offset="100%" stop-color="#061F6E"/>
+            </linearGradient></defs>
+            <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#mg1)"/>
+            <g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none">
+              <line x1="14" y1="15" x2="14" y2="33"/><line x1="24" y1="15" x2="24" y2="33"/>
+              <line x1="14" y1="24" x2="24" y2="24"/><line x1="24" y1="33" x2="34" y2="33"/>
+            </g>
+            <circle cx="37" cy="11" r="1.8" fill="#14C295"/>
+          </svg>
+        </div>
+        <div class="name">Mark</div>
+        <div class="use">Favicon, app icon, avatars, small brand touches</div>
+        <div class="file">hl-logo-mark.svg</div>
+      </div>
+
+      <div class="logo-box">
+        <div class="demo">
+          <svg viewBox="0 0 240 40" width="220" height="36">
+            <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="22" letter-spacing="-0.8" fill="#0A2E9E">Health Ledger</text>
+            <circle cx="143" cy="27" r="2.5" fill="#14C295"/>
+          </svg>
+        </div>
+        <div class="name">Wordmark</div>
+        <div class="use">Headers, email signatures, short-form branding</div>
+        <div class="file">hl-logo-wordmark.svg</div>
+      </div>
+
+      <div class="logo-box">
+        <div class="demo">
+          <svg viewBox="0 0 320 60" width="290" height="54">
+            <defs><linearGradient id="mg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0E3ABF"/><stop offset="55%" stop-color="#0A2E9E"/><stop offset="100%" stop-color="#061F6E"/>
+            </linearGradient></defs>
+            <rect x="4" y="6" width="48" height="48" rx="13" fill="url(#mg2)"/>
+            <g stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" transform="translate(4,6)">
+              <line x1="14" y1="15" x2="14" y2="33"/><line x1="24" y1="15" x2="24" y2="33"/>
+              <line x1="14" y1="24" x2="24" y2="24"/><line x1="24" y1="33" x2="34" y2="33"/>
+            </g>
+            <circle cx="41" cy="17" r="1.8" fill="#14C295"/>
+            <text x="68" y="34" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="22" letter-spacing="-0.8" fill="#1D1D1F">Health Ledger</text>
+            <circle cx="208" cy="33" r="2.5" fill="#14C295"/>
+            <text x="68" y="50" font-family="Inter, system-ui, sans-serif" font-weight="400" font-size="10" letter-spacing="1.5" fill="#6E6E73">MOBILE ALTENZAHNHEILKUNDE</text>
+          </svg>
+        </div>
+        <div class="name">Lockup</div>
+        <div class="use">Letterheads, business cards, formal documents, reports</div>
+        <div class="file">hl-logo-lockup.svg</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== COLOR PALETTE ===== -->
+  <section>
+    <h2>Color Palette</h2>
+    <div class="colors">
+      <div class="color">
+        <div class="swatch" style="background:linear-gradient(135deg,#0E3ABF 0%,#0A2E9E 55%,#061F6E 100%)"></div>
+        <div class="info">
+          <div class="name">Brand Navy</div>
+          <div class="hex">#0A2E9E</div>
+          <div class="rgb">RGB 10·46·158 · CMYK 94·71·0·38</div>
+        </div>
+      </div>
+      <div class="color">
+        <div class="swatch" style="background:#14C295"></div>
+        <div class="info">
+          <div class="name">Signal Green</div>
+          <div class="hex">#14C295</div>
+          <div class="rgb">RGB 20·194·149 · CMYK 90·0·23·24</div>
+        </div>
+      </div>
+      <div class="color">
+        <div class="swatch" style="background:#1D1D1F"></div>
+        <div class="info">
+          <div class="name">Ink Black</div>
+          <div class="hex">#1D1D1F</div>
+          <div class="rgb">RGB 29·29·31 · CMYK 0·0·0·88</div>
+        </div>
+      </div>
+      <div class="color">
+        <div class="swatch" style="background:#6E6E73;"></div>
+        <div class="info">
+          <div class="name">Gray</div>
+          <div class="hex">#6E6E73</div>
+          <div class="rgb">RGB 110·110·115 · CMYK 4·4·0·55</div>
+        </div>
+      </div>
+      <div class="color">
+        <div class="swatch" style="background:#F5F5F7;border-bottom:0.5pt solid var(--hair)"></div>
+        <div class="info">
+          <div class="name">Surface</div>
+          <div class="hex">#F5F5F7</div>
+          <div class="rgb">RGB 245·245·247 · CMYK 1·1·0·3</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TYPOGRAPHY ===== -->
+  <section>
+    <h2>Typography — Inter</h2>
+    <div class="type-row">
+      <div class="label">H1 · Display</div>
+      <div class="sample" style="font-size:22pt;font-weight:700;letter-spacing:-0.5px">Health Ledger.</div>
+      <div class="spec">22pt / 700 / -0.5</div>
+    </div>
+    <div class="type-row">
+      <div class="label">H2 · Heading</div>
+      <div class="sample" style="font-size:16pt;font-weight:600;letter-spacing:-0.3px">Section title</div>
+      <div class="spec">16pt / 600 / -0.3</div>
+    </div>
+    <div class="type-row">
+      <div class="label">Body · Regular</div>
+      <div class="sample" style="font-size:10pt;font-weight:400;line-height:1.5">The quick brown fox jumps over the lazy dog. 1234567890</div>
+      <div class="spec">10pt / 400 / 1.5</div>
+    </div>
+    <div class="type-row">
+      <div class="label">Caption · Small</div>
+      <div class="sample" style="font-size:8pt;font-weight:500;color:var(--gray);text-transform:uppercase;letter-spacing:1px">LABEL · META · TAGLINE</div>
+      <div class="spec">8pt / 500 / +1.0</div>
+    </div>
+  </section>
+
+  <!-- ===== DO'S AND DON'TS ===== -->
+  <section>
+    <h2>Usage Rules</h2>
+    <div class="two-col">
+      <ul class="list do">
+        <li><span class="icon">✓</span><span>Keep clearspace around the mark equal to the width of the HL strokes</span></li>
+        <li><span class="icon">✓</span><span>Place on white, surface grey, or the brand navy background</span></li>
+        <li><span class="icon">✓</span><span>Use SVG at any size — renders crisp on all devices</span></li>
+        <li><span class="icon">✓</span><span>Maintain the signal green dot in every context</span></li>
+      </ul>
+      <ul class="list dont">
+        <li><span class="icon">✕</span><span>Don't stretch, skew, or rotate the mark</span></li>
+        <li><span class="icon">✕</span><span>Don't change stroke weights or letter proportions</span></li>
+        <li><span class="icon">✕</span><span>Don't place on busy photographs without a solid backdrop</span></li>
+        <li><span class="icon">✕</span><span>Don't recolor outside the palette above</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== PRINT SPECIFICATIONS ===== -->
+  <section>
+    <h2>Print Specification</h2>
+    <div class="spec-grid">
+      <div class="spec"><div class="k">Minimum size</div><div class="v">12 mm</div></div>
+      <div class="spec"><div class="k">Clearspace</div><div class="v">4 mm</div></div>
+      <div class="spec"><div class="k">Paper stock</div><div class="v">100gsm+</div></div>
+      <div class="spec"><div class="k">Color mode</div><div class="v">CMYK</div></div>
+      <div class="spec"><div class="k">Resolution</div><div class="v">300 DPI</div></div>
+      <div class="spec"><div class="k">Bleed</div><div class="v">3 mm</div></div>
+      <div class="spec"><div class="k">File format</div><div class="v">SVG · PDF/X-1a</div></div>
+      <div class="spec"><div class="k">A4 margins</div><div class="v">15–18 mm</div></div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <span>Health Ledger · Brand Guidelines · v10.0</span>
+    <span>© 2026 SwissMedAI GmbH · Berlin</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
