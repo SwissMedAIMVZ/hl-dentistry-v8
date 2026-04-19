@@ -1413,7 +1413,9 @@ function openBehandelnModal(k){
   if(!p)return;
   S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
   var defVerw=USERS.find(function(u){return u.role==='verwaltung'});
-  S.behandelnForm={notes:'',manualNote:'',weiterBeh:'',weiterBhId:defVerw?defVerw.email:'',transcribed:false};
+  var nextWeek=new Date(TODAY.getTime()+7*D);
+  var iso=nextWeek.getFullYear()+'-'+String(nextWeek.getMonth()+1).padStart(2,'0')+'-'+String(nextWeek.getDate()).padStart(2,'0');
+  S.behandelnForm={notes:'',manualNote:'',weiterBeh:'',weiterDate:iso,weiterBhId:defVerw?defVerw.email:'',transcribed:false};
   render();
 }
 function closeBehandelnModal(){S.behandelnModal=null;render()}
@@ -1435,32 +1437,37 @@ function mockDictText(m){
 }
 function saveBehandelnModal(){
   var m=S.behandelnModal;if(!m)return;
-  var f=S.behandelnForm||{notes:'',manualNote:'',weiterBeh:'',weiterBhId:'',transcribed:false};
-  /* First click: reveal the transcription in the textarea, keep any manual note / Weiterbehandlung selections the user has already made */
-  if(!f.transcribed){
-    var mta0=document.getElementById('bhManualText');
-    var wb0=document.getElementById('bhWeiterBeh');
-    var wbh0=document.getElementById('bhWeiterBhId');
-    S.behandelnForm={
-      notes:mockDictText(m),
-      manualNote:mta0?mta0.value:(f.manualNote||''),
-      weiterBeh:wb0?wb0.value:(f.weiterBeh||''),
-      weiterBhId:wbh0?wbh0.value:(f.weiterBhId||''),
-      transcribed:true
-    };
-    render();
-    return;
-  }
-  /* Second click: commit everything */
+  var f=S.behandelnForm||{};
+  if(f.transcribed)return;
+  /* Reveal the transcription; preserve any manual note / Weiterbehandlung the user already filled */
+  var mta0=document.getElementById('bhManualText');
+  var wb0=document.getElementById('bhWeiterBeh');
+  var wd0=document.getElementById('bhWeiterDate');
+  var wbh0=document.getElementById('bhWeiterBhId');
+  S.behandelnForm={
+    notes:mockDictText(m),
+    manualNote:mta0?mta0.value:(f.manualNote||''),
+    weiterBeh:wb0?wb0.value:(f.weiterBeh||''),
+    weiterDate:wd0?wd0.value:(f.weiterDate||''),
+    weiterBhId:wbh0?wbh0.value:(f.weiterBhId||''),
+    transcribed:true
+  };
+  render();
+}
+function erledigtBehandlung(){
+  var m=S.behandelnModal;if(!m)return;
+  var f=S.behandelnForm||{};
   var ta=document.getElementById('bhDictText');
   var mta=document.getElementById('bhManualText');
   var wb=document.getElementById('bhWeiterBeh');
+  var wd=document.getElementById('bhWeiterDate');
   var wbh=document.getElementById('bhWeiterBhId');
   var dict=ta?ta.value.trim():(f.notes||'');
   var manual=mta?mta.value.trim():(f.manualNote||'');
   var wBeh=wb?wb.value:(f.weiterBeh||'');
+  var wDate=wd?wd.value:(f.weiterDate||'');
   var wBhId=wbh?wbh.value:(f.weiterBhId||'');
-  /* Combine dict + manual into one visit entry */
+  /* Save combined dict + manual note to patient visit history */
   var combined=dict;
   if(manual)combined+=(combined?'\n\nManuelle Erg\u00e4nzung: ':'Manuelle Erg\u00e4nzung: ')+manual;
   var p=PATIENTS.find(function(x){return x.id===m.patId});
@@ -1468,18 +1475,22 @@ function saveBehandelnModal(){
     if(!p.visits)p.visits=[];
     p.visits.unshift({date:Date.now(),behandler:S.user?S.user.bId||'hFeld':'hFeld',codes:[],text:combined,voice:true});
   }
+  /* Mark current task done */
   if(!S.doneTaskIds)S.doneTaskIds={};
   S.doneTaskIds[m.key]=true;
-  /* If the user picked a Weiterbehandlung, schedule it as a new task for next week */
-  var toastText=m.patName+': Behandlung dokumentiert';
+  /* Create follow-up task if Weiterbehandlung selected */
+  var toastText=m.patName+': Erledigt';
   if(wBeh&&p){
     var assignee=USERS.find(function(u){return u.email===wBhId});
-    var assigneeBhId=(assignee&&assignee.bId)?assignee.bId:(m.key.split('|')[0]?(function(){
-      /* fallback: keep the original task's bh by re-finding a task that matches this patient — defaults to hFeld if nothing else fits */
+    var assigneeBhId=(assignee&&assignee.bId)?assignee.bId:(function(){
       var orig=TASKS.find(function(t){return t.name===p.name});
       return orig?orig.bh:'hFeld';
-    })():'hFeld');
-    var nm=new Date(TODAY.getTime()+7*D);
+    })();
+    var taskDate=wDate||fmtShort(new Date(TODAY.getTime()+7*D));
+    var dateParts=taskDate.split('-');
+    var prettyDate=dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':taskDate;
+    var taskDateObj=new Date(taskDate);
+    var isNextWeek=taskDateObj.getTime()>TODAY.getTime()+D;
     TASKS.push({
       id:nextId++,
       bh:assigneeBhId,
@@ -1487,22 +1498,28 @@ function saveBehandelnModal(){
       heim:heimName(p.heim),
       behandlung:wBeh,
       status:'offen',
-      week:'next',
-      date:fmtShort(nm)
+      week:isNextWeek?'next':'current',
+      date:dateParts.length===3?dateParts[2]+'.'+dateParts[1]+'.':fmtShort(new Date(TODAY.getTime()+7*D))
     });
     var who=assignee?assignee.name:'Behandler';
-    toastText+=' \u00b7 Weiterbehandlung: '+wBeh+' ('+who+')';
+    toastText+=' \u00b7 '+wBeh+': '+prettyDate+' ('+who+')';
   }
   S.behandelnModal=null;
   showToast(toastText,'var(--emerald)');
 }
 function renderBehandelnModal(){
   var m=S.behandelnModal;if(!m)return'';
-  var f=S.behandelnForm||{notes:'',manualNote:'',weiterBeh:'',weiterBhId:'',transcribed:false};
+  var f=S.behandelnForm||{notes:'',manualNote:'',weiterBeh:'',weiterDate:'',weiterBhId:'',transcribed:false};
   var statusBar=f.transcribed
     ?'<div class="dict-bar" style="background:linear-gradient(135deg,var(--emerald-bg),#E6FAF3);color:var(--emerald);animation:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Transkription abgeschlossen</div>'
     :'<div class="dict-bar" style="animation:pulse 1.5s infinite">'+ICO.mic+' Aufnahme aktiv\u2026</div>';
-  var btnLabel=f.transcribed?'Speichern &amp; Abschlie\u00dfen':'Behandlung abschlie\u00dfen';
+  var dictBtnStyle=f.transcribed
+    ?'width:100%;padding:12px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(20,194,149,0.3);border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:default;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px'
+    :'width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)';
+  var dictBtnLabel=f.transcribed
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>Transkription gespeichert'
+    :'Behandlung abschlie\u00dfen';
+  var dictBtnClick=f.transcribed?'':'onclick="saveBehandelnModal()"';
   /* Behandler options = Behandler + Verwaltung users; Verwaltung as default */
   var assigneeUsers=USERS.filter(function(u){return u.role==='behandler'||u.role==='verwaltung'});
   var bhOpts=assigneeUsers.map(function(u){
@@ -1525,7 +1542,8 @@ function renderBehandelnModal(){
       +'<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh-sm);margin-bottom:14px">'
         +'<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px">'+ICO.mic+'<span>KI-Diktat</span></div>'
         +statusBar
-        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:110px;resize:none;outline:none;transition:border .2s;line-height:1.5" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+        +'<textarea id="bhDictText" placeholder="Transkription erscheint hier\u2026" style="width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);font-size:12px;font-family:inherit;min-height:110px;resize:none;outline:none;transition:border .2s;line-height:1.5;margin-bottom:12px" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+        +'<button style="'+dictBtnStyle+'" '+dictBtnClick+'>'+dictBtnLabel+'</button>'
       +'</div>'
       +'<label class="form-label" style="margin-top:4px">Manuelle Beschreibung</label>'
       +'<textarea id="bhManualText" placeholder="Zus\u00e4tzliche Notizen, Hinweise f\u00fcr die Verwaltung\u2026" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;min-height:70px;resize:vertical;outline:none;background:var(--surface);color:var(--text);line-height:1.5" oninput="S.behandelnForm.manualNote=this.value">'+(f.manualNote||'')+'</textarea>'
@@ -1537,10 +1555,12 @@ function renderBehandelnModal(){
         +'<div style="font-size:11px;color:var(--text-3);margin-bottom:12px">Optional \u2014 Folgetermin planen und zuweisen</div>'
         +'<label class="form-label" style="margin-top:0">Behandlung</label>'
         +'<select class="form-select" id="bhWeiterBeh" onchange="S.behandelnForm.weiterBeh=this.value">'+behOpts+'</select>'
+        +'<label class="form-label">Datum</label>'
+        +'<input type="date" class="form-input" id="bhWeiterDate" value="'+(f.weiterDate||'')+'" oninput="S.behandelnForm.weiterDate=this.value">'
         +'<label class="form-label">Behandler</label>'
         +'<select class="form-select" id="bhWeiterBhId" onchange="S.behandelnForm.weiterBhId=this.value">'+bhOpts+'</select>'
       +'</div>'
-      +'<button class="save-btn" onclick="saveBehandelnModal()">'+btnLabel+'</button>'
+      +'<button class="save-btn" style="background:var(--emerald);box-shadow:0 4px 12px rgba(20,194,149,0.3)" onclick="erledigtBehandlung()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="14" height="14" style="margin-right:6px"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
     +'</div>'
   +'</div>';
   return h;
