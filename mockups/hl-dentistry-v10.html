@@ -38,21 +38,21 @@
   --surface:    #F5F5F7;
   --surface-2:  #EEEEEF;
   --white:      #FFFFFF;
-  /* Tooth States */
-  --t-healthy:  #0D9276;
+  /* Tooth States — aligned with Ledger semantics */
+  --t-healthy:  #14C295;
   --t-caries:   #D97706;
   --t-extract:  #C9313D;
   --t-crown:    #6C47FF;
-  --t-composite:#3D66FE;
+  --t-composite:#2D5BF5;
   --t-bridge:   #DB2777;
-  --t-other:    #94A3B8;
+  --t-other:    #86868B;
   --t-teleskop: #0891B2;
   --t-wurzelrest:#92400E;
   --t-zerstoert: #7F1D1D;
   --t-stift:    #B45309;
   --t-halte:    #E11D48;
   --t-retiniert:#475569;
-  --t-fehlt:    #E2E8F0;
+  --t-fehlt:    #D2D2D7;
   /* Shadows — tuned for Ledger neutrals */
   --sh-sm: 0 1px 2px rgba(29,29,31,0.05);
   --sh-md: 0 4px 12px rgba(29,29,31,0.08);
@@ -267,7 +267,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 .dict-panel .submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)}
 
 /* ===== LOGIN ===== */
-.login-bg{display:flex;flex-direction:column;height:100%;background:linear-gradient(155deg,#041347 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
+.login-bg{display:flex;flex-direction:column;height:100%;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
 .login-bg::before{content:'';position:absolute;top:-20%;right:-30%;width:500px;height:500px;background:radial-gradient(circle,rgba(61,102,254,0.15) 0%,transparent 60%);border-radius:50%}
 .login-bg::after{content:'';position:absolute;bottom:-20%;left:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(108,71,255,0.1) 0%,transparent 60%);border-radius:50%}
 .login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;z-index:1}
@@ -448,7 +448,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
   body{padding:0;background:var(--surface)}
   .phone.desktop-mode{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;flex-direction:row;overflow:hidden}
   /* Sidebar */
-  .dk-sidebar{width:240px;min-width:240px;height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#041347 100%);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+  .dk-sidebar{width:240px;min-width:240px;height:100vh;background:linear-gradient(180deg,var(--navy) 0%,#061F6E 100%);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
   .dk-sidebar-logo{padding:24px 20px 16px;display:flex;align-items:center;gap:12px}
   .dk-sidebar-logo svg{width:32px;height:32px;color:#fff}
   .dk-sidebar-logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px}
@@ -495,7 +495,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
   .dk-verw-content .einv-tabs{border-bottom:1px solid var(--border)}
   .dk-verw-content .card{box-shadow:none;border:1px solid var(--border)}
   /* Desktop login — full viewport, centered card */
-  .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#041347 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
+  .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
   .phone.desktop-login::before{content:'';position:absolute;top:-10%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(61,102,254,0.12) 0%,transparent 60%);border-radius:50%}
   .phone.desktop-login::after{content:'';position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(108,71,255,0.08) 0%,transparent 60%);border-radius:50%}
   .dk-login-card{background:var(--white);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.25);width:420px;max-width:90%;padding:40px;position:relative;z-index:1}
@@ -871,18 +871,18 @@ button:focus-visible,.tab:focus-visible,.card:focus-visible,.nav-btn:focus-visib
 var ZE_STATES=["Befund","Zustimmung angefragt","Zugestimmt","HKP erstellt","HKP eingereicht","HKP bewilligt","Abdruck","Labor","Anprobe","Eingliederung","Fertig"];
 var PA_STATES=[
   {id:"sondierung",label:"Sondierung gemacht",short:"Sond.",color:"#6C47FF"},
-  {id:"antrag",label:"Antrag geschickt",short:"5e",color:"#082A99"},
+  {id:"antrag",label:"Antrag geschickt",short:"5e",color:"#0A2E9E"},
   {id:"ait_geplant",label:"AIT geplant",short:"AIT-P",color:"#D97706"},
-  {id:"ait",label:"AIT durchgeführt",short:"AIT",color:"#0D9276"},
-  {id:"nachkontrolle",label:"Nachkontrolle",short:"NK",color:"#0D9276"},
-  {id:"upt1",label:"UPT 1",short:"U1",color:"#082A99"},
+  {id:"ait",label:"AIT durchgeführt",short:"AIT",color:"#14C295"},
+  {id:"nachkontrolle",label:"Nachkontrolle",short:"NK",color:"#14C295"},
+  {id:"upt1",label:"UPT 1",short:"U1",color:"#0A2E9E"},
   {id:"recall1",label:"Recall 1 (174a/b)",short:"R1",color:"#6C47FF"},
-  {id:"upt2",label:"UPT 2",short:"U2",color:"#082A99"},
+  {id:"upt2",label:"UPT 2",short:"U2",color:"#0A2E9E"},
   {id:"recall2",label:"Recall 2 (174a/b)",short:"R2",color:"#6C47FF"},
-  {id:"upt3",label:"UPT 3",short:"U3",color:"#082A99"},
+  {id:"upt3",label:"UPT 3",short:"U3",color:"#0A2E9E"},
   {id:"recall3",label:"Recall 3 (174a/b)",short:"R3",color:"#6C47FF"},
-  {id:"upt4",label:"UPT 4",short:"U4",color:"#082A99"},
-  {id:"abgeschlossen",label:"Abgeschlossen",short:"\u2713",color:"#0D9276"},
+  {id:"upt4",label:"UPT 4",short:"U4",color:"#0A2E9E"},
+  {id:"abgeschlossen",label:"Abgeschlossen",short:"\u2713",color:"#14C295"},
   {id:"abgelehnt",label:"Abgelehnt",short:"\u2717",color:"#C9313D"}
 ];
 var HEIME=[{id:1,name:"Alexa Lichtenrade",addr:"Berlin Lichterfelde"},{id:2,name:"Haus am Weigandufer",addr:"Berlin K\u00f6penick"},{id:3,name:"Vitanas M\u00e4rkisches V.",addr:"Berlin Prenzlberg"},{id:4,name:"Senterra Alloheim",addr:"Berlin Spandau"}];
@@ -907,7 +907,7 @@ var USERS=[
   {email:"c.weigert@mvz-arzt.de",pw:"admin",name:"C. Weigert",role:"verwaltung"}
 ];
 var LAB_STAGES=["Abdruck","Druck/Guss","Politur/Montage","Abholbereit"];
-var LAB_COLORS=["#D97706","#082A99","#6C47FF","#0D9276"];
+var LAB_COLORS=["#D97706","#0A2E9E","#6C47FF","#14C295"];
 var LAB_BG=["#FFFBEB","#EBF0FF","#F3F0FF","#ECFDF5"];
 var VITA_SHADES=["A1","A2","A3","A3.5","B1","B2","B3","B4","C1","C2","C3","C4","D2","D3","D4"];
 var PROTH_TYPES=["Totalprothese","Teilprothese","Schiene","Br\u00fccke","Krone","Sonstiges"];
@@ -1116,7 +1116,7 @@ function renderLogin(){
     +'<button class="login-btn" onclick="doLogin()">Anmelden</button>'
     +'<div class="login-forgot">Passwort vergessen?</div>'
     +'</div>'
-    +'<div class="login-version">v5.0 \u2014 SwissMedAI GmbH</div>'
+    +'<div class="login-version">v10.0 \u2014 SwissMedAI GmbH</div>'
     +'</div>';
 }
 function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":"home";S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
@@ -3076,13 +3076,13 @@ function showViewPicker(){
   el.id='viewPicker';
   el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(6px)';
   el.innerHTML='<div style="background:#fff;border-radius:16px;padding:32px 36px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;max-width:340px;width:90%">'
-    +'<div style="font-size:18px;font-weight:800;color:#082A99;margin-bottom:6px">HL-Dentistry v10</div>'
-    +'<div style="font-size:12px;color:#64748B;margin-bottom:24px">Welche Ansicht m\u00f6chten Sie testen?</div>'
+    +'<div style="font-size:20px;font-weight:700;letter-spacing:-0.5px;color:#0A2E9E;margin-bottom:8px;display:flex;align-items:baseline;justify-content:center;gap:1px">HL-Dentistry<span style="color:#14C295">.</span></div>'
+    +'<div style="font-size:11px;color:#6E6E73;margin-bottom:28px;text-transform:uppercase;letter-spacing:1.5px;font-weight:500">Welche Ansicht m\u00f6chten Sie testen?</div>'
     +'<div style="display:flex;gap:12px">'
-      +'<button onclick="pickView(\'desktop\')" style="flex:1;padding:16px 12px;background:linear-gradient(135deg,#082A99,#3D66FE);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(8,42,153,0.3)">'
+      +'<button onclick="pickView(\'desktop\')" style="flex:1;padding:16px 12px;background:linear-gradient(135deg,#0E3ABF,#0A2E9E 55%,#061F6E);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(10,46,158,0.3)">'
         +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'
         +'Desktop</button>'
-      +'<button onclick="pickView(\'mobile\')" style="flex:1;padding:16px 12px;background:#F8FAFC;color:#082A99;border:2px solid #E2E8F0;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">'
+      +'<button onclick="pickView(\'mobile\')" style="flex:1;padding:16px 12px;background:#F5F5F7;color:#0A2E9E;border:1.5px solid #D2D2D7;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">'
         +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="28" height="28" style="display:block;margin:0 auto 8px"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>'
         +'Mobile</button>'
     +'</div>'

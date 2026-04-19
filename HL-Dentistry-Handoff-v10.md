@@ -45,6 +45,32 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-19 — Brand Guidelines fully applied across mobile app + deployment CSS
+
+**Why:** Final pass to ensure the entire app — both the v10 mockup and the standalone deployment CSS — adheres to the Ledger brand palette established in `assets/hl-brand-guidelines.html`. Hunting down legacy hex codes left over from earlier iterations.
+
+**What changed:**
+
+*v10 mockup (`mockups/hl-dentistry-v10.html`)*
+- `:root` tooth state variables aligned with Ledger palette: `--t-healthy: #14C295` (was `#0D9276`), `--t-composite: #2D5BF5` (was `#3D66FE`).
+- Login background gradients (mobile + desktop): `#041347` → `#061F6E` (Ledger `--ink-deep`), 3 occurrences.
+- Mobile login version label updated from `v5.0` → `v10.0`.
+- All hardcoded JS palette references in `PA_STATES` and `LAB_COLORS` swept via sed: 12 replacements (`#082A99` → `#0A2E9E`, `#0D9276` → `#14C295`, `#3D66FE` → `#2D5BF5`).
+- View-picker popup redesigned with Ledger typography: navy title with green signal dot, uppercase subtitle, refined button gradient using `linear-gradient(135deg,#0E3ABF,#0A2E9E 55%,#061F6E)`, neutral secondary button.
+
+*Deployment CSS (`assets/hl-dentistry.css`)*
+- `--t-healthy: #0D9276` → `#14C295` (line 71)
+- `--t-composite: #3D66FE` → `#2D5BF5` (line 75)
+- `.login-bg` gradient: `#041347` → `#061F6E` (line 299)
+- `.dk-sidebar` gradient: `#041347` → `#061F6E` (line 480)
+- `.phone.desktop-login` gradient: `#041347` → `#061F6E` (line 527)
+
+**Verification:** `grep -nE "#041347|#082A99|#0D9276|#3D66FE"` against the active files (`mockups/hl-dentistry-v10.html` and `assets/hl-dentistry.css`) returns zero matches. Remaining occurrences live only in frozen earlier versions (v7, v8, v9, admin-v3) and historical handoff docs, which is intentional.
+
+**Result:** The mobile and desktop layouts now render with the unified Ledger palette: navy `#0A2E9E` (with `#061F6E` deep gradient stops), signal green `#14C295`, ink black `#1D1D1F`, neutral grays `#6E6E73 / #86868B`. Tooth state, lab kanban, and PA pipeline colors all match the brand guidelines.
+
+---
+
 ### 2026-04-12 — Elegant cross-platform logo (Ledger-inspired)
 
 **Why:** User wants an elegant logo that works on any device, matching the Ledger aesthetic.
