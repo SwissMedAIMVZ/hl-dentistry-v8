@@ -1406,6 +1406,45 @@ function renderRescheduleModal(){
   return h;
 }
 
+/* Behandeln flow: click "Behandeln" on a task card → openBehandelnModal → modal with treatment type + notes → saveBehandelnModal marks the task done */
+function openBehandelnModal(k){
+  var parts=k.split('|');var patId=parseInt(parts[0],10);
+  var p=PATIENTS.find(function(x){return x.id===patId});
+  if(!p)return;
+  S.behandelnModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
+  S.behandelnForm={notes:''};
+  render();
+}
+function closeBehandelnModal(){S.behandelnModal=null;render()}
+function saveBehandelnModal(){
+  var m=S.behandelnModal;if(!m)return;
+  if(!S.doneTaskIds)S.doneTaskIds={};
+  S.doneTaskIds[m.key]=true;
+  S.behandelnModal=null;
+  showToast(m.patName+': Behandlung dokumentiert','var(--emerald)');
+}
+function renderBehandelnModal(){
+  var m=S.behandelnModal;if(!m)return'';
+  var f=S.behandelnForm||{notes:''};
+  var h='<div class="overlay-bg" onclick="closeBehandelnModal()">'
+    +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+      +'<div class="overlay-header">'
+        +'<div class="overlay-title">Behandeln</div>'
+        +'<button class="overlay-close" onclick="closeBehandelnModal()">\u00d7</button>'
+      +'</div>'
+      +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px">'
+        +'<div style="font-size:14px;font-weight:700;color:var(--text)">'+m.patName+'</div>'
+        +'<div style="font-size:12px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+m.heim+'</div>'
+        +'<div style="font-size:11px;color:var(--navy);margin-top:6px;font-weight:600">'+m.label+'</div>'
+      +'</div>'
+      +'<label class="form-label">Behandlungsnotiz</label>'
+      +'<textarea class="form-input" id="bhNotes" rows="4" placeholder="Durchgef\u00fchrte Behandlung, Befund, n\u00e4chste Schritte\u2026" style="resize:vertical;font-family:inherit" oninput="S.behandelnForm.notes=this.value">'+(f.notes||'')+'</textarea>'
+      +'<button class="save-btn" onclick="saveBehandelnModal()">Behandlung abschlie\u00dfen</button>'
+    +'</div>'
+  +'</div>';
+  return h;
+}
+
 /* Home route — distance matrix & nearest-neighbor renderer for the 4 home HEIME */
 var HOME_HEIM_T={
   "Alexa Lichtenrade":       {"Alexa Lichtenrade":0,"Haus am Weigandufer":25,"Vitanas M\u00e4rkisches V.":30,"Senterra Alloheim":35},
@@ -1505,7 +1544,7 @@ function renderHome(){
       var key=taskKey(t);
       var actions=t.done
         ?'<button style="flex:1;padding:7px;background:var(--surface);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="markTaskUndone(\''+key+'\')">Zur\u00fcck zu Offen</button>'
-        :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="markTaskDone(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>Erledigt</button>'
+        :'<button style="flex:1;padding:7px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(13,146,118,0.3);border-radius:var(--r-sm);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openBehandelnModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Behandeln</button>'
          +'<button style="flex:1;padding:7px;background:var(--white);color:var(--text-2);border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px" onclick="openRescheduleModal(\''+key+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Neu planen</button>';
       h+='<div class="task-card'+(t.done?" done":"")+'" style="flex-direction:column;align-items:stretch;gap:10px" onclick="goPat('+t.patId+')">'
         +'<div style="display:flex;align-items:center;gap:10px">'
@@ -2723,6 +2762,8 @@ function render(){
   if(S.toast)html+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
   /* Home task reschedule modal */
   if(S.rescheduleModal)html+=renderRescheduleModal();
+  /* Home task Behandeln modal */
+  if(S.behandelnModal)html+=renderBehandelnModal();
   /* Horizontal odontogram zoom overlay */
   if(S.odoZoom)html+=renderOdoZoom();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */
