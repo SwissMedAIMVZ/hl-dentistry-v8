@@ -45,6 +45,45 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-19 — Behandeln popup with KI-Diktat two-step transcription flow
+
+**Why:** User wants the task-card "Erledigt" action reframed as the start of a documented treatment: click opens a popup that simulates the KI-Diktat flow from the patient file, showing who/what is being treated and capturing the transcription before the task is marked done.
+
+**What changed:**
+
+*Task card button (`renderHome` — Klinik Heute, `mockups/hl-dentistry-v10.html:~1508`)*
+- Green "Erledigt ✓" action button relabelled to **"Behandeln"** with a sun/treatment icon.
+- `onclick` rewired from `markTaskDone(key)` → `openBehandelnModal(key)`.
+- "Neu planen" sibling button unchanged.
+
+*New Behandeln modal (`~1409`)*
+- State: `S.behandelnModal = {key, patId, patName, heim, label}` + `S.behandelnForm = {notes, transcribed}`.
+- Layout (top to bottom):
+  1. **Modal title = patient name**, heim in a subline (`ICO.pin` + heim name).
+  2. **"Geplante Behandlung"** card — small uppercase label + treatment type (`m.label`) in navy, sitting in a `--blue-50` tinted box.
+  3. **KI-Diktat panel** — mirrors the patient-file dict-panel: mic icon + "KI-Diktat" title, status bar, textarea, submit button.
+- Two-step submit flow driven by `S.behandelnForm.transcribed`:
+  - **First click on "Behandlung abschließen"** → `saveBehandelnModal()` detects `transcribed===false`, fills the textarea via `mockDictText(m)` (context-aware German transcription: PA/UPT, ZE, HKP, Kontrolle, or generic), swaps the "Aufnahme aktiv…" pulse bar for a green "Transkription abgeschlossen ✓" badge, and relabels the button to **"Speichern & Abschließen"**. `render()` is called so the overlay rebuilds with the new state.
+  - **Second click** → commits the (still editable) note to `p.visits.unshift({...voice:true})` exactly like `saveDictation()` does, flags `S.doneTaskIds[key] = true`, closes the modal, and fires the standard "Behandlung dokumentiert" toast.
+- `closeBehandelnModal()` aborts the flow without saving or marking the task done.
+- Wired into the render pipeline next to `renderRescheduleModal()`: `if(S.behandelnModal)html+=renderBehandelnModal();`
+
+**Why two-step:** a single click would hide the transcription from the user — the point of the demo is to *show* that the KI captured the voice note. The second click is the explicit commit once the behandler has reviewed/edited the text.
+
+**Mock transcription library (`mockDictText`):** keyword-matches the treatment label so the generated text feels plausible:
+- `pa` / `upt` / `ait` → parodontale Status + Taschensondierung + subgingivale Instrumentierung
+- `ze` / `abnahme` / `befund` / `prothes` → Zahnersatz eingegliedert + Okklusion + Pflegehinweise
+- `hkp` → HKP besprochen + Unterschrift + Krankenkasse
+- `kontrolle` → Routinekontrolle + Schleimhautbefund
+- fallback → generic "Behandlung gemäß Planung durchgeführt…"
+
+**Related cleanups in the same session:**
+- **Verwaltung "Behandler-Aufgaben" initials dots** — `BEHANDLER` objects had no `initials` field, so `bh-avatar` rendered empty circles. Added a shared `bhInitials(b)` helper that derives initials from the name (first + last word initial, fallback to first two chars). Used in both `bhSection` (the dots in Verwaltung Behandler-Aufgaben) and `renderBehandler_2` (the Behandler admin list). Renaming a Behandler now updates both places automatically.
+- **Nachrichten tab removed from Management** — `renderManager` + `renderDesktopManagerBody` tab lists trimmed from `[Übersicht, Behandler, Heime, Planung, Fälle, Nachrichten]` to `[Übersicht, Behandler, Heime, Planung, Fälle]`. The desktop sidebar Management dropdown also no longer lists Nachrichten. The standalone "Nachrichten" page (bottom-nav / sidebar top-level) still exists — the sub-tab was the only thing removed.
+- **Verwaltung bottom nav → Abrechnung added after Behandler** — `renderAdminBottomNav_2` gained a 6th button: `btn('abrechnung', euroIcon, 'Abrechnung')`. Links straight into the existing Abrechnung hub page (Pflegeheime / Preisliste / Texteditor). An earlier iteration briefly used "Heime" pointing at `pflegeheime`, then was renamed per user request.
+
+---
+
 ### 2026-04-19 — Brand Guidelines fully applied across mobile app + deployment CSS
 
 **Why:** Final pass to ensure the entire app — both the v10 mockup and the standalone deployment CSS — adheres to the Ledger brand palette established in `assets/hl-brand-guidelines.html`. Hunting down legacy hex codes left over from earlier iterations.
