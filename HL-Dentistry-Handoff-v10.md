@@ -45,6 +45,66 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Elegant cross-platform logo (Ledger-inspired)
+
+**Why:** User wants an elegant logo that works on any device, matching the Ledger aesthetic.
+
+**Design rationale:**
+- **Geometric HL monogram** in a 44 px rounded square badge (the primary mark). The letters are drawn as flat paths so they render identically on every device without font dependencies.
+- **Signal green dot** (`#14C295`) in the bottom-right corner of the badge — Ledger's signature accent, used as the "unfinished sentence" pop that makes the brand feel complete.
+- **Wordmark** pairs the "HL-Dentistry" text with a period-style green dot after the name (also Ledger-inspired).
+- All colors are drawn directly in the SVG using the Ledger palette (`#0A2E9E` navy, `#FFFFFF` white, `#14C295` signal), so there's no dependency on CSS variables. Works as a favicon, print icon, app launcher, email signature, anywhere.
+
+**Three SVG assets delivered** (all in the repo root):
+1. **`hl-logo-mark.svg`** — 48×48 icon mark. Rounded navy square + white HL monogram + green dot. Use for favicons, app icons, small brand touches.
+2. **`hl-logo-wordmark.svg`** — 220×40 horizontal wordmark. "HL-Dentistry" in Inter 700 navy + green signal dot. Use for headers, letterheads.
+3. **`hl-logo-lockup.svg`** — 300×60 full lockup. Mark + wordmark + "MOBILE ALTENZAHNHEILKUNDE" tagline. Use for stationery, login screens when space allows.
+
+**In-app integration:**
+- `hl-dentistry-v10.html:7` — added `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,...">` with the mark inline as a data URI. This sets the browser tab favicon to the new logo — no external file needed.
+- `hl-dentistry-v10.html:948` — replaced the old stylized tooth SVG in `ICO.tooth` with the new mark (same viewBox, drop-in replacement). Added two new icons: `ICO.logoMark` (same as tooth) and `ICO.logoWordmark` (horizontal text version).
+- `hl-dentistry-v10.html:1106,2698` — mobile + desktop login title now reads **"HL-Dentistry."** with the period in signal green (matches Ledger's branding).
+- `hl-dentistry-v10.html:2474` — desktop sidebar logo text gets the same green signal dot.
+
+**Usage guide:**
+- Use the **mark** alone for small spaces (favicon, app icon, social avatar, button overlays)
+- Use the **wordmark** when horizontal space allows and the mark is overkill (email signatures, memo headers)
+- Use the **lockup** for formal documents (letterheads, print reports, business cards)
+- All three SVGs are editable vector — scale without loss, recolor by changing the fill attributes
+
+---
+
+### 2026-04-12 — Adopt Ledger palette + font (Inter Tight)
+
+**Why:** User provided `Ledger - Landing.html` as the reference for the app's font and color scheme. The Ledger design system uses a minimal 3-colour palette with Apple-style system font stack.
+
+**Ledger design tokens applied:**
+
+| Token | Ledger value | Mapped to |
+|---|---|---|
+| `--ink` | `#0A2E9E` | `--navy` (was `#082A99` — nearly identical, slight shift) |
+| `--ink-deep` | `#061F6E` | not directly mapped (kept for reference) |
+| `--signal` | `#14C295` | `--emerald` (was `#0D9276` — brighter, more vivid green) |
+| `--black` | `#1D1D1F` | `--text` (was `#0F172A` — warmer, Apple-style near-black) |
+| `--gray` | `#6E6E73` | `--text-3` (was `#64748B` — Apple system gray) |
+| `--light-gray` | `#86868B` | `--text-4` (was `#94A3B8` — darker than before) |
+| `--hairline` | `#D2D2D7` | `--border` (was `#E2E8F0` — slightly more visible) |
+| `--surface` | `#F5F5F7` | `--surface` (was `#F8FAFC` — Apple-style off-white) |
+| `--white` | `#FFFFFF` | `--white` (unchanged) |
+| `--font` | `-apple-system, "SF Pro Display", "Inter Tight"` | `'Inter Tight', -apple-system, ...` (Inter Tight loaded via Google Fonts) |
+
+**What changed:**
+- `hl-dentistry-v10.html:7` — Google Fonts link switched from `DM Sans` to `Inter Tight` (300–800 weights).
+- `hl-dentistry-v10.html:13` — `:root` CSS variables updated: brand blues shifted from `#082A99` to `#0A2E9E`, emerald from `#0D9276` to `#14C295`, all neutral grays replaced with Ledger's Apple-style values, shadows adjusted from slate `rgba(15,23,42,...)` to near-black `rgba(29,29,31,...)`.
+- `hl-dentistry-v10.html:69` — `body` font-family updated to `'Inter Tight', -apple-system, 'SF Pro Display', system-ui, sans-serif`. Added `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, and `font-feature-settings: 'ss01','cv11'` (matching Ledger's rendering).
+- `--text-2` adjusted from `#334155` → `#3A3A3C` to sit between `--text` (#1D1D1F) and `--text-3` (#6E6E73) in the new gray scale.
+- `--surface-2` adjusted from `#F1F5F9` → `#EEEEEF` for better contrast against `--surface` (#F5F5F7).
+- `--border-2` adjusted from `#CBD5E1` → `#C7C7CC` to match the Ledger hairline family.
+
+**Visual impact:** the entire app (mobile + desktop) now uses a warmer, Apple-inspired neutral palette with Inter Tight as the primary typeface. Headers, cards, buttons, badges, the odontogram, the email inbox, and the desktop sidebar all pick up the new colours automatically since they reference CSS variables. No component-level changes were needed.
+
+---
+
 ### 2026-04-12 — Nachrichten tab added to Management (mobile + desktop)
 
 **Why:** User wants the email/messages UI accessible from the Management section too, not just from the bottom-nav/sidebar "Nachrichten" item.

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Health Ledger — elegant horizontal wordmark. Inter Medium with tight tracking + signal dot. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 40" width="240" height="40" role="img" aria-label="Health Ledger">
+  <text x="0" y="28" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-weight="500" font-size="22" letter-spacing="-0.8" fill="#0A2E9E">Health Ledger</text>
+  <circle cx="143" cy="27" r="2.5" fill="#14C295"/>
+</svg>
