@@ -886,7 +886,8 @@ var PA_STATES=[
   {id:"abgelehnt",label:"Abgelehnt",short:"\u2717",color:"#C9313D"}
 ];
 var HEIME=[{id:1,name:"Alexa Lichtenrade",addr:"Berlin Lichterfelde"},{id:2,name:"Haus am Weigandufer",addr:"Berlin K\u00f6penick"},{id:3,name:"Vitanas M\u00e4rkisches V.",addr:"Berlin Prenzlberg"},{id:4,name:"Senterra Alloheim",addr:"Berlin Spandau"}];
-var BEHANDLER=[{id:"hFeld",name:"Dr. Feld",initials:"DF",cases:298,avgDays:42,done:185},{id:"hHess",name:"Dr. Hess",initials:"DH",cases:231,avgDays:38,done:156},{id:"hGomez",name:"Dr. Gomez",initials:"DG",cases:52,avgDays:51,done:31}];
+var BEHANDLER=[{id:"hFeld",name:"Dr. Feld",cases:298,avgDays:42,done:185},{id:"hHess",name:"Dr. Hess",cases:231,avgDays:38,done:156},{id:"hGomez",name:"Dr. Gomez",cases:52,avgDays:51,done:31}];
+function bhInitials(b){var parts=(b.name||'').split(/\s+/).filter(Boolean);if(parts.length>1)return(parts[0][0]+parts[parts.length-1][0]).toUpperCase();return(b.name||'').slice(0,2).toUpperCase()}
 var D=86400000,N=Date.now();
 var PATIENTS=[
   {id:1,name:"M\u00fcller, Hans",heim:1,room:"203",age:78,ins:"TK",insNr:"123456789",z1Nr:"Z1-2024-0001",rel:true,odo:{tl:["ex","ex","g","g","g","g","g","ex"],tr:["g","g","f","f","f","ex","ex","ex"],bl:["ex","ex","g","g","g","g","f+b","ex"],br:["f","g","f+II","f","f","ex","ex","ex"]},tx:["druck","co"],txPlan:{14:["ta"],23:["fu"]},ze:{st:5,type:"Voll OK",zs:75,exp:N+30*D,bh:"hFeld"},pa:{step:"upt",befund:{date:N-300*D,spiegel:{16:[4,3],15:[2,2],14:[3,3],13:[2,1],12:[2,1],21:[2,2],22:[3,2],23:[2,2],24:[3,3],25:[4,4],46:[4,3],45:[3,2],44:[2,2],43:[3,2],42:[2,1],31:[2,2],32:[2,1],33:[3,2],34:[3,3],35:[4,3]},bop:{16:1,25:1,46:1},lockerung:{25:1,46:2},furkation:{16:1,26:0,46:2}},stoer:{date:N-298*D,items:[{l:"Rauchen",s:"beseitigt"},{l:"Diabetes mellitus",s:"nb"},{l:"Mundtrockenheit",s:"nein"},{l:"Immunsuppression",s:"nein"},{l:"Sonstige",s:"nein"}]},vordruck:{date:N-296*D},anzeige:{date:N-295*D},einwilligung:{date:N-295*D},atg:{date:N-294*D,text:"Generalisierte chronische Parodontitis Grad B/C. AIT in 4 Quadranten-Sitzungen geplant."},mhu:{date:N-292*D,pi:42,bop:35,notes:"Interdentalbuersten empfohlen"},ait:{sessions:[{date:N-290*D,q:1,an:true,anType:"I",notes:"Scaling Q1"},{date:N-287*D,q:2,an:true,anType:"I",notes:"Scaling+WG Q2"},{date:N-284*D,q:3,an:false,notes:"Scaling Q3"},{date:N-281*D,q:4,an:true,anType:"L1",notes:"Scaling+WG Q4"}]},beva:{date:N-270*D,spiegel:{16:[3,2],15:[2,2],14:[2,2],13:[2,1],12:[2,1],21:[2,2],22:[2,2],23:[2,2],24:[2,2],25:[3,3],46:[3,2],45:[2,2],44:[2,2],43:[2,2],42:[2,1],31:[2,2],32:[2,1],33:[2,2],34:[2,2],35:[3,2]},bop:{},ergebnis:"besserung"},upts:[{nr:1,date:N-210*D,done:true,type:"e"},{nr:2,date:N-120*D,done:true,type:"e"},{nr:3,date:N-30*D,done:false,type:"e"},{nr:4,date:N+60*D,done:false,type:"f"}],recalls:[{nr:1,date:N-165*D,done:true,type:"174a"},{nr:2,date:N-75*D,done:true,type:"174a"}],comment:"Guter Verlauf, UPT3 steht an",behandler:"hFeld",risks:{diabetes:true,raucher10:false,blutverduennend:true,bisphosphonat:false,perioVerlust:true,herzklappe:false}},odoHist:[{date:N-30*D,odo:{tl:["ex","ex","g","g","g","g","g","ex"],tr:["g","g","f","f","f","ex","ex","ex"],bl:["ex","ex","g","g","g","g","f","ex"],br:["f","g","f","f","f","ex","ex","ex"]}}],visits:[{date:N-30*D,behandler:"hFeld",codes:["druck","co"],text:"Druckstelle OK Prothese angepasst. Patient toleriert gut.",voice:false},{date:N-90*D,behandler:"hHess",codes:["fu"],text:"F\u00fcllungstherapie 26 MOD. Composite, Lokalan\u00e4sthesie.",voice:true},{date:N-180*D,behandler:"hFeld",codes:["pa","174a"],text:"Erstbefund 174a durchgef\u00fchrt. Sondierung gemacht. PA-Fall eingeleitet.",voice:false}],photos:[{date:N-10*D,name:"20260324_Muller_Hans_OK.jpg"},{date:N-90*D,name:"20260103_Muller_Hans_Befund.jpg"}],forms174a:[{date:N-30*D,id:"f1"},{date:N-180*D,id:"f2"}],notes:"Allergien: Penicillin. Betreuer: Sohn (Tel. 0176-1234567). Braucht Rollstuhl-Transport."},
@@ -3217,7 +3218,7 @@ function bhSection(bh,tasks,badgeClass,badgeLabel,weekParam){
   }
   return '<div class="bh-section">'
     +'<div class="bh-header" onclick="toggleBh(\''+bh.id+'\')">'
-      +'<div class="bh-avatar">'+bh.initials+'</div>'
+      +'<div class="bh-avatar">'+bhInitials(bh)+'</div>'
       +'<div class="bh-name">'+bh.name+'</div>'
       +'<div class="bh-badge '+badgeClass+'">'+badgeLabel+'</div>'
       +'<span class="'+chevCls+'">&#9660;</span>'
@@ -4011,8 +4012,7 @@ function renderBehandler_2(){
   +'</div></div>';
   h+='<div class="content">';
   BEHANDLER.forEach(function(b){
-    var parts=b.name.split(' ');
-    var initials=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:b.name.slice(0,2)).toUpperCase();
+    var initials=bhInitials(b);
     var user=USERS.find(function(u){return u.bId===b.id});
     var email=user?user.email:'\u2014 kein Account';
     var role=user?user.role:null;
