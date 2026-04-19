@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- HL-Dentistry — logo mark (icon). Works cross-platform (SVG). Colors: #0A2E9E navy + #14C295 signal green. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="HL-Dentistry">
+  <rect x="2" y="2" width="44" height="44" rx="11" fill="#0A2E9E"/>
+  <path d="M13 16v16h3.5v-6h6v6h3.5V16h-3.5v7h-6v-7H13zm17 0v16h9v-3h-5.5V16H30z" fill="#FFFFFF"/>
+  <circle cx="37" cy="33" r="3" fill="#14C295"/>
+</svg>

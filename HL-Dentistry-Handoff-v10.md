@@ -45,6 +45,35 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Elegant cross-platform logo (Ledger-inspired)
+
+**Why:** User wants an elegant logo that works on any device, matching the Ledger aesthetic.
+
+**Design rationale:**
+- **Geometric HL monogram** in a 44 px rounded square badge (the primary mark). The letters are drawn as flat paths so they render identically on every device without font dependencies.
+- **Signal green dot** (`#14C295`) in the bottom-right corner of the badge — Ledger's signature accent, used as the "unfinished sentence" pop that makes the brand feel complete.
+- **Wordmark** pairs the "HL-Dentistry" text with a period-style green dot after the name (also Ledger-inspired).
+- All colors are drawn directly in the SVG using the Ledger palette (`#0A2E9E` navy, `#FFFFFF` white, `#14C295` signal), so there's no dependency on CSS variables. Works as a favicon, print icon, app launcher, email signature, anywhere.
+
+**Three SVG assets delivered** (all in the repo root):
+1. **`hl-logo-mark.svg`** — 48×48 icon mark. Rounded navy square + white HL monogram + green dot. Use for favicons, app icons, small brand touches.
+2. **`hl-logo-wordmark.svg`** — 220×40 horizontal wordmark. "HL-Dentistry" in Inter 700 navy + green signal dot. Use for headers, letterheads.
+3. **`hl-logo-lockup.svg`** — 300×60 full lockup. Mark + wordmark + "MOBILE ALTENZAHNHEILKUNDE" tagline. Use for stationery, login screens when space allows.
+
+**In-app integration:**
+- `hl-dentistry-v10.html:7` — added `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,...">` with the mark inline as a data URI. This sets the browser tab favicon to the new logo — no external file needed.
+- `hl-dentistry-v10.html:948` — replaced the old stylized tooth SVG in `ICO.tooth` with the new mark (same viewBox, drop-in replacement). Added two new icons: `ICO.logoMark` (same as tooth) and `ICO.logoWordmark` (horizontal text version).
+- `hl-dentistry-v10.html:1106,2698` — mobile + desktop login title now reads **"HL-Dentistry."** with the period in signal green (matches Ledger's branding).
+- `hl-dentistry-v10.html:2474` — desktop sidebar logo text gets the same green signal dot.
+
+**Usage guide:**
+- Use the **mark** alone for small spaces (favicon, app icon, social avatar, button overlays)
+- Use the **wordmark** when horizontal space allows and the mark is overkill (email signatures, memo headers)
+- Use the **lockup** for formal documents (letterheads, print reports, business cards)
+- All three SVGs are editable vector — scale without loss, recolor by changing the fill attributes
+
+---
+
 ### 2026-04-12 — Adopt Ledger palette + font (Inter Tight)
 
 **Why:** User provided `Ledger - Landing.html` as the reference for the app's font and color scheme. The Ledger design system uses a minimal 3-colour palette with Apple-style system font stack.

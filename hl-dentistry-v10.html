@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HL-Dentistry v10</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='2' y='2' width='44' height='44' rx='11' fill='%230A2E9E'/%3E%3Cpath d='M13 16v16h3.5v-6h6v6h3.5V16h-3.5v7h-6v-7H13zm17 0v16h9v-3h-5.5V16H30z' fill='%23FFF'/%3E%3Ccircle cx='37' cy='33' r='3' fill='%2314C295'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
@@ -945,7 +946,9 @@ var ICO={
   mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>',
   arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
-  tooth:'<svg viewBox="0 0 48 48" fill="white"><path d="M24 4c-4.5 0-8 1.5-10 3.5S10 12 10 15c0 3.5 1 6 2 9s2 6.5 2.5 10c.5 3.5 1.5 6 3 8s3 2.5 4.5 2c1.5-.5 2-2 2-4V36c0-1 .5-2 1-2h-2c.5 0 1 1 1 2v4c0 2 .5 3.5 2 4s3-.5 4.5-2 2.5-4.5 3-8c.5-3.5 1.5-7 2.5-10s2-5.5 2-9c0-3-1.5-5.5-4-7.5S28.5 4 24 4z"/></svg>',
+  tooth:'<svg viewBox="0 0 48 48" fill="none"><rect x="2" y="2" width="44" height="44" rx="11" fill="currentColor"/><path d="M13 16v16h3.5v-6h6v6h3.5V16h-3.5v7h-6v-7H13zm17 0v16h9v-3h-5.5V16H30z" fill="#fff"/><circle cx="37" cy="33" r="3" fill="#14C295"/></svg>',
+  logoMark:'<svg viewBox="0 0 48 48" fill="none"><rect x="2" y="2" width="44" height="44" rx="11" fill="currentColor"/><path d="M13 16v16h3.5v-6h6v6h3.5V16h-3.5v7h-6v-7H13zm17 0v16h9v-3h-5.5V16H30z" fill="#fff"/><circle cx="37" cy="33" r="3" fill="#14C295"/></svg>',
+  logoWordmark:'<svg viewBox="0 0 220 40" fill="none"><text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="22" letter-spacing="-0.5" fill="currentColor">HL-Dentistry</text><circle cx="198" cy="28" r="4" fill="#14C295"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -1101,7 +1104,7 @@ function renderLogin(){
   return '<div class="login-bg">'
     +'<div class="login-top">'
     +'<div class="login-logo">'+ICO.tooth+'</div>'
-    +'<div class="login-title">HL-Dentistry</div>'
+    +'<div class="login-title">HL-Dentistry<span style="color:var(--emerald)">.</span></div>'
     +'<div class="login-subtitle">Mobile Altenzahnheilkunde</div>'
     +'</div>'
     +'<div class="login-form">'
@@ -2469,7 +2472,7 @@ function renderDesktopSidebar(){
   var isVerwOpen=S.dkOpen.verwaltung;
 
   var h='<div class="dk-sidebar">'
-    +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry</div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
+    +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry<span style="color:var(--emerald)">.</span></div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
     +'<div class="dk-sidebar-nav">';
 
   /* Wochenplan */
@@ -2693,7 +2696,7 @@ function renderDesktopLogin(){
   var h='<div class="dk-login-card">'
     +'<div class="dk-login-header">'
       +'<div class="login-logo">'+ICO.tooth+'</div>'
-      +'<div class="login-title">HL-Dentistry</div>'
+      +'<div class="login-title">HL-Dentistry<span style="color:var(--emerald)">.</span></div>'
       +'<div class="login-subtitle">Mobile Altenzahnheilkunde</div>'
     +'</div>'
     +'<label>E-Mail</label>'
