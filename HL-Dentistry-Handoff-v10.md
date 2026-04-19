@@ -45,6 +45,161 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+**Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
+
+### 2026-04-19 — Meine Aufgaben > Offen: surface Behandeln follow-ups delegated to Verwaltung
+
+**Commit:** `69c3170` — *Show Verwaltung-delegated Behandeln follow-ups in Meine Aufgaben > Offen*
+
+**Why:** When a Behandler assigns a Weiterbehandlung to a Verwaltung user via the Behandeln popup, the delegated task needs to appear in that user's own queue so they can actually see it and schedule it. Before this change, the task was pushed to `TASKS` but had no way to show up under the Verwaltung user's "Meine Aufgaben" view — it would only appear in the Behandler-Aufgaben grouped list under whatever fallback doctor it landed on.
+
+**Data-model additions to follow-up tasks.** In `erledigtBehandlung()`, when the selected assignee has `role === 'verwaltung'`, the new TASK object now carries two extra fields:
+- `assignedToEmail` — the Verwaltung user's email (`c.weigert@mvz-arzt.de` in demo data); used as the query key for "is this task mine?"
+- `delegatedFromBh` — the `bId` of the Behandler who triggered the delegation (read from `S.user.bId`); used to render the "← Dr. Feld" origin label on the card
+
+The task's `bh` field still holds a Behandler id (falls back to the original task's doctor if the assignee has no `bId`) so the TASKS list doesn't break anywhere that expects a doctor to exist — Verwaltung assignment is layered on top, not a replacement.
+
+**Rendering in `renderMeineAufgaben()` > `mt==='offen'`:**
+
+New section inserted before the existing `OFFEN_PAT` cards:
+
+```js
+var myEmail = S.user ? S.user.email : '';
+var delegated = TASKS.filter(t =>
+  t.assignedToEmail === myEmail && t.status === 'offen'
+);
+```
+
+For each delegated task:
+- `.mini-card` with a **violet left border** (3 px, `var(--violet)`) to distinguish from OFFEN_PAT's plain white cards
+- Body: patient name + pin-icon heim subline + a meta row containing
+  - violet-tinted badge with the treatment name (`var(--violet-bg)` / `var(--violet)`)
+  - scheduled date in `var(--text-3)`
+  - origin label: `"← Dr. Feld"` (using `bhdlName(task.delegatedFromBh)`)
+- Right column: amber "Offen" status badge + **"Zuweisen →"** action button
+
+Section header: uppercase 11 px "Von Behandler zugewiesen". When both the delegated list and `OFFEN_PAT` have entries, a second subhead ("Offene Patienten") is rendered between them.
+
+**Empty-state handling:** `Keine offenen Patienten` is only shown when both `delegated.length === 0` and `OFFEN_PAT.length === 0` — so a Verwaltung user with no incoming delegations but no hardcoded open patients still gets a clean empty state, while users with only delegations don't see the empty string pop underneath.
+
+**Zuweisen action — new `openReassignTask(taskId)` function:**
+
+Adds a `'delegated'` source type to the existing reassign flow:
+
+```js
+function openReassignTask(taskId) {
+  var t = TASKS.find(x => x.id === taskId);
+  if (!t) return;
+  S._reassignTaskId = taskId;
+  S.reassignIdx_2 = -1;              // sentinel — not indexing into any array
+  S.reassignSrc_2 = 'delegated';
+  // Convert display date (e.g. "24.04.") back to ISO yyyy-mm-dd for the date input
+  var iso = '';
+  var m = t.date && t.date.match(/^(\d{1,2})\.(\d{1,2})\.?/);
+  if (m) {
+    var yr = TODAY.getFullYear();
+    iso = yr + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[1]).padStart(2,'0');
+  }
+  S.reassignForm_2 = { bh: '', date: iso, behandlung: t.behandlung || '' };
+  S.reassignErr_2 = '';
+  render();
+}
+```
+
+**`renderReassign()` extension:** the patient lookup (line `~3922`) gains a `'delegated'` branch that pulls the task straight from `TASKS` via the stored `_reassignTaskId`. The modal title resolves to "Behandler zuweisen" for this source.
+
+**`saveReassign()` extension:** a new branch at the top handles `src2 === 'delegated'`:
+- Finds the task by `_reassignTaskId`
+- Updates `task.bh` to the selected real Behandler id
+- Rewrites `task.date` from ISO back to `"dd.mm."` display format
+- Re-evaluates `task.week` (`'next'` if date ≥ TODAY + 7 days else `'current'`)
+- **Deletes** `assignedToEmail` and `delegatedFromBh` so the task moves out of the Verwaltung queue into the regular Behandler-Aufgaben list
+- Fires toast: `"Aufgabe zugewiesen an <bhdlName>"`
+
+**`closeReassign()`:** also clears `_reassignTaskId` (harmless for other sources).
+
+**End-to-end demo flow after this change:**
+1. Log in as "Dr. Feld" → Klinik Heute → click "Behandeln" on any task.
+2. Fill Weiterbehandlung (e.g. "UPT-Sitzung"), pick a future date, leave Behandler on the default "C. Weigert — Verwaltung".
+3. Click "Erledigt" → toast confirms, task disappears from Feld's list.
+4. Log out, log in as "C. Weigert" → Verwaltung → Behandler-Aufgaben → Meine Aufgaben → Offen.
+5. The new task shows at the top under "Von Behandler zugewiesen" with the violet border + "← Dr. Feld" origin label.
+6. Click "Zuweisen →" → reassign modal opens pre-filled with the treatment + date → pick a real Behandler → Save.
+7. Task now appears in that Behandler's grouped list at the bottom of Behandler-Aufgaben (tab "Behandler Aufgaben"), no longer in C. Weigert's Meine Aufgaben > Offen.
+
+---
+
+### 2026-04-19 — Behandeln popup: drop generic "Verwaltung" account from Behandler dropdown
+
+**Commit:** `77e1c13` — *Behandeln popup: drop generic 'Verwaltung' account from Behandler dropdown*
+
+**Why:** The seed `USERS` array contains two verwaltung-role entries — a generic `"Verwaltung"` account (`verwaltung@swissmedai.com`, intended as a role placeholder) and a named `"C. Weigert"` account (`c.weigert@mvz-arzt.de`). Showing both in the Weiterbehandlung assignee dropdown was confusing ("Verwaltung — Verwaltung" reads as redundant) and made the default assignee a shared mailbox rather than a real person.
+
+**Two one-line filters:**
+
+*In `openBehandelnModal()`:*
+```js
+// was: USERS.find(u => u.role === 'verwaltung');
+var defVerw = USERS.find(u => u.role === 'verwaltung' && u.name !== 'Verwaltung');
+```
+
+*In `renderBehandelnModal()`, the assignee list build:*
+```js
+// was: USERS.filter(u => u.role === 'behandler' || u.role === 'verwaltung');
+var assigneeUsers = USERS.filter(u =>
+  (u.role === 'behandler' || u.role === 'verwaltung') && u.name !== 'Verwaltung'
+);
+```
+
+**Resulting dropdown (with demo data):**
+- Dr. Feld — Behandler
+- Dr. Hess — Behandler
+- **C. Weigert — Verwaltung** ← default
+
+The generic `verwaltung@swissmedai.com` is still a valid login (the account itself isn't deleted), it's just excluded from this one picker.
+
+---
+
+### 2026-04-19 — Behandeln popup: restructure buttons + date field + Erledigt
+
+**Commit:** `362072b` — *Behandeln popup: restructure buttons + add date field + Erledigt*
+
+**Why:** The previous single-button layout tangled two different decisions — "has the KI finished transcribing?" and "is the whole treatment done?" — into one control. The user wanted them split: the "Behandlung abschließen" button goes back inside the KI-Diktat card as its own confirmation, a date field joins the Weiterbehandlung section, and a dedicated green "Erledigt" button sits at the bottom of the modal as the final commit.
+
+**Three layout changes:**
+
+1. **"Behandlung abschließen" moved back inside the KI-Diktat card.** Sits directly below the transcription textarea (12 px gap). Scoped to the card so its role is visually obvious: it's about the KI dictation, nothing else.
+   - Pre-click state: blue gradient button, label "Behandlung abschließen".
+   - Post-click state: emerald-tinted pill with checkmark ("Transkription gespeichert"), `cursor: default`, no onclick — one-shot reveal.
+
+2. **"Datum" date field added between Behandlung and Behandler** in the Weiterbehandlung section. `<input type="date">` with id `bhWeiterDate`, bound to `S.behandelnForm.weiterDate`. Default populated in `openBehandelnModal` as today + 7 days in ISO format (`yyyy-mm-dd`).
+
+3. **"Erledigt" green button at the bottom of the modal.** Uses `.save-btn` with inline emerald background override (`background: var(--emerald)` + matching shadow), checkmark icon, full-width. Calls a new `erledigtBehandlung()` function.
+
+**State-shape change in `openBehandelnModal`:** `S.behandelnForm` gains `weiterDate` (ISO string) in addition to the existing fields. Default computed as:
+```js
+var nextWeek = new Date(TODAY.getTime() + 7 * D);
+var iso = nextWeek.getFullYear() + '-'
+        + String(nextWeek.getMonth() + 1).padStart(2, '0') + '-'
+        + String(nextWeek.getDate()).padStart(2, '0');
+```
+
+**`saveBehandelnModal()` simplified to one-shot reveal.** No longer handles commit. Now just:
+- If `transcribed === true`, return early (idempotent).
+- Otherwise snapshot any currently-typed manual note / Weiterbehandlung values from the DOM (so the re-render doesn't wipe them), fill `notes` with `mockDictText(m)`, flip `transcribed = true`, `render()`.
+
+**New `erledigtBehandlung()` function** takes over the commit responsibilities from the old single button:
+
+1. Reads all four text/select inputs from the DOM (`bhDictText`, `bhManualText`, `bhWeiterBeh`, `bhWeiterDate`, `bhWeiterBhId`).
+2. Combines dict + manual into one visit entry and `unshift`s it onto `p.visits` as `{voice: true}` — so the transcription + manual description appear at the top of the patient file's Historie tab (Behandlungsverlauf).
+3. Flags `S.doneTaskIds[m.key] = true` → the current task card's checkbox fills in and it drops out of the "Offen" filter in Klinik Heute.
+4. If Weiterbehandlung is selected, pushes a new TASK with `bh: assigneeBhId`, `date: <picked date>` (converted from ISO to `dd.mm.` display), `status: 'offen'`, and `week: 'next'` / `'current'` based on how far out the date is. The `assignedToEmail` / `delegatedFromBh` tagging (added in the commit described above) happens here.
+5. Closes the modal + fires summary toast: `"<patient>: Erledigt · <treatment>: <date> (<assignee>)"`.
+
+**Behavioural invariant:** the KI-Diktat transcription and manual description are written to the patient's `p.visits` even if no Weiterbehandlung is chosen — the treatment documentation is independent of whether a follow-up gets scheduled.
+
+---
+
 ### 2026-04-19 — Behandeln popup: manual note + Weiterbehandlung (follow-up) scheduler
 
 **Why:** After the KI transcription, the behandler often needs to (a) add a short manual clarification that isn't worth dictating, and (b) schedule a follow-up ("Weiterbehandlung") — pick the next treatment type and the person responsible for it. The Verwaltung role is the default assignee because they coordinate the scheduling downstream.
