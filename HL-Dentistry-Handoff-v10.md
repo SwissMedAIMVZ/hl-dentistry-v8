@@ -45,6 +45,37 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 
 Each change gets its own entry. Newest on top.
 
+### 2026-04-12 — Adopt Ledger palette + font (Inter Tight)
+
+**Why:** User provided `Ledger - Landing.html` as the reference for the app's font and color scheme. The Ledger design system uses a minimal 3-colour palette with Apple-style system font stack.
+
+**Ledger design tokens applied:**
+
+| Token | Ledger value | Mapped to |
+|---|---|---|
+| `--ink` | `#0A2E9E` | `--navy` (was `#082A99` — nearly identical, slight shift) |
+| `--ink-deep` | `#061F6E` | not directly mapped (kept for reference) |
+| `--signal` | `#14C295` | `--emerald` (was `#0D9276` — brighter, more vivid green) |
+| `--black` | `#1D1D1F` | `--text` (was `#0F172A` — warmer, Apple-style near-black) |
+| `--gray` | `#6E6E73` | `--text-3` (was `#64748B` — Apple system gray) |
+| `--light-gray` | `#86868B` | `--text-4` (was `#94A3B8` — darker than before) |
+| `--hairline` | `#D2D2D7` | `--border` (was `#E2E8F0` — slightly more visible) |
+| `--surface` | `#F5F5F7` | `--surface` (was `#F8FAFC` — Apple-style off-white) |
+| `--white` | `#FFFFFF` | `--white` (unchanged) |
+| `--font` | `-apple-system, "SF Pro Display", "Inter Tight"` | `'Inter Tight', -apple-system, ...` (Inter Tight loaded via Google Fonts) |
+
+**What changed:**
+- `hl-dentistry-v10.html:7` — Google Fonts link switched from `DM Sans` to `Inter Tight` (300–800 weights).
+- `hl-dentistry-v10.html:13` — `:root` CSS variables updated: brand blues shifted from `#082A99` to `#0A2E9E`, emerald from `#0D9276` to `#14C295`, all neutral grays replaced with Ledger's Apple-style values, shadows adjusted from slate `rgba(15,23,42,...)` to near-black `rgba(29,29,31,...)`.
+- `hl-dentistry-v10.html:69` — `body` font-family updated to `'Inter Tight', -apple-system, 'SF Pro Display', system-ui, sans-serif`. Added `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, and `font-feature-settings: 'ss01','cv11'` (matching Ledger's rendering).
+- `--text-2` adjusted from `#334155` → `#3A3A3C` to sit between `--text` (#1D1D1F) and `--text-3` (#6E6E73) in the new gray scale.
+- `--surface-2` adjusted from `#F1F5F9` → `#EEEEEF` for better contrast against `--surface` (#F5F5F7).
+- `--border-2` adjusted from `#CBD5E1` → `#C7C7CC` to match the Ledger hairline family.
+
+**Visual impact:** the entire app (mobile + desktop) now uses a warmer, Apple-inspired neutral palette with Inter Tight as the primary typeface. Headers, cards, buttons, badges, the odontogram, the email inbox, and the desktop sidebar all pick up the new colours automatically since they reference CSS variables. No component-level changes were needed.
+
+---
+
 ### 2026-04-12 — Nachrichten tab added to Management (mobile + desktop)
 
 **Why:** User wants the email/messages UI accessible from the Management section too, not just from the bottom-nav/sidebar "Nachrichten" item.

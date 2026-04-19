@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HL-Dentistry v10</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   DESIGN SYSTEM — HL-Dentistry v5
-   Font: DM Sans | Primary: #082A99 | Swiss Medical Precision
+   DESIGN SYSTEM — HL-Dentistry v10 (Ledger palette)
+   Font: Inter Tight | Primary: #0A2E9E | Swiss Medical Precision
    ============================================================ */
 :root{
-  /* Brand */
-  --navy:       #082A99;
-  --navy-light: #0E3ABF;
-  --blue:       #3D66FE;
-  --blue-light: #638DFF;
+  /* Brand — aligned with Ledger palette */
+  --navy:       #0A2E9E;
+  --navy-light: #0B3BC0;
+  --blue:       #2D5BF5;
+  --blue-light: #5A82FF;
   --blue-50:    #EBF0FF;
   --blue-25:    #F5F7FF;
   /* Semantic */
-  --emerald:    #0D9276;
+  --emerald:    #14C295;
   --emerald-bg: #ECFDF5;
   --amber:      #D97706;
   --amber-bg:   #FFFBEB;
@@ -27,15 +27,15 @@
   --crimson-bg: #FEF2F2;
   --violet:     #6C47FF;
   --violet-bg:  #F3F0FF;
-  /* Neutral */
-  --text:       #0F172A;
-  --text-2:     #334155;
-  --text-3:     #64748B;
-  --text-4:     #94A3B8;
-  --border:     #E2E8F0;
-  --border-2:   #CBD5E1;
-  --surface:    #F8FAFC;
-  --surface-2:  #F1F5F9;
+  /* Neutral — aligned with Ledger grays */
+  --text:       #1D1D1F;
+  --text-2:     #3A3A3C;
+  --text-3:     #6E6E73;
+  --text-4:     #86868B;
+  --border:     #D2D2D7;
+  --border-2:   #C7C7CC;
+  --surface:    #F5F5F7;
+  --surface-2:  #EEEEEF;
   --white:      #FFFFFF;
   /* Tooth States */
   --t-healthy:  #0D9276;
@@ -52,13 +52,13 @@
   --t-halte:    #E11D48;
   --t-retiniert:#475569;
   --t-fehlt:    #E2E8F0;
-  /* Shadows */
-  --sh-sm: 0 1px 2px rgba(15,23,42,0.05);
-  --sh-md: 0 4px 12px rgba(15,23,42,0.08);
-  --sh-lg: 0 8px 30px rgba(15,23,42,0.12);
-  --sh-xl: 0 20px 60px rgba(15,23,42,0.15);
-  --sh-blue: 0 4px 20px rgba(8,42,153,0.25);
-  --sh-card: 0 1px 3px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.06);
+  /* Shadows — tuned for Ledger neutrals */
+  --sh-sm: 0 1px 2px rgba(29,29,31,0.05);
+  --sh-md: 0 4px 12px rgba(29,29,31,0.08);
+  --sh-lg: 0 8px 30px rgba(29,29,31,0.12);
+  --sh-xl: 0 20px 60px rgba(29,29,31,0.15);
+  --sh-blue: 0 4px 20px rgba(10,46,158,0.25);
+  --sh-card: 0 1px 3px rgba(29,29,31,0.04), 0 4px 12px rgba(29,29,31,0.06);
   /* Radii */
   --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 9999px;
   /* Transitions */
@@ -66,7 +66,7 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:#E8ECF4;display:flex;justify-content:center;align-items:start;min-height:100vh;padding:20px;color:var(--text)}
+body{font-family:'Inter Tight',-apple-system,'SF Pro Display',system-ui,sans-serif;background:#E8ECF4;display:flex;justify-content:center;align-items:start;min-height:100vh;padding:20px;color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:'ss01','cv11'}
 
 /* ===== PHONE CONTAINER ===== */
 .phone{width:393px;height:852px;background:var(--surface);border-radius:28px;box-shadow:var(--sh-xl),0 0 0 1px rgba(0,0,0,0.05);overflow:hidden;display:flex;flex-direction:column;position:relative}
