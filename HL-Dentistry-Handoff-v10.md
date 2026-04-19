@@ -47,6 +47,34 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patient file → Aktive Behandlungen: use shared `taskCard` renderer, drop custom overline
+
+**Why:** The first iteration rendered open tasks as bespoke mini-cards with a "Offene Behandler-Aufgaben" overline. User wanted them to look exactly like the tasks in Verwaltung > Behandler-Aufgaben > Wochenplanung — same visual language, same click target, no separate section header.
+
+**Change:** In `renderPat()`, the Historie tab's per-task rendering is reduced to a direct call into the shared `taskCard(t)` function (defined at `~3371`):
+```js
+patTasks.forEach(function(t){ h += taskCard(t); });
+```
+
+Dropped:
+- The `"OFFENE BEHANDLER-AUFGABEN"` uppercase overline.
+- The custom mini-card markup (border-colored left edge, treatment + meta row, amber "Offen" pill).
+- The assignee-resolution logic with "(Verwaltung)" suffix and `← Dr. Feld` origin label — `taskCard` doesn't show those fields and that's intentional now.
+
+**What `taskCard` renders** (for reference — this is what shows up in the patient file now):
+- `.task-card` with status-class left-border (amber `tc-o` for Offen, emerald `tc-e` for Erledigt).
+- Patient name (big, first line).
+- Date (second line, right-aligned in the original layout).
+- Pin-icon + heim on its own row.
+- Treatment badge (`tb-beh`) + status badge (Offen/Erledigt clock/check) on a bottom row.
+- `onclick="goPatFromAdmin(patId)"` when the patient exists — self-navigation on the patient page is a no-op.
+
+**Empty-state logic unchanged:** still only shows "Keine aktiven Behandlungen" when both `p.tx` is empty AND no open tasks reference the patient. Bottom 10 px spacer retained to keep the rhythm before "Behandlungsverlauf".
+
+**Visual consistency payoff:** the tasks look identical whether a user sees them in the Verwaltung weekly plan or on a patient detail page — same component, same layout, same click affordance. No more "why is this card styled differently?" cognitive load.
+
+---
+
 ### 2026-04-19 — Patient file → Aktive Behandlungen: list connected open Behandler-Aufgaben
 
 **Why:** The patient file's "Aktive Behandlungen" section on the Historie tab previously only showed the treatment-code badges from `p.tx` (shorthand codes like CO, ZE, PA). When the user schedules follow-up tasks via the Behandeln popup — or when tasks exist in `TASKS` that reference this patient by name — there was no visibility of them on the patient file itself. The patient page is where a behandler looks when prepping for a visit; they need to see what's already on the schedule for this person.
