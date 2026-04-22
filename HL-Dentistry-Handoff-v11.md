@@ -62,6 +62,33 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: replace Pflegeheim dropdown with type-ahead search bar
+
+**Why:** A dropdown doesn't scale — when the practice serves dozens of Heime, scrolling through a `<select>` is slow. A type-ahead search bar with autocomplete suggestions lets the user find a Heim by typing any part of the name.
+
+**Replaced:** the `<select class="form-select">` dropdown with an `<input type="search">` bar.
+
+**Search bar UI:**
+- Magnifying-glass icon (positioned absolute, left 12px inside the input)
+- Input: `type="search"`, 13px, `var(--surface)` background, placeholder "Pflegeheim suchen…"
+- Border highlights to `var(--blue)` when there are matching results
+- Bound to `S.gvHeimSearch` via `oninput`
+
+**Autocomplete dropdown:** appears below the search bar when the user types and there are matches (`HEIME.filter(name.indexOf(query) !== -1)`). Each suggestion shows:
+- Heim name (bold) + address + patient count
+- Hover effect (`var(--blue-25)`)
+- `onclick` sets `S.gvHeimFilter` to the Heim ID and `S.gvHeimSearch` to the full name, then re-renders → suggestions close, patient list appears
+
+**"Kein Pflegeheim gefunden"** message when the query matches zero Heime.
+
+**"× Zurücksetzen" link** next to the selected Heim name — clears both `gvHeimSearch` and `gvHeimFilter`, returning to the empty search state.
+
+**State:** `S.gvHeimSearch` (string, the typed query) + `S.gvHeimFilter` (string, selected Heim ID or empty). Patient list only shows when `gvHeimFilter` is set (i.e. user clicked a suggestion). Typing alone shows suggestions but not the patient list.
+
+**Patient list rendering:** unchanged from previous commit (cards with name, room, age, insurance, ZE/PA/tx badges, responsive `.gv-grid`).
+
+---
+
 ### 2026-04-19 — Großvisiten: patient search by Pflegeheim
 
 **Why:** When planning a Großvisite, the Verwaltung needs to see which patients belong to a specific nursing home — their names, rooms, insurance, and active cases (ZE pipeline state, PA step, open treatment codes). A dropdown filter lets them pick a Heim and instantly see the full patient roster.
