@@ -62,6 +62,30 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: patient search by Pflegeheim
+
+**Why:** When planning a Großvisite, the Verwaltung needs to see which patients belong to a specific nursing home — their names, rooms, insurance, and active cases (ZE pipeline state, PA step, open treatment codes). A dropdown filter lets them pick a Heim and instantly see the full patient roster.
+
+**New UI section** in `renderGrossvisiten()`, inserted between the action bar and the "Geplante Großvisiten" card list:
+
+- **Section header**: uppercase "PATIENTEN NACH PFLEGEHEIM"
+- **Pflegeheim dropdown** (`.form-select`): lists all `HEIME` entries with patient count per Heim in parentheses (e.g. "Alexa Lichtenrade (3 Pat.)"). Bound to `S.gvHeimFilter`. Default: "Pflegeheim wählen…" (empty = no filter, no patient list shown).
+- **Patient list** (shown when a Heim is selected):
+  - Header line: pin icon + Heim name + "— N Patienten" count.
+  - Cards in `.gv-grid` (responsive 2-column on desktop, stacked on mobile).
+  - Each card shows:
+    - Patient name (`.card-title`, clickable → `goPatFromAdmin(p.id)` to open patient file)
+    - Sub-line: room ("Zi. 203"), age ("78 J."), insurance ("TK")
+    - Badge row: ZE state badge (blue-50), PA step badge (violet-bg), active tx codes (amber-bg) — only rendered if the patient has those cases
+    - Chevron arrow on the right
+  - Empty state: "Keine Patienten in dieser Einrichtung"
+
+**State:** `S.gvHeimFilter` (string, Heim ID or empty). Persists across renders; cleared when leaving Verwaltung.
+
+**Data query:** `PATIENTS.filter(p => p.heim === parseInt(selHeim, 10))` — uses the existing `heim` integer FK on each PATIENT that maps to `HEIME[].id`.
+
+---
+
 ### 2026-04-19 — Großvisiten: responsive layout for desktop + mobile
 
 **Why:** The initial Großvisiten page was a mobile-only placeholder. Needed stats overview, Behandler assignments per visit, action buttons, and a 2-column card grid on desktop while stacking cleanly on mobile.

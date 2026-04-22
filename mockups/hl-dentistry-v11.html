@@ -5281,6 +5281,49 @@ function renderGrossvisiten(){
     +'<button style="flex:1;min-width:180px;padding:12px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="alert(\'Neue Großvisite planen — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neue Großvisite</button>'
     +'<button style="flex:1;min-width:120px;padding:12px 16px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px" onclick="alert(\'Export — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportieren</button>'
   +'</div>';
+  /* Patienten-Suche nach Pflegeheim */
+  var selHeim=S.gvHeimFilter||'';
+  h+='<div style="margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Patienten nach Pflegeheim</div>'
+    +'<select class="form-select" style="margin-bottom:10px" onchange="S.gvHeimFilter=this.value;render()">'
+      +'<option value="">Pflegeheim wählen…</option>';
+  HEIME.forEach(function(hm){
+    var patCount=PATIENTS.filter(function(p){return p.heim===hm.id}).length;
+    h+='<option value="'+hm.id+'"'+(selHeim==String(hm.id)?' selected':'')+'>'+hm.name+' ('+patCount+' Pat.)</option>';
+  });
+  h+='</select>';
+  if(selHeim){
+    var heimId=parseInt(selHeim,10);
+    var heimPats=PATIENTS.filter(function(p){return p.heim===heimId});
+    var heimObj=HEIME.find(function(x){return x.id===heimId});
+    h+='<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px">'
+      +ICO.pin+' '+(heimObj?heimObj.name:'')
+      +'<span style="font-weight:500;color:var(--text-3);font-size:11px">— '+heimPats.length+' Patienten</span>'
+    +'</div>';
+    if(heimPats.length===0){
+      h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Keine Patienten in dieser Einrichtung</div>';
+    } else {
+      h+='<div class="gv-grid">';
+      heimPats.forEach(function(p){
+        var badges='';
+        if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
+        if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
+        if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
+        h+='<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
+            +'<div style="flex:1;min-width:0">'
+              +'<div class="card-title">'+p.name+'</div>'
+              +'<div class="card-sub" style="margin-top:2px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
+              +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+badges+'</div>':'')
+            +'</div>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;color:var(--text-4);margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>'
+          +'</div>'
+        +'</div>';
+      });
+      h+='</div>';
+    }
+  }
+  h+='</div>';
   /* Cards — grid on desktop, stacked on mobile */
   h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px">Geplante Großvisiten</div>';
   h+='<div class="gv-grid">';
