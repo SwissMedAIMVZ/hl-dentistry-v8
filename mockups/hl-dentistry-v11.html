@@ -5313,10 +5313,20 @@ function renderGrossvisiten(){
   if(selHeim){
     var heimId=parseInt(selHeim,10);
     var heimPats=PATIENTS.filter(function(p){return p.heim===heimId});
-    h+='<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px">'
-      +ICO.pin+' '+(selHeimObj?selHeimObj.name:'')
-      +'<span style="font-weight:500;color:var(--text-3);font-size:11px">— '+heimPats.length+' Patienten</span>'
-      +'<span style="font-size:10px;color:var(--blue);cursor:pointer;margin-left:auto;font-weight:600" onclick="S.gvHeimFilter=\'\';S.gvHeimSearch=\'\';render()">× Zurücksetzen</span>'
+    /* Document-style title: yyyymmdd_Großvisite_HeimName */
+    var now=new Date();
+    var ymd=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
+    var heimSlug=(selHeimObj?selHeimObj.name:'').replace(/[^A-Za-z0-9äöüÄÖÜß]/g,'_').replace(/_+/g,'_').replace(/_$/,'');
+    var listTitle=ymd+'_Großvisite_'+heimSlug;
+    h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+      +'<div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;letter-spacing:-0.2px">'+listTitle+'</div>'
+        +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+heimPats.length+' Patienten</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;align-items:center">'
+        +'<button style="padding:6px 12px;background:var(--white);color:var(--navy);border:1px solid var(--border);border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px" onclick="printGvList(\''+listTitle.replace(/'/g,"\\'")+'\','+heimId+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>PDF</button>'
+        +'<span style="font-size:10px;color:var(--blue);cursor:pointer;font-weight:600" onclick="S.gvHeimFilter=\'\';S.gvHeimSearch=\'\';render()">× Zurücksetzen</span>'
+      +'</div>'
     +'</div>';
     if(heimPats.length===0){
       h+='<div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Keine Patienten in dieser Einrichtung</div>';
@@ -5364,6 +5374,48 @@ function renderGrossvisiten(){
   h+='</div>';
   h+=renderAdminBottomNav_2('grossvisiten');
   return h;
+}
+
+function printGvList(title,heimId){
+  var pats=PATIENTS.filter(function(p){return p.heim===heimId}).sort(function(a,b){return a.name.localeCompare(b.name,'de')});
+  var heimObj=HEIME.find(function(x){return x.id===heimId});
+  var now=new Date();
+  var dateStr=now.getDate()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+now.getFullYear();
+  var rows='';
+  pats.forEach(function(p,i){
+    var status=[];
+    if(p.ze)status.push('ZE: '+ZE_STATES[p.ze.st]);
+    if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)status.push('PA: '+ps.label);}
+    if(p.tx.length>0)p.tx.forEach(function(t){status.push(t.toUpperCase());});
+    rows+='<tr>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt">'+(i+1)+'</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt;font-weight:600">'+p.name+'</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt">Zi. '+p.room+'</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt">'+p.age+' J.</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt">'+p.ins+'</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:9pt">'+(status.join(', ')||'—')+'</td>'
+      +'<td style="padding:6px 8px;border:1px solid #D2D2D7;font-size:10pt;min-width:100px"></td>'
+    +'</tr>';
+  });
+  var body='<div style="width:21cm;margin:0 auto;padding:2cm 2.5cm;font-family:Arial,Helvetica,sans-serif">'
+    +EINV_LETTERHEAD_HTML
+    +'<h1 style="font-size:14pt;margin-bottom:4px;color:#0A2E9E">'+title+'</h1>'
+    +'<p style="font-size:10pt;color:#6E6E73;margin-bottom:16px">'+(heimObj?heimObj.name+' · '+heimObj.addr:'')+' · Datum: '+dateStr+'</p>'
+    +'<table style="width:100%;border-collapse:collapse">'
+      +'<thead><tr>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">#</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Patient</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Zimmer</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Alter</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Kasse</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Status</th>'
+        +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">Notizen</th>'
+      +'</tr></thead>'
+      +'<tbody>'+rows+'</tbody>'
+    +'</table>'
+    +'<p style="font-size:9pt;color:#86868B;margin-top:16px">'+pats.length+' Patienten · Erstellt am '+dateStr+' · SwissMedAI MVZ</p>'
+  +'</div>';
+  _openPrintWindow(title,body);
 }
 
 function renderPflegeheime(){

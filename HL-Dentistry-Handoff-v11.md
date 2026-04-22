@@ -62,6 +62,29 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: document-style list title + PDF export
+
+**Why:** When preparing a Großvisite, the Verwaltung needs a printable patient list with a structured file name they can reference later. The naming convention `yyyymmdd_Großvisite_HeimName` lets them file and retrieve visit documentation chronologically.
+
+**Title bar:** Replaces the simple "pin + Heim name" header with a document-style card (`var(--surface)` background, border) showing:
+- **List title**: `yyyymmdd_Großvisite_HeimName` (e.g. `20260419_Großvisite_Alexa_Lichtenrade`) — date from `new Date()`, heim name sanitized (non-alphanumeric → `_`, collapsed, trailing stripped).
+- **Patient count** below the title.
+- **PDF button** (printer icon) → calls `printGvList(title, heimId)`.
+- **× Zurücksetzen** link to clear the search.
+
+**New `printGvList(title, heimId)` function:**
+- Queries `PATIENTS.filter(p => p.heim === heimId)`, sorted alphabetically by name.
+- Builds a print-ready A4 HTML page (21cm width, 2cm/2.5cm padding):
+  - SwissMedAI letterhead (`EINV_LETTERHEAD_HTML` — same block used in Einverständnis PDFs).
+  - Title as `<h1>` in navy.
+  - Subtitle: Heim name + address + date.
+  - Table with columns: #, Patient, Zimmer, Alter, Kasse, Status, Notizen (empty column for handwritten notes during the visit).
+  - Status column aggregates: ZE pipeline state, PA step label, active tx codes.
+  - Footer: patient count + generation date + "SwissMedAI MVZ".
+- Opens via `_openPrintWindow(title, body)` → browser print dialog → PDF.
+
+---
+
 ### 2026-04-19 — Großvisiten: add to mobile burger menu
 
 **Why:** On mobile, Großvisiten was only reachable by navigating to Verwaltung first. Adding it as a direct entry in the burger menu (`renderMenu_2`) gives one-tap access from any screen.
