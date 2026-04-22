@@ -2698,7 +2698,7 @@ function renderDesktopSidebar(){
   var isVerwActive=S.dkPage==='verwaltung';
   h+='<button class="dk-nav-item '+(isVerwActive?'active':'')+'" onclick="toggleDkGroup(\'verwaltung\')" style="padding-right:10px">'+gridIcon+'<span>Verwaltung</span>'+(isVerwOpen?chevUp:chevDown)+'</button>';
   if(isVerwOpen){
-    [{pg:'uebersicht',l:'\u00dcbersicht'},{pg:'einverstaendnis',l:'Einverst\u00e4ndnis'},{pg:'archiv',l:'Archiv'},{pg:'abrechnung',l:'Abrechnung'},{pg:'pflegeheime',l:'Pflegeheime'}].forEach(function(it){
+    [{pg:'uebersicht',l:'\u00dcbersicht'},{pg:'einverstaendnis',l:'Einverst\u00e4ndnis'},{pg:'archiv',l:'Archiv'},{pg:'abrechnung',l:'Abrechnung'},{pg:'pflegeheime',l:'Pflegeheime'},{pg:'grossvisiten',l:'Großvisiten'}].forEach(function(it){
       var active=(isVerwActive&&S.adminPage_2===it.pg)?'active':'';
       h+='<button class="dk-nav-item '+active+'" style="padding-left:44px;font-size:12px" onclick="goDesktopVerwSub(\''+it.pg+'\')"><span>'+it.l+'</span></button>';
     });
@@ -2795,7 +2795,7 @@ function dkDefaultPage(){
   return'manager';
 }
 var DK_TITLES={manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
-var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime'};
+var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten'};
 function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode=true;render()}
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
 function goDesktopMgrTab(t){S.dkPage='manager';S.adminMode=false;S.screen='manager';S.mgrTab=t;render()}
@@ -2812,6 +2812,7 @@ function renderDesktopVerwaltungBody(){
   else if(pg==='zepreisliste') h+=renderZEPreisliste();
   else if(pg==='texteditor') h+=renderTexteditor();
   else if(pg==='pflegeheime') h+=renderPflegeheime();
+  else if(pg==='grossvisiten') h+=renderGrossvisiten();
   h+='</div>';
   return h;
 }
@@ -5249,6 +5250,46 @@ function saveHeimEdit(){
   S.heimEdit_2=null;render();
 }
 function deleteHeimEdit(){PFLEGEHEIME.splice(S.heimEdit_2,1);S.heimEdit_2=null;render();}
+/* ===== GROßVISITEN ===== */
+function renderGrossvisiten(){
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Großvisiten</h1><div class="sub">Planung &amp; Dokumentation</div></div>'
+    +MENU_BTN_2
+  +'</div></div>';
+  h+='<div class="content" style="padding:16px">';
+  h+='<div style="text-align:center;padding:40px 20px">'
+    +'<div style="width:56px;height:56px;background:var(--blue-50);border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg></div>'
+    +'<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">Großvisiten</div>'
+    +'<div style="font-size:12px;color:var(--text-3);line-height:1.6;max-width:280px;margin:0 auto">Planen und dokumentieren Sie regelmäßige Großvisiten in Pflegeeinrichtungen. Termine, Teilnehmer und Protokolle an einem Ort.</div>'
+  +'</div>';
+  /* Placeholder list of upcoming Großvisiten */
+  var gvItems=[
+    {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,status:'geplant'},
+    {heim:'Senterra Alloheim',date:'02.05.',patients:8,status:'geplant'},
+    {heim:'Vitanas Märkisches V.',date:'09.05.',patients:15,status:'geplant'},
+    {heim:'Haus am Weigandufer',date:'16.05.',patients:10,status:'geplant'}
+  ];
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:4px 0 10px">Geplante Großvisiten</div>';
+  gvItems.forEach(function(gv){
+    h+='<div class="card" style="margin-bottom:8px;cursor:pointer">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'
+        +'<div>'
+          +'<div class="card-title">'+gv.heim+'</div>'
+          +'<div class="card-sub" style="margin-top:3px;display:flex;align-items:center;gap:8px">'
+            +'<span style="display:inline-flex;align-items:center;gap:3px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'+gv.date+'</span>'
+            +'<span>'+gv.patients+' Patienten</span>'
+          +'</div>'
+        +'</div>'
+        +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full)">Geplant</span>'
+      +'</div>'
+    +'</div>';
+  });
+  h+='<button style="width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="alert(\'Neue Großvisite planen — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neue Großvisite planen</button>';
+  h+='</div>';
+  h+=renderAdminBottomNav_2('grossvisiten');
+  return h;
+}
+
 function renderPflegeheime(){
   var sorted=PFLEGEHEIME.map(function(ph,i){return{ph:ph,i:i};}).sort(function(a,b){return a.ph.name.localeCompare(b.ph.name,'de');});
   var h='<div class="header"><div class="header-inner">'
@@ -5312,6 +5353,7 @@ function renderAdminPortal_2(){
   else if(page==='zepreisliste') html=renderZEPreisliste();
   else if(page==='texteditor') html=renderTexteditor();
   else if(page==='pflegeheime') html=renderPflegeheime();
+  else if(page==='grossvisiten') html=renderGrossvisiten();
   /* Admin hamburger */
   if(S.showMenu_2) html+=renderMenu_2();
   /* Overlays */
