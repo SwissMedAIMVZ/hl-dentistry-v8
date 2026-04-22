@@ -2969,6 +2969,7 @@ function goHome(){S.screen="home";S.heimId=null;S.patId=null;S.patTab="Historie"
 function goHeim(id){S.screen="heim";S.heimId=id;S.heimSearch="";render()}
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";render()}
 function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";render()}
+function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";render()}
 function goPipeline(){S.screen="pipeline";S.pipeView="Fristen";render()}
 function goSearch(){S.screen="search";S.searchQ="";render()}
 function goBack(){if(S.screen==="patient"){S.screen="heim";S.patId=null}else if(S.screen==="heim"){S.screen="home";S.heimId=null}else S.screen="home";render()}
@@ -5324,7 +5325,7 @@ function renderGrossvisiten(){
               if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
               if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
               if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
-              h+='<div class="card" style="margin-bottom:6px;cursor:pointer;background:var(--white)" onclick="goPatFromAdmin('+p.id+')">'
+              h+='<div class="card" style="margin-bottom:6px;cursor:pointer;background:var(--white)" onclick="goPatTo174a('+p.id+')">'
                 +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
                   +'<div style="flex:1;min-width:0">'
                     +'<div class="card-title">'+p.name+'</div>'

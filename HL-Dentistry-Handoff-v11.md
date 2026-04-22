@@ -62,6 +62,16 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: patient click navigates to 174a tab
+
+**Why:** During a Großvisite the Behandler needs to fill the §174a form for each patient. Clicking a patient in the expanded list should go directly to the 174a tab, not the default Historie tab.
+
+**New function `goPatTo174a(id)`:** same as `goPatFromAdmin` but sets `S.patTab="174a"` instead of `"Historie"`. Added at line ~2972.
+
+**Changed onclick:** the patient cards inside the expanded Großvisiten saved lists now call `goPatTo174a(p.id)` instead of `goPatFromAdmin(p.id)`. Only affects the Großvisiten context — all other patient-card clicks elsewhere in the app still go to Historie.
+
+---
+
 ### 2026-04-19 — Großvisiten Patienten: save-and-expand list pattern
 
 **Why:** Showing all patient cards immediately after selecting a Heim cluttered the page and made it hard to manage multiple Heime. Now selecting a Heim saves a collapsed list title card; clicking the title expands it to show patients.
