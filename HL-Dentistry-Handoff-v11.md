@@ -62,6 +62,20 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: split into Patienten + Geplant tabs
+
+**Why:** Mixing the patient search and the planned-visits list on one page made the page too long and conflated two tasks: "look up patients in a Heim" vs. "see what visits are scheduled". Splitting into two tabs keeps each focused.
+
+**New tab bar:** uses the existing `.tabs` / `.tab` classes (same as the patient file tabs). State: `S.gvTab` (`'patienten'` default | `'geplant'`).
+
+**Patienten tab** — contains the type-ahead search bar, autocomplete suggestions, selected-Heim document title card, patient list grid, and PDF button. The stats row and action bar (Neue Großvisite / Exportieren) moved to the Geplant tab since they relate to scheduled visits.
+
+**Geplant tab** — contains the 4 KPI stats row, action buttons, and the Großvisiten cards grid with Behandler badges. All content that was previously in the lower half of the single-page view.
+
+**No data changes.** `gvItems` and the search state (`gvHeimSearch`, `gvHeimFilter`) are unaffected — they just render in different tabs now.
+
+---
+
 ### 2026-04-19 — Großvisiten: assign all Behandler to each visit day
 
 **Why:** A Großvisite is a full-team event — all available Behandler go to the same Pflegeheim on the same day. Showing a single doctor per card was misleading; it implied individual assignments rather than a team visit.
