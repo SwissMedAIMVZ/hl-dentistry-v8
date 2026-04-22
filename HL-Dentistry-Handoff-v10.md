@@ -1,7 +1,7 @@
 # HL-Dentistry v10 — Change Handoff
 
-**Living document — updated as changes are made to `hl-dentistry-v10.html`**
-SwissMedAI GmbH — Started 2026-04-12
+**FROZEN — v10 is superseded by v11. This file is kept for historical reference.**
+SwissMedAI GmbH — 2026-04-12 → 2026-04-19
 
 ---
 
@@ -46,6 +46,25 @@ At this checkpoint, v10 is functionally identical to v9 except for the document 
 Each change gets its own entry. Newest on top.
 
 **Standing rule for this session and future ones:** every change to `mockups/hl-dentistry-v10.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
+
+### 2026-04-19 — Einverständnis PDF: restore full verbatim text from source Word template
+
+**Commit:** `89ba34a` — *Einverständnis PDF: restore full verbatim text from source Word template*
+
+**Why:** The `EINV_LETTER_TEXTS` object had several paragraphs trimmed compared to the original `20231121_TemplateEdit.docx.md` Word template (now committed at `assets/20231121_TemplateEdit.docx.md`). Restored the full verbatim text across 7 fields:
+
+- `t_kosten` — added parenthetical "in so gut wie allen Fällen wird Ihre Zuzahlung die in der Tabelle aufgeführten Kosten nicht überschreiten"
+- `t_haertefall` — added "individuelle Härtefallregelung" sentence
+- `t_todesfall` — added KZV-Berlin URL hyperlink + "80% der Kosten übernimmt" assurance paragraph
+- `t_dauer` — added "Sobald die Kostenübernahme geregelt ist…" continuation
+- `t_weiter` — expanded to full HKP flow (Einverständnis → HKP → Bewilligung → Härtefallantrag → Kostenübernahme → Erstellung)
+- `t_kontakt` — added "Wir helfen Ihnen gerne weiter!"
+- `wichtig` — expanded to full postal/fax/email instructions matching source doc
+- `intro` — wrapped `{{behandlung}}` in `<strong>` to match original bold emphasis
+
+Also added a comment referencing the source file for future readers.
+
+---
 
 ### 2026-04-19 — Patient file → Aktive Behandlungen: use Wochenplan > Meine Aufgaben card layout
 
