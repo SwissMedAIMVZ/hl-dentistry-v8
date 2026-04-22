@@ -62,6 +62,26 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: responsive layout for desktop + mobile
+
+**Why:** The initial Großvisiten page was a mobile-only placeholder. Needed stats overview, Behandler assignments per visit, action buttons, and a 2-column card grid on desktop while stacking cleanly on mobile.
+
+**Changes:**
+- **Stats row** (reuses `.mgr-stats` grid): 4 KPI cards — Geplant (count), Patienten (total), Behandler (count), Überfällig (0).
+  - Desktop: forced `grid-template-columns: repeat(4, 1fr)` via `.dk-verw-content .mgr-stats`.
+- **Action bar**: "Neue Großvisite" (navy gradient CTA) + "Exportieren" (outlined secondary). Uses `flex-wrap: wrap` + `min-width` so they stack on mobile and sit side-by-side on desktop.
+- **Card data enriched**: each demo card now includes `behandler` name (e.g. "Dr. Feld") alongside the calendar date and patient count.
+- **`.gv-grid`**: wrapper div for the cards.
+  - Mobile: block flow (default), cards stacked with 8px margin-bottom.
+  - Desktop: `display: grid; grid-template-columns: 1fr 1fr; gap: 10px` via `.dk-verw-content .gv-grid`. Card bottom margins zeroed since gap handles spacing.
+- **Intro section removed**: replaced by the stats row + action bar which are more informative and take less vertical space.
+- **Desktop CSS additions** (inside `@media(min-width:900px)`):
+  - `.dk-verw-content .gv-grid` — 2-column grid
+  - `.dk-verw-content .gv-grid .card` — no bottom margin
+  - `.dk-verw-content .mgr-stats` — force 4 columns
+
+---
+
 ### 2026-04-19 — Verwaltung: new "Großvisiten" sub-page
 
 **Why:** The practice needs a dedicated area for planning and documenting large-scale nursing-home visits (Großvisiten) — scheduled days where the full team visits a Pflegeheim to treat multiple patients. Currently this is coordinated ad-hoc; a purpose-built page gives the Verwaltung a single view of upcoming visits with patient counts and status.
