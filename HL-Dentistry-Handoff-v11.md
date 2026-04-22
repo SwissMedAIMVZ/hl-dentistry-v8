@@ -62,6 +62,14 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: add to mobile burger menu
+
+**Why:** On mobile, Großvisiten was only reachable by navigating to Verwaltung first. Adding it as a direct entry in the burger menu (`renderMenu_2`) gives one-tap access from any screen.
+
+**Change:** Inserted a new `menu-item` button between "Verwaltung" and "Abmelden" in `renderMenu_2()` (~5458). Icon: calendar with dot markers. `onclick` sets `S.adminMode=true; S.adminPage_2='grossvisiten'` and renders.
+
+---
+
 ### 2026-04-19 — Großvisiten: replace Pflegeheim dropdown with type-ahead search bar
 
 **Why:** A dropdown doesn't scale — when the practice serves dozens of Heime, scrolling through a `<select>` is slow. A type-ahead search bar with autocomplete suggestions lets the user find a Heim by typing any part of the name.
