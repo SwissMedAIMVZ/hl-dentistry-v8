@@ -5263,11 +5263,12 @@ function renderGrossvisiten(){
   +'</div></div>';
   h+='<div class="content" style="padding:16px">';
   /* Stats row */
+  var allBhNames=BEHANDLER.map(function(b){return b.name});
   var gvItems=[
-    {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,behandler:'Dr. Feld',status:'geplant'},
-    {heim:'Senterra Alloheim',date:'02.05.',patients:8,behandler:'Dr. Hess',status:'geplant'},
-    {heim:'Vitanas Märkisches V.',date:'09.05.',patients:15,behandler:'Dr. Feld',status:'geplant'},
-    {heim:'Haus am Weigandufer',date:'16.05.',patients:10,behandler:'Dr. Gomez',status:'geplant'}
+    {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,behandler:allBhNames.slice(),status:'geplant'},
+    {heim:'Senterra Alloheim',date:'02.05.',patients:8,behandler:allBhNames.slice(),status:'geplant'},
+    {heim:'Vitanas Märkisches V.',date:'09.05.',patients:15,behandler:allBhNames.slice(),status:'geplant'},
+    {heim:'Haus am Weigandufer',date:'16.05.',patients:10,behandler:allBhNames.slice(),status:'geplant'}
   ];
   var totalPat=0;gvItems.forEach(function(g){totalPat+=g.patients});
   h+='<div class="mgr-stats" style="margin-bottom:16px">'
@@ -5363,7 +5364,9 @@ function renderGrossvisiten(){
           +'<div class="card-sub" style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
             +'<span style="display:inline-flex;align-items:center;gap:3px">'+calIcon+' '+gv.date+'</span>'
             +'<span style="display:inline-flex;align-items:center;gap:3px">'+usrIcon+' '+gv.patients+' Pat.</span>'
-            +'<span style="color:var(--navy);font-weight:600">'+gv.behandler+'</span>'
+          +'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">'
+            +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">'+n+'</span>'}).join('')
           +'</div>'
         +'</div>'
         +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Geplant</span>'
@@ -5400,7 +5403,8 @@ function printGvList(title,heimId){
   var body='<div style="width:21cm;margin:0 auto;padding:2cm 2.5cm;font-family:Arial,Helvetica,sans-serif">'
     +EINV_LETTERHEAD_HTML
     +'<h1 style="font-size:14pt;margin-bottom:4px;color:#0A2E9E">'+title+'</h1>'
-    +'<p style="font-size:10pt;color:#6E6E73;margin-bottom:16px">'+(heimObj?heimObj.name+' · '+heimObj.addr:'')+' · Datum: '+dateStr+'</p>'
+    +'<p style="font-size:10pt;color:#6E6E73;margin-bottom:4px">'+(heimObj?heimObj.name+' · '+heimObj.addr:'')+' · Datum: '+dateStr+'</p>'
+    +'<p style="font-size:10pt;color:#1D1D1F;margin-bottom:16px"><strong>Behandler:</strong> '+BEHANDLER.map(function(b){return b.name}).join(', ')+'</p>'
     +'<table style="width:100%;border-collapse:collapse">'
       +'<thead><tr>'
         +'<th style="padding:6px 8px;border:1px solid #0A2E9E;background:#0A2E9E;color:#fff;font-size:9pt;text-align:left">#</th>'

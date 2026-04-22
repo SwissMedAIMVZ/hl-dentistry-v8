@@ -62,6 +62,22 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: assign all Behandler to each visit day
+
+**Why:** A Großvisite is a full-team event — all available Behandler go to the same Pflegeheim on the same day. Showing a single doctor per card was misleading; it implied individual assignments rather than a team visit.
+
+**Data change:** `gvItems[].behandler` changed from a single string (`'Dr. Feld'`) to an array of all Behandler names (`BEHANDLER.map(b => b.name)`). Each card gets `.slice()` so mutations don't leak across items (defensive copy).
+
+**Card rendering:** the single `<span>` with the doctor name is replaced by a row of navy-on-blue-50 badges, one per Behandler:
+```
+Dr. Feld  Dr. Hess  Dr. Gomez
+```
+Badges sit in a `flex-wrap: wrap` row below the date + patient count line, with 5px top margin and 4px gap.
+
+**PDF export (`printGvList`):** subtitle line now includes a bold "Behandler:" followed by all names comma-separated (e.g. "Dr. Feld, Dr. Hess, Dr. Gomez").
+
+---
+
 ### 2026-04-19 — Großvisiten: document-style list title + PDF export
 
 **Why:** When preparing a Großvisite, the Verwaltung needs a printable patient list with a structured file name they can reference later. The naming convention `yyyymmdd_Großvisite_HeimName` lets them file and retrieve visit documentation chronologically.
