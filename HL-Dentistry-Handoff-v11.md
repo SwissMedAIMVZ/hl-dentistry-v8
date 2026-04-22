@@ -62,6 +62,28 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten Patienten: save-and-expand list pattern
+
+**Why:** Showing all patient cards immediately after selecting a Heim cluttered the page and made it hard to manage multiple Heime. Now selecting a Heim saves a collapsed list title card; clicking the title expands it to show patients.
+
+**Flow:**
+1. User types in the search bar → autocomplete suggestions appear.
+2. Clicking a suggestion calls `gvSaveList(heimId)` which pushes `{heimId, title, date}` to `S.gvSavedLists` (deduped by heimId + title), clears the search, and auto-expands the new list.
+3. Saved lists render as collapsible cards under "GESPEICHERTE LISTEN". Each shows the `yyyymmdd_Großvisite_HeimName` title + patient count. Collapsed by default (except the most recently added).
+4. Clicking the title card toggles `S.gvOpenList` (index or null) to expand/collapse the patient grid.
+5. Each card has a PDF button + a × delete button (splices from `S.gvSavedLists`).
+
+**State additions:**
+- `S.gvSavedLists` — array of `{heimId, title, date}` objects, persists across renders
+- `S.gvOpenList` — index of the currently expanded list, or null
+- `S.gvHeimFilter` removed (no longer needed — replaced by the save-list pattern)
+
+**Empty state:** "Suchen Sie ein Pflegeheim, um eine Großvisiten-Liste zu erstellen" when no lists saved yet.
+
+**`gvSaveList(heimId)` function:** generates the title slug, checks for duplicates, pushes to `S.gvSavedLists`, clears search input, auto-opens the new entry.
+
+---
+
 ### 2026-04-19 — Großvisiten: split into Patienten + Geplant tabs
 
 **Why:** Mixing the patient search and the planned-visits list on one page made the page too long and conflated two tasks: "look up patients in a Heim" vs. "see what visits are scheduled". Splitting into two tabs keeps each focused.
