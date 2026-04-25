@@ -5290,8 +5290,11 @@ function renderGrossvisiten(){
       +'<button style="flex:1;min-width:120px;padding:12px 16px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px" onclick="alert(\'Export — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportieren</button>'
     +'</div>';
     h+='<div class="gv-grid" style="margin-bottom:18px">';
-    gvItems.forEach(function(gv){
-      h+='<div class="card" style="margin-bottom:8px;cursor:pointer">'
+    gvItems.forEach(function(gv,gi){
+      var isOpen=S.gvExpandedVisit===gi;
+      var heimObj=HEIME.find(function(x){return x.name===gv.heim});
+      h+='<div style="background:var(--white);border:1px solid '+(isOpen?'var(--navy)':'var(--border)')+';border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;transition:border .2s;box-shadow:var(--sh-card)">';
+      h+='<div style="padding:12px 14px;cursor:pointer" onclick="S.gvExpandedVisit=S.gvExpandedVisit==='+gi+'?null:'+gi+';render()">'
         +'<div style="display:flex;justify-content:space-between;align-items:start;gap:10px">'
           +'<div style="flex:1;min-width:0">'
             +'<div class="card-title">'+gv.heim+'</div>'
@@ -5303,9 +5306,33 @@ function renderGrossvisiten(){
               +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">'+n+'</span>'}).join('')
             +'</div>'
           +'</div>'
-          +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Geplant</span>'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+            +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Geplant</span>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" width="14" height="14" style="flex-shrink:0;transition:transform .2s;transform:rotate('+(isOpen?'90':'0')+'deg)"><polyline points="9 18 15 12 9 6"/></svg>'
+          +'</div>'
         +'</div>'
       +'</div>';
+      if(isOpen&&heimObj){
+        var heimPats=PATIENTS.filter(function(p){return p.heim===heimObj.id}).sort(function(a,b){return a.name.localeCompare(b.name,'de')});
+        h+='<div style="padding:0 14px 14px;border-top:1px solid var(--border)">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin:10px 0 8px">'+heimPats.length+' Patienten (alphabetisch)</div>';
+        heimPats.forEach(function(p){
+          var badges='';
+          if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
+          if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
+          if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
+          h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="goPatTo174a('+p.id+')">'
+            +'<div style="flex:1;min-width:0">'
+              +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+p.name+'</div>'
+              +'<div style="font-size:10px;color:var(--text-3);margin-top:1px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
+              +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">'+badges+'</div>':'')
+            +'</div>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg>'
+          +'</div>';
+        });
+        h+='</div>';
+      }
+      h+='</div>';
     });
     h+='</div>';
     /* Saved patient lists */

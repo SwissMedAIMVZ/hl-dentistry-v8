@@ -62,6 +62,24 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten Geplant: click visit card to expand patient list (alphabetical)
+
+**Why:** The Verwaltung needs to see which patients are in a specific planned Großvisite without leaving the page. Clicking the Heim card now expands it inline to show all patients from that Pflegeheim, sorted alphabetically.
+
+**State:** `S.gvExpandedVisit` — index of the expanded card, or null. Toggled on click; only one card can be open at a time.
+
+**Expanded card rendering:**
+- Border switches to navy, chevron rotates 90° (same expand pattern as saved lists).
+- Below the card header, a patient list section appears with border-top separator.
+- Section header: "N Patienten (alphabetisch)" — uppercase overline.
+- Patients queried via `PATIENTS.filter(p.heim === heimObj.id).sort(name.localeCompare('de'))`.
+- Each patient row: name (12px bold), room/age/insurance subline, ZE/PA/tx badges, chevron → `goPatTo174a(p.id)` (navigates to 174a tab).
+- Rows separated by `surface-2` bottom borders (list style, not card style — fits more patients vertically).
+
+**Card structure changed from `.card` to custom wrapper:** the visit cards are no longer using the generic `.card` class — they're now `<div>` with explicit background/border/radius/shadow so the expanded state with its inner content section doesn't conflict with `.card`'s padding.
+
+---
+
 ### 2026-04-19 — Großvisiten: merge Patienten into Geplant, reduce to 2 tabs
 
 **Why:** Three tabs was one too many — the stats/visit cards and the search/saved lists are both "planning" activities. Merging them into a single Geplant tab keeps everything the Verwaltung needs on one scrollable page.
