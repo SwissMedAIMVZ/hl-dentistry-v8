@@ -145,6 +145,29 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-19 — Karte status: quarterly auto-reset + icon in patient file header
+
+**Why:** The Verwaltung needs to track whether each patient's insurance card has been scanned this quarter. The status must reset automatically every quarter (Jan 1, Apr 1, Jul 1, Sep 1) so stale checks don't carry over.
+
+**Quarterly reset logic:**
+- `getQuarterStart()` — returns the timestamp of the current quarter's first day. Quarter months: 0 (Jan), 3 (Apr), 6 (Jul), 8 (Sep) — note: Sep not Oct, matching the user's specification of January, April, July, September.
+- `isKarteValid(patId)` — returns true only if `S.gvKarte[patId]` (a timestamp) is >= `getQuarterStart()`. Any check from a previous quarter is treated as unchecked.
+- `toggleKarte(patId)` — sets `S.gvKarte[patId] = Date.now()` when checking, or `null` when unchecking. Replaces the old boolean toggle.
+
+**Data change:** `S.gvKarte[patId]` changed from boolean to timestamp (ms since epoch) or null. Old boolean `true` values would fail `isKarteValid` (since they're not >= quarter start), effectively auto-resetting — safe migration.
+
+**Großvisiten drill-in checkbox:** updated to use `isKarteValid(p.id)` for display and `toggleKarte(p.id)` for onclick. Visual behaviour unchanged (emerald/white).
+
+**Patient file header icon:** added below the name + "Heim — Zimmer — Alter" subline in `renderPatient()` (~line 1803). Shows a credit-card SVG icon + text:
+- **Green** (`--emerald-bg` / `--emerald`): "Karte ✓" — card scanned this quarter.
+- **Red** (`--crimson-bg` / `--crimson`): "Karte ✗" — not scanned or expired.
+- Clickable — toggles the Karte status directly from the patient file (calls `toggleKarte(p.id)`).
+- Pill-shaped badge (`--r-full` border-radius, 9px bold text, 3px/8px padding).
+
+**Reset schedule:** every Jan 1, Apr 1, Jul 1, Sep 1. No cron/timer needed — the comparison is evaluated at render time, so crossing a quarter boundary naturally flips all patients to "unchecked" on the next page load.
+
+---
+
 ### 2026-04-19 — Großvisiten drill-in: "Karte" checkbox per patient
 
 **Why:** During a Großvisite the Verwaltung tracks which patient's insurance card (Karte) has been collected/verified. A checkbox per patient row lets them mark this directly in the list.
