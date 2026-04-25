@@ -62,6 +62,28 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — New top-level "Patienten" page in sidebar + burger menu
+
+**Why:** There was no dedicated place to browse all patients across all Heime. The existing search page required typing a query; the new Patienten page shows the full roster grouped by Pflegeheim with a live filter.
+
+**Desktop sidebar:** "Patienten" button added as the **first** item (above Wochenplan), with a users/group icon. Sets `S.dkPage='patienten'`, `S.screen='patienten'`.
+
+**Mobile burger menu:** "Patienten" added as the **first** item (above Wochenplan). Same users icon + `S.screen='patienten'`.
+
+**Page routing:** `goDesktopPage('patienten')`, `syncDkPageFromMobile`, `renderDesktop`, and the mobile render switch all handle the new `'patienten'` screen.
+
+**`DK_TITLES.patienten`** = `'Patienten'` — shows in the desktop top bar.
+
+**`renderPatientenPage()` function:**
+- Header: "Patienten" title + "N Patienten in M Einrichtungen" subtitle + burger menu.
+- Search bar (type="search"): filters by patient name, room, or Heim name. Live counter "N von M Patienten" when filtering.
+- Body: patients grouped by Heim (alphabetical Heim names as section headers with pin icon + count). Within each group, patients sorted alphabetically.
+- Each patient card: name, room/age/insurance, ZE/PA/tx badges, chevron → `goPatFromAdmin(id)` (opens patient file on Historie tab).
+- Empty state: "Keine Patienten gefunden".
+- Desktop: renders inside `.dk-verw-content` wrapper (header auto-hidden, content padded).
+
+---
+
 ### 2026-04-19 — Großvisiten: open patient in new window + search within expanded list
 
 **Why:** During a Großvisite the Verwaltung user works through a list of patients — they need to open each patient's details without losing the list, and quickly find a specific patient by name in large Heime.

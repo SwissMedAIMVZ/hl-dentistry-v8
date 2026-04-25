@@ -2685,6 +2685,10 @@ function renderDesktopSidebar(){
     +'<div class="dk-sidebar-logo">'+ICO.tooth+'<div><div class="dk-sidebar-logo-text">HL-Dentistry<span style="color:var(--emerald)">.</span></div><div class="dk-sidebar-logo-sub">Mobile Altenzahnheilkunde</div></div></div>'
     +'<div class="dk-sidebar-nav">';
 
+  /* Patienten */
+  var patIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  h+='<button class="dk-nav-item '+(S.dkPage==='patienten'?'active':'')+'" onclick="goDesktopPage(\'patienten\')">'+patIcon+'<span>Patienten</span></button>';
+
   /* Wochenplan */
   h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopHomeTab(\'heute\')">'+calIcon+'<span>Wochenplan</span></button>';
 
@@ -2783,7 +2787,8 @@ function renderDesktopManagerBody(){
 function goDesktopPage(id){
   S.showMenu_2=false;
   S.dkPage=id;
-  if(id==='manager'){S.adminMode=false;S.screen='manager'}
+  if(id==='patienten'){S.adminMode=false;S.screen='patienten'}
+  else if(id==='manager'){S.adminMode=false;S.screen='manager'}
   else if(id==='wochenplan'){S.adminMode=false;S.screen='home'}
   else if(id==='behandler'){S.adminMode=true;S.adminPage_2='behandler'}
   else if(id==='labor'){S.adminMode=false;S.screen='lab'}
@@ -2797,7 +2802,7 @@ function dkDefaultPage(){
   if(role==='behandler')return'wochenplan';
   return'manager';
 }
-var DK_TITLES={manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
+var DK_TITLES={patienten:'Patienten',manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
 var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten'};
 function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode=true;render()}
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
@@ -2844,7 +2849,9 @@ function renderDesktop(){
   /* Top bar */
   var title=page==='verwaltung'?'Verwaltung \u2014 '+(DK_VERW_TITLES[S.adminPage_2||'uebersicht']||''):(DK_TITLES[page]||page);
   h+='<div class="dk-topbar"><div><h1>'+title+'</h1><div class="dk-topbar-sub">'+u.name+' \u2014 '+roleLabel(u.role)+'</div></div></div>';
-  if(page==='manager'){
+  if(page==='patienten'){
+    h+='<div class="dk-verw-content" style="position:relative">'+renderPatientenPage()+'</div>';
+  } else if(page==='manager'){
     h+=renderDesktopManagerBody();
   } else if(page==='verwaltung'){
     h+=renderDesktopVerwaltungBody();
@@ -2880,6 +2887,7 @@ function syncDkPageFromMobile(){
   else if(S.screen==='lab')S.dkPage='labor';
   else if(S.screen==='messages')S.dkPage='nachrichten';
   else if(S.screen==='search')S.dkPage='suche';
+  else if(S.screen==='patienten')S.dkPage='patienten';
 }
 function renderDesktopLogin(){
   var app=document.getElementById("app");
@@ -2919,6 +2927,7 @@ function render(){
   if(S.screen==="manager")html=renderManager();
   else if(S.screen==="lab")html=renderLab();
   else if(S.screen==="messages")html=renderMessages();
+  else if(S.screen==="patienten")html=renderPatientenPage();
   else if(S.screen==="home")html=renderHome();
   else if(S.screen==="heim")html=renderHeim();
   else if(S.screen==="patient")html=renderPatient();
@@ -5275,6 +5284,55 @@ function saveHeimEdit(){
   S.heimEdit_2=null;render();
 }
 function deleteHeimEdit(){PFLEGEHEIME.splice(S.heimEdit_2,1);S.heimEdit_2=null;render();}
+/* ===== PATIENTEN PAGE ===== */
+function renderPatientenPage(){
+  var pq=(S.patPageSearch||'').toLowerCase();
+  var allPats=PATIENTS.slice().sort(function(a,b){return a.name.localeCompare(b.name,'de')});
+  var filtered=pq?allPats.filter(function(p){return p.name.toLowerCase().indexOf(pq)!==-1||p.room.toLowerCase().indexOf(pq)!==-1||heimName(p.heim).toLowerCase().indexOf(pq)!==-1}):allPats;
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Patienten</h1><div class="sub">'+PATIENTS.length+' Patienten in '+HEIME.length+' Einrichtungen</div></div>'
+    +MENU_BTN_2
+  +'</div></div>';
+  h+='<div class="content" style="padding:16px">';
+  /* Search bar */
+  h+='<div style="position:relative;margin-bottom:14px">'
+    +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+    +'<input type="search" placeholder="Patient, Zimmer oder Pflegeheim suchen…" value="'+(S.patPageSearch||'').replace(/"/g,'&quot;')+'" oninput="S.patPageSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)" autocomplete="off">'
+  +'</div>';
+  if(pq)h+='<div style="font-size:11px;color:var(--text-3);margin-bottom:10px">'+filtered.length+' von '+allPats.length+' Patienten</div>';
+  /* Group by Heim */
+  var byHeim={};
+  filtered.forEach(function(p){
+    var hn=heimName(p.heim);
+    if(!byHeim[hn])byHeim[hn]=[];
+    byHeim[hn].push(p);
+  });
+  var heimKeys=Object.keys(byHeim).sort(function(a,b){return a.localeCompare(b,'de')});
+  heimKeys.forEach(function(hn){
+    var pats=byHeim[hn];
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+hn+' <span style="font-weight:500;letter-spacing:0">('+pats.length+')</span></div>';
+    pats.forEach(function(p){
+      var badges='';
+      if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
+      if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
+      if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
+      h+='<div class="card" style="margin-bottom:6px;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
+        +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div class="card-title">'+p.name+'</div>'
+            +'<div class="card-sub" style="margin-top:2px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
+            +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+badges+'</div>':'')
+          +'</div>'
+          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;color:var(--text-4);margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>'
+        +'</div>'
+      +'</div>';
+    });
+  });
+  if(filtered.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
+  h+='</div>';
+  return h;
+}
+
 /* ===== GROßVISITEN ===== */
 function renderGrossvisiten(){
   var calIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
@@ -5613,6 +5671,7 @@ function renderMenu_2(){
   if(!S.showMenu_2)return'';
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
+      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'patienten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Patienten</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'home\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'manager\';S.mgrTab=\'\u00dcbersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Management</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
