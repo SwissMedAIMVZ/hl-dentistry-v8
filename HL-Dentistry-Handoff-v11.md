@@ -62,6 +62,24 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: restructure into 3 tabs (Patienten / Geplant / Vorherige)
+
+**Why:** The tab names didn't match the content. The stats + scheduled visit cards belong under "Patienten" (the upcoming roster), the search + saved lists are "Geplant" (visits being prepared), and completed visits need their own "Vorherige" history tab.
+
+**Tab restructure:**
+
+| Tab | Content | Was previously |
+|---|---|---|
+| **Patienten** (default) | Stats row (4 KPIs), action buttons (Neue Großvisite / Exportieren), scheduled visit cards with all-Behandler badges + "Geplant" status pill | Was "Geplant" tab |
+| **Geplant** | Search bar, autocomplete, saved lists (collapsible title cards → expandable patient grids), PDF export per list | Was "Patienten" tab |
+| **Vorherige** | Past/completed Großvisiten cards with dates, patient counts, Behandler badges in muted gray (`--surface-2`), and green "Abgeschlossen" status pill. 4 demo entries (14.04., 07.04., 31.03., 24.03.) | New tab |
+
+**State:** `S.gvTab` default changed to `'patienten'` (still the first tab, just now shows the visit schedule).
+
+**Vorherige styling:** cards at `opacity: 0.75` with gray Behandler badges (`--surface-2` / `--text-3` instead of `--blue-50` / `--navy`) to visually distinguish completed from upcoming.
+
+---
+
 ### 2026-04-19 — Großvisiten: patient click navigates to 174a tab
 
 **Why:** During a Großvisite the Behandler needs to fill the §174a form for each patient. Clicking a patient in the expanded list should go directly to the 174a tab, not the default Historie tab.

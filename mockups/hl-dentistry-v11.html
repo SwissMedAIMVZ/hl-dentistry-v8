@@ -5262,15 +5262,16 @@ function renderGrossvisiten(){
     +'<div><h1>Großvisiten</h1><div class="sub">Planung &amp; Dokumentation</div></div>'
     +MENU_BTN_2
   +'</div></div>';
-  /* Tabs: Patienten | Geplant */
+  /* Tabs: Patienten | Geplant | Vorherige */
   var gvTab=S.gvTab||'patienten';
   h+='<div class="tabs">'
     +'<button class="tab'+(gvTab==='patienten'?' active':'')+'" onclick="S.gvTab=\'patienten\';render()">Patienten</button>'
     +'<button class="tab'+(gvTab==='geplant'?' active':'')+'" onclick="S.gvTab=\'geplant\';render()">Geplant</button>'
+    +'<button class="tab'+(gvTab==='vorherige'?' active':'')+'" onclick="S.gvTab=\'vorherige\';render()">Vorherige</button>'
   +'</div>';
   h+='<div class="content" style="padding:16px">';
 
-  if(gvTab==='patienten'){
+  if(gvTab==='geplant'){
     if(!S.gvSavedLists)S.gvSavedLists=[];
     /* Search bar */
     var gvQ=(S.gvHeimSearch||'').toLowerCase();
@@ -5347,7 +5348,7 @@ function renderGrossvisiten(){
     }
   }
 
-  if(gvTab==='geplant'){
+  if(gvTab==='patienten'){
     var allBhNames=BEHANDLER.map(function(b){return b.name});
     var gvItems=[
       {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,behandler:allBhNames.slice(),status:'geplant'},
@@ -5385,6 +5386,33 @@ function renderGrossvisiten(){
       +'</div>';
     });
     h+='</div>';
+  }
+
+  if(gvTab==='vorherige'){
+    var pastItems=[
+      {heim:'Alexa Lichtenrade',date:'14.04.',patients:11,behandler:BEHANDLER.map(function(b){return b.name})},
+      {heim:'Senterra Alloheim',date:'07.04.',patients:9,behandler:BEHANDLER.map(function(b){return b.name})},
+      {heim:'Vitanas Märkisches V.',date:'31.03.',patients:14,behandler:BEHANDLER.map(function(b){return b.name})},
+      {heim:'Haus am Weigandufer',date:'24.03.',patients:8,behandler:BEHANDLER.map(function(b){return b.name})}
+    ];
+    pastItems.forEach(function(gv){
+      h+='<div class="card" style="margin-bottom:8px;opacity:0.75">'
+        +'<div style="display:flex;justify-content:space-between;align-items:start;gap:10px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div class="card-title">'+gv.heim+'</div>'
+            +'<div class="card-sub" style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+              +'<span style="display:inline-flex;align-items:center;gap:3px">'+calIcon+' '+gv.date+'</span>'
+              +'<span style="display:inline-flex;align-items:center;gap:3px">'+usrIcon+' '+gv.patients+' Pat.</span>'
+            +'</div>'
+            +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">'
+              +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--surface-2);color:var(--text-3)">'+n+'</span>'}).join('')
+            +'</div>'
+          +'</div>'
+          +'<span class="mini-badge" style="background:var(--emerald-bg);color:var(--emerald);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Abgeschlossen</span>'
+        +'</div>'
+      +'</div>';
+    });
+    if(pastItems.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine vorherigen Großvisiten</div>';
   }
 
   h+='</div>';
