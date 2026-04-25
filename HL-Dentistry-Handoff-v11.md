@@ -62,6 +62,27 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: open patient in new window + search within expanded list
+
+**Why:** During a Großvisite the Verwaltung user works through a list of patients — they need to open each patient's details without losing the list, and quickly find a specific patient by name in large Heime.
+
+**Patient opens in new window — `openPatNewWindow(patId)`:**
+Replaces `goPatTo174a` in the expanded visit card rows. Opens a new browser window (`_openPrintWindow`) with a standalone patient summary page:
+- SwissMedAI letterhead
+- Patient name (h1), heim/room/age/insurance subline
+- Aktive Behandlungen: tx badges, ZE pipeline state, PA step
+- §174a Formulare table (date, form ID, status)
+- Notizen section
+The Großvisiten page stays intact underneath — no navigation away.
+
+**Search bar within expanded patient list:**
+- Small search input (`type="search"`) with magnifying-glass icon, sits between the section header and the patient rows.
+- Filters `heimPats` by `name.indexOf(query)` or `room.indexOf(query)`.
+- Counter updates live: "N von M Patienten" when filtering, "N Patienten" when not.
+- State: `S.gvPatSearch` (typed query string). Cleared on card collapse.
+
+---
+
 ### 2026-04-19 — Großvisiten Geplant: click visit card to expand patient list (alphabetical)
 
 **Why:** The Verwaltung needs to see which patients are in a specific planned Großvisite without leaving the page. Clicking the Heim card now expands it inline to show all patients from that Pflegeheim, sorted alphabetically.

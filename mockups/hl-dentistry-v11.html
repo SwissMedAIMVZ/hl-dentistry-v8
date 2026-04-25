@@ -2970,6 +2970,27 @@ function goHeim(id){S.screen="heim";S.heimId=id;S.heimSearch="";render()}
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";render()}
 function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";render()}
 function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";render()}
+function openPatNewWindow(id){
+  var p=PATIENTS.find(function(x){return x.id===id});if(!p)return;
+  var parts=p.name.split(', '),lastName=parts[0]||'',firstName=parts[1]||'';
+  var hm=HEIME.find(function(x){return x.id===p.heim});
+  var forms=(p.forms174a||[]).map(function(f){return'<tr><td style="padding:6px 8px;border:1px solid #D2D2D7">'+fmtDate(f.date)+'</td><td style="padding:6px 8px;border:1px solid #D2D2D7">'+f.id+'</td><td style="padding:6px 8px;border:1px solid #D2D2D7">Vorhanden</td></tr>'}).join('');
+  var txList=p.tx.length>0?p.tx.map(function(t){return'<span style="display:inline-block;padding:3px 10px;background:#EBF0FF;color:#0A2E9E;border-radius:20px;font-size:10px;font-weight:700;margin-right:4px">'+t.toUpperCase()+'</span>'}).join(''):'<span style="color:#86868B;font-size:11px">Keine</span>';
+  var zeInfo=p.ze?'<div style="margin-top:12px;padding:10px;background:#EBF0FF;border-radius:8px"><strong style="color:#0A2E9E">ZE:</strong> '+ZE_STATES[p.ze.st]+' — '+p.ze.type+' ('+p.ze.zs+'% Zuschuss)</div>':'';
+  var paInfo='';if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});paInfo='<div style="margin-top:8px;padding:10px;background:#F3F0FF;border-radius:8px"><strong style="color:#6C47FF">PA:</strong> '+(ps?ps.label:'')+'</div>';}
+  var body='<div style="width:21cm;margin:0 auto;padding:2cm 2.5cm;font-family:Arial,Helvetica,sans-serif">'
+    +EINV_LETTERHEAD_HTML
+    +'<h1 style="font-size:16pt;color:#0A2E9E;margin-bottom:4px">'+p.name+'</h1>'
+    +'<p style="font-size:11pt;color:#6E6E73;margin-bottom:16px">'+(hm?hm.name:'')+(p.room?' · Zi. '+p.room:'')+' · '+p.age+' J. · '+p.ins+' · '+p.insNr+'</p>'
+    +'<h2 style="font-size:12pt;margin:20px 0 8px;text-decoration:none;border-bottom:1px solid #D2D2D7;padding-bottom:4px">Aktive Behandlungen</h2>'
+    +txList+zeInfo+paInfo
+    +'<h2 style="font-size:12pt;margin:24px 0 8px;text-decoration:none;border-bottom:1px solid #D2D2D7;padding-bottom:4px">§174a Formulare</h2>'
+    +(forms?'<table style="width:100%;border-collapse:collapse;font-size:10pt"><thead><tr><th style="padding:6px 8px;background:#0A2E9E;color:#fff;border:1px solid #0A2E9E;text-align:left">Datum</th><th style="padding:6px 8px;background:#0A2E9E;color:#fff;border:1px solid #0A2E9E;text-align:left">Formular-ID</th><th style="padding:6px 8px;background:#0A2E9E;color:#fff;border:1px solid #0A2E9E;text-align:left">Status</th></tr></thead><tbody>'+forms+'</tbody></table>':'<p style="color:#86868B;font-size:11pt">Keine §174a Formulare vorhanden</p>')
+    +'<h2 style="font-size:12pt;margin:24px 0 8px;text-decoration:none;border-bottom:1px solid #D2D2D7;padding-bottom:4px">Notizen</h2>'
+    +'<p style="font-size:10.5pt;color:#3A3A3C">'+(p.notes||'Keine Notizen')+'</p>'
+  +'</div>';
+  _openPrintWindow('Patient — '+p.name,body);
+}
 function goPipeline(){S.screen="pipeline";S.pipeView="Fristen";render()}
 function goSearch(){S.screen="search";S.searchQ="";render()}
 function goBack(){if(S.screen==="patient"){S.screen="heim";S.patId=null}else if(S.screen==="heim"){S.screen="home";S.heimId=null}else S.screen="home";render()}
@@ -5313,15 +5334,21 @@ function renderGrossvisiten(){
         +'</div>'
       +'</div>';
       if(isOpen&&heimObj){
+        var gvPatQ=(S.gvPatSearch||'').toLowerCase();
         var heimPats=PATIENTS.filter(function(p){return p.heim===heimObj.id}).sort(function(a,b){return a.name.localeCompare(b.name,'de')});
+        var filteredPats=gvPatQ?heimPats.filter(function(p){return p.name.toLowerCase().indexOf(gvPatQ)!==-1||p.room.toLowerCase().indexOf(gvPatQ)!==-1}):heimPats;
         h+='<div style="padding:0 14px 14px;border-top:1px solid var(--border)">'
-          +'<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin:10px 0 8px">'+heimPats.length+' Patienten (alphabetisch)</div>';
-        heimPats.forEach(function(p){
+          +'<div style="position:relative;margin:10px 0 8px">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+            +'<input type="search" placeholder="Patient suchen…" value="'+(S.gvPatSearch||'').replace(/"/g,'&quot;')+'" oninput="S.gvPatSearch=this.value;render()" style="width:100%;padding:8px 10px 8px 32px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:11px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)" autocomplete="off">'
+          +'</div>'
+          +'<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">'+filteredPats.length+(gvPatQ?' von '+heimPats.length:'')+' Patienten</div>';
+        filteredPats.forEach(function(p){
           var badges='';
           if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
           if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
           if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
-          h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="goPatTo174a('+p.id+')">'
+          h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="openPatNewWindow('+p.id+')">'
             +'<div style="flex:1;min-width:0">'
               +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+p.name+'</div>'
               +'<div style="font-size:10px;color:var(--text-3);margin-top:1px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
