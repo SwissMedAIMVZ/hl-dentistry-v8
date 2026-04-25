@@ -145,6 +145,14 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-19 — Großvisiten drill-in: patient click opens 174a tab in patient file
+
+**Why:** Clicking a patient in the Großvisiten drill-in view previously opened a standalone print window (`openPatNewWindow`). The user wants it to navigate to the actual patient file's 174a tab instead.
+
+**Change:** Single line — `onclick="openPatNewWindow('+p.id+')"` → `onclick="goPatTo174a('+p.id+')"` in the drill-in patient list (~line 5390). `goPatTo174a` sets `S.screen='patient'`, `S.patId=id`, `S.patTab='174a'` and renders.
+
+---
+
 ### 2026-04-19 — Großvisiten: drill-in patient view with Zurück button
 
 **Why:** The expand-in-place accordion showed patients mixed in with stats, buttons, and other cards. The user wants a clean dedicated view: click a Großvisite → see ONLY that Heim's patients + a way back.
