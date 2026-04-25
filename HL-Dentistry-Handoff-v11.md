@@ -62,6 +62,22 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patienten page: only "Zuletzt gesehen" (5 max) + search results
+
+**Why:** The page should be minimal — just a search bar, the last 5 patients you looked at, and nothing else. The full grouped-by-Heim roster was removed entirely.
+
+**Changes:**
+- Renamed "Zuletzt angesehen" → **"Zuletzt gesehen"**.
+- Capped to `S.recentPatients.slice(0, 5)` — only the 5 most recent patients show.
+- Removed the wrapper `<div>` with `padding-bottom` / `border-bottom` (no section below to separate from).
+- Removed the full patient list that appeared on search. Search results now render as the same compact row style (initial avatar + name + heim/room + chevron) — consistent with the Zuletzt gesehen rows.
+- Empty search state: "Keine Patienten gefunden".
+
+**Default view (not searching):** search bar → "ZULETZT GESEHEN" (up to 5 rows) → nothing else.
+**Searching:** search bar → result count → matching patients as compact rows.
+
+---
+
 ### 2026-04-19 — Patienten page: hide full patient list, show only on search
 
 **Why:** Listing all patients by default cluttered the page — the Patienten page should be a clean landing with just the search bar and recently viewed patients. The full grouped-by-Heim list only appears when the user actively searches for someone.
