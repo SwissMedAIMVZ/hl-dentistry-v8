@@ -145,6 +145,22 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-19 — Großvisiten: drill-in patient view with Zurück button
+
+**Why:** The expand-in-place accordion showed patients mixed in with stats, buttons, and other cards. The user wants a clean dedicated view: click a Großvisite → see ONLY that Heim's patients + a way back.
+
+**Change:** `S.gvExpandedVisit` now acts as a drill-in state instead of an accordion toggle. When set, the entire Geplant tab content is replaced with:
+- **"← Zurück zur Übersicht"** button — clears `S.gvExpandedVisit` + `S.gvPatSearch`, returns to the overview.
+- **Heim name** as a 16px bold title + date + patient count subline.
+- **Patient search bar** — filters by name or room within this Heim.
+- **Patient list** — sorted alphabetically, each row with name/room/age/insurance, ZE/PA/tx badges, chevron → `openPatNewWindow()`.
+
+The overview (stats, action buttons, visit cards, saved lists) is hidden while drilling in — wrapped in an `else` block.
+
+Clicking a visit card from the overview: `S.gvExpandedVisit = gi` (sets index, clears patient search, renders drill-in view). No more toggle — single click always drills in.
+
+---
+
 ### 2026-04-19 — Großvisiten Geplant: click visit card to expand patient list (alphabetical)
 
 **Why:** The Verwaltung needs to see which patients are in a specific planned Großvisite without leaving the page. Clicking the Heim card now expands it inline to show all patients from that Pflegeheim, sorted alphabetically.
