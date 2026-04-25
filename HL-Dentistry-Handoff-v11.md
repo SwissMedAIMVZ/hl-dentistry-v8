@@ -62,6 +62,22 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patienten page: "Zuletzt angesehen" recent-patient history
+
+**Why:** The Verwaltung user revisits the same patients frequently. A "recently viewed" section below the search bar gives one-tap access without retyping names.
+
+**Tracking — `trackRecentPat(id)`:** called from `goPat`, `goPatFromAdmin`, `goPatTo174a`, and `mgrDrillPat`. Maintains `S.recentPatients` — an array of patient IDs, most recent first, capped at 10 entries, deduped (revisiting a patient moves them to the top).
+
+**Rendering in `renderPatientenPage()`:** shown only when the search bar is empty (`!pq`). Section header: uppercase "ZULETZT ANGESEHEN". Each row is a compact list item (not a card) with:
+- Circle avatar showing the patient's first initial (`var(--surface-2)` background)
+- Name (12px bold) + Heim + room subline
+- Chevron → `goPatFromAdmin(id)`
+- Separated by `surface-2` bottom borders
+
+Hidden when searching (the filter results take priority). Empty state: section simply not rendered if `S.recentPatients` is empty or undefined.
+
+---
+
 ### 2026-04-19 — New top-level "Patienten" page in sidebar + burger menu
 
 **Why:** There was no dedicated place to browse all patients across all Heime. The existing search page required typing a query; the new Patienten page shows the full roster grouped by Pflegeheim with a live filter.

@@ -2976,9 +2976,15 @@ function render(){
 /* ===== NAVIGATION ===== */
 function goHome(){S.screen="home";S.heimId=null;S.patId=null;S.patTab="Historie";render()}
 function goHeim(id){S.screen="heim";S.heimId=id;S.heimSearch="";render()}
-function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";render()}
-function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";render()}
-function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";render()}
+function trackRecentPat(id){
+  if(!S.recentPatients)S.recentPatients=[];
+  S.recentPatients=S.recentPatients.filter(function(x){return x!==id});
+  S.recentPatients.unshift(id);
+  if(S.recentPatients.length>10)S.recentPatients=S.recentPatients.slice(0,10);
+}
+function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
+function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
+function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";trackRecentPat(id);render()}
 function openPatNewWindow(id){
   var p=PATIENTS.find(function(x){return x.id===id});if(!p)return;
   var parts=p.name.split(', '),lastName=parts[0]||'',firstName=parts[1]||'';
@@ -3122,7 +3128,7 @@ function doLogout(){S.showLogoutConfirm=true;render()}
 function confirmLogout(){S.showLogoutConfirm=false;S.screen="login";S.user=null;S.loginErr=false;S.showNewPatient=false;S.showNewHeim=false;S.patEditMode=false;render()}
 function cancelLogout(){S.showLogoutConfirm=false;render()}
 function markAllRead(){getMyMessages().forEach(function(m){m.read=true});render()}
-function mgrDrillPat(id){S.patId=id;S.screen="patient";S.patTab="Historie";render()}
+function mgrDrillPat(id){S.patId=id;S.screen="patient";S.patTab="Historie";trackRecentPat(id);render()}
 function mgrDrillHeim(id){S.heimId=id;S.screen="heim";render()}
 
 /* ===== NEW PATIENT ===== */
@@ -5300,6 +5306,24 @@ function renderPatientenPage(){
     +'<input type="search" placeholder="Patient, Zimmer oder Pflegeheim suchen…" value="'+(S.patPageSearch||'').replace(/"/g,'&quot;')+'" oninput="S.patPageSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text)" autocomplete="off">'
   +'</div>';
   if(pq)h+='<div style="font-size:11px;color:var(--text-3);margin-bottom:10px">'+filtered.length+' von '+allPats.length+' Patienten</div>';
+  /* Zuletzt angesehen — only shown when not searching */
+  if(!pq&&S.recentPatients&&S.recentPatients.length>0){
+    h+='<div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Zuletzt angesehen</div>';
+    S.recentPatients.forEach(function(pid){
+      var rp=PATIENTS.find(function(x){return x.id===pid});
+      if(!rp)return;
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="goPatFromAdmin('+rp.id+')">'
+        +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-3)">'+rp.name.charAt(0)+'</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+rp.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-3)">'+heimName(rp.heim)+' · Zi. '+rp.room+'</div>'
+        +'</div>'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg>'
+      +'</div>';
+    });
+    h+='</div>';
+  }
   /* Group by Heim */
   var byHeim={};
   filtered.forEach(function(p){
