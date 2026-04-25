@@ -5324,35 +5324,37 @@ function renderPatientenPage(){
     });
     h+='</div>';
   }
-  /* Group by Heim */
-  var byHeim={};
-  filtered.forEach(function(p){
-    var hn=heimName(p.heim);
-    if(!byHeim[hn])byHeim[hn]=[];
-    byHeim[hn].push(p);
-  });
-  var heimKeys=Object.keys(byHeim).sort(function(a,b){return a.localeCompare(b,'de')});
-  heimKeys.forEach(function(hn){
-    var pats=byHeim[hn];
-    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+hn+' <span style="font-weight:500;letter-spacing:0">('+pats.length+')</span></div>';
-    pats.forEach(function(p){
-      var badges='';
-      if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
-      if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
-      if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
-      h+='<div class="card" style="margin-bottom:6px;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
-        +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
-          +'<div style="flex:1;min-width:0">'
-            +'<div class="card-title">'+p.name+'</div>'
-            +'<div class="card-sub" style="margin-top:2px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
-            +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+badges+'</div>':'')
-          +'</div>'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;color:var(--text-4);margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>'
-        +'</div>'
-      +'</div>';
+  /* Full patient list — only shown when searching */
+  if(pq){
+    var byHeim={};
+    filtered.forEach(function(p){
+      var hn=heimName(p.heim);
+      if(!byHeim[hn])byHeim[hn]=[];
+      byHeim[hn].push(p);
     });
-  });
-  if(filtered.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
+    var heimKeys=Object.keys(byHeim).sort(function(a,b){return a.localeCompare(b,'de')});
+    heimKeys.forEach(function(hn){
+      var pats=byHeim[hn];
+      h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 6px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+hn+' <span style="font-weight:500;letter-spacing:0">('+pats.length+')</span></div>';
+      pats.forEach(function(p){
+        var badges='';
+        if(p.ze){var zs=ZE_STATES[p.ze.st];badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">ZE: '+zs+'</span>';}
+        if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
+        if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
+        h+='<div class="card" style="margin-bottom:6px;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:start;gap:8px">'
+            +'<div style="flex:1;min-width:0">'
+              +'<div class="card-title">'+p.name+'</div>'
+              +'<div class="card-sub" style="margin-top:2px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
+              +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">'+badges+'</div>':'')
+            +'</div>'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="flex-shrink:0;color:var(--text-4);margin-top:2px"><polyline points="9 18 15 12 9 6"/></svg>'
+          +'</div>'
+        +'</div>';
+      });
+    });
+    if(filtered.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
+  }
   h+='</div>';
   return h;
 }

@@ -62,6 +62,14 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Patienten page: hide full patient list, show only on search
+
+**Why:** Listing all patients by default cluttered the page — the Patienten page should be a clean landing with just the search bar and recently viewed patients. The full grouped-by-Heim list only appears when the user actively searches for someone.
+
+**Change:** Wrapped the "Group by Heim" patient list block in `if(pq){…}` — it only renders when the search bar has input. When idle, the page shows just: search bar → Zuletzt angesehen (if any) → empty space.
+
+---
+
 ### 2026-04-19 — Patienten page: "Zuletzt angesehen" recent-patient history
 
 **Why:** The Verwaltung user revisits the same patients frequently. A "recently viewed" section below the search bar gives one-tap access without retyping names.
