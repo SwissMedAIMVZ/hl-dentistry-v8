@@ -5262,16 +5262,53 @@ function renderGrossvisiten(){
     +'<div><h1>Großvisiten</h1><div class="sub">Planung &amp; Dokumentation</div></div>'
     +MENU_BTN_2
   +'</div></div>';
-  /* Tabs: Patienten | Geplant | Vorherige */
-  var gvTab=S.gvTab||'patienten';
+  /* Tabs: Geplant | Vorherige */
+  var gvTab=S.gvTab||'geplant';
   h+='<div class="tabs">'
-    +'<button class="tab'+(gvTab==='patienten'?' active':'')+'" onclick="S.gvTab=\'patienten\';render()">Patienten</button>'
     +'<button class="tab'+(gvTab==='geplant'?' active':'')+'" onclick="S.gvTab=\'geplant\';render()">Geplant</button>'
     +'<button class="tab'+(gvTab==='vorherige'?' active':'')+'" onclick="S.gvTab=\'vorherige\';render()">Vorherige</button>'
   +'</div>';
   h+='<div class="content" style="padding:16px">';
 
   if(gvTab==='geplant'){
+    var allBhNames=BEHANDLER.map(function(b){return b.name});
+    var gvItems=[
+      {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,behandler:allBhNames.slice(),status:'geplant'},
+      {heim:'Senterra Alloheim',date:'02.05.',patients:8,behandler:allBhNames.slice(),status:'geplant'},
+      {heim:'Vitanas Märkisches V.',date:'09.05.',patients:15,behandler:allBhNames.slice(),status:'geplant'},
+      {heim:'Haus am Weigandufer',date:'16.05.',patients:10,behandler:allBhNames.slice(),status:'geplant'}
+    ];
+    var totalPat=0;gvItems.forEach(function(g){totalPat+=g.patients});
+    h+='<div class="mgr-stats" style="margin-bottom:16px">'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--navy)">'+gvItems.length+'</div><div class="label">Geplant</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--emerald)">'+totalPat+'</div><div class="label">Patienten</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--violet)">'+BEHANDLER.length+'</div><div class="label">Behandler</div></div>'
+      +'<div class="mgr-stat"><div class="num" style="color:var(--amber)">0</div><div class="label">Überfällig</div></div>'
+    +'</div>';
+    h+='<div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">'
+      +'<button style="flex:1;min-width:180px;padding:12px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="alert(\'Neue Großvisite planen — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neue Großvisite</button>'
+      +'<button style="flex:1;min-width:120px;padding:12px 16px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px" onclick="alert(\'Export — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportieren</button>'
+    +'</div>';
+    h+='<div class="gv-grid" style="margin-bottom:18px">';
+    gvItems.forEach(function(gv){
+      h+='<div class="card" style="margin-bottom:8px;cursor:pointer">'
+        +'<div style="display:flex;justify-content:space-between;align-items:start;gap:10px">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div class="card-title">'+gv.heim+'</div>'
+            +'<div class="card-sub" style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+              +'<span style="display:inline-flex;align-items:center;gap:3px">'+calIcon+' '+gv.date+'</span>'
+              +'<span style="display:inline-flex;align-items:center;gap:3px">'+usrIcon+' '+gv.patients+' Pat.</span>'
+            +'</div>'
+            +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">'
+              +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">'+n+'</span>'}).join('')
+            +'</div>'
+          +'</div>'
+          +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Geplant</span>'
+        +'</div>'
+      +'</div>';
+    });
+    h+='</div>';
+    /* Saved patient lists */
     if(!S.gvSavedLists)S.gvSavedLists=[];
     /* Search bar */
     var gvQ=(S.gvHeimSearch||'').toLowerCase();
@@ -5346,46 +5383,6 @@ function renderGrossvisiten(){
     } else {
       h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Suchen Sie ein Pflegeheim, um eine Großvisiten-Liste zu erstellen</div>';
     }
-  }
-
-  if(gvTab==='patienten'){
-    var allBhNames=BEHANDLER.map(function(b){return b.name});
-    var gvItems=[
-      {heim:'Alexa Lichtenrade',date:'28.04.',patients:12,behandler:allBhNames.slice(),status:'geplant'},
-      {heim:'Senterra Alloheim',date:'02.05.',patients:8,behandler:allBhNames.slice(),status:'geplant'},
-      {heim:'Vitanas Märkisches V.',date:'09.05.',patients:15,behandler:allBhNames.slice(),status:'geplant'},
-      {heim:'Haus am Weigandufer',date:'16.05.',patients:10,behandler:allBhNames.slice(),status:'geplant'}
-    ];
-    var totalPat=0;gvItems.forEach(function(g){totalPat+=g.patients});
-    h+='<div class="mgr-stats" style="margin-bottom:16px">'
-      +'<div class="mgr-stat"><div class="num" style="color:var(--navy)">'+gvItems.length+'</div><div class="label">Geplant</div></div>'
-      +'<div class="mgr-stat"><div class="num" style="color:var(--emerald)">'+totalPat+'</div><div class="label">Patienten</div></div>'
-      +'<div class="mgr-stat"><div class="num" style="color:var(--violet)">'+BEHANDLER.length+'</div><div class="label">Behandler</div></div>'
-      +'<div class="mgr-stat"><div class="num" style="color:var(--amber)">0</div><div class="label">Überfällig</div></div>'
-    +'</div>';
-    h+='<div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">'
-      +'<button style="flex:1;min-width:180px;padding:12px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;gap:8px" onclick="alert(\'Neue Großvisite planen — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Neue Großvisite</button>'
-      +'<button style="flex:1;min-width:120px;padding:12px 16px;background:var(--white);color:var(--navy);border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px" onclick="alert(\'Export — in Production verfügbar\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportieren</button>'
-    +'</div>';
-    h+='<div class="gv-grid">';
-    gvItems.forEach(function(gv){
-      h+='<div class="card" style="margin-bottom:8px;cursor:pointer">'
-        +'<div style="display:flex;justify-content:space-between;align-items:start;gap:10px">'
-          +'<div style="flex:1;min-width:0">'
-            +'<div class="card-title">'+gv.heim+'</div>'
-            +'<div class="card-sub" style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
-              +'<span style="display:inline-flex;align-items:center;gap:3px">'+calIcon+' '+gv.date+'</span>'
-              +'<span style="display:inline-flex;align-items:center;gap:3px">'+usrIcon+' '+gv.patients+' Pat.</span>'
-            +'</div>'
-            +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">'
-              +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">'+n+'</span>'}).join('')
-            +'</div>'
-          +'</div>'
-          +'<span class="mini-badge" style="background:var(--blue-50);color:var(--navy);font-size:9px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);flex-shrink:0">Geplant</span>'
-        +'</div>'
-      +'</div>';
-    });
-    h+='</div>';
   }
 
   if(gvTab==='vorherige'){

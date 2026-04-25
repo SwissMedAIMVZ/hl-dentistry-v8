@@ -62,6 +62,23 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v11.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+### 2026-04-19 — Großvisiten: merge Patienten into Geplant, reduce to 2 tabs
+
+**Why:** Three tabs was one too many — the stats/visit cards and the search/saved lists are both "planning" activities. Merging them into a single Geplant tab keeps everything the Verwaltung needs on one scrollable page.
+
+**Change:** Removed the Patienten tab button entirely. Moved its content (stats row, Neue Großvisite / Exportieren buttons, scheduled visit cards grid) to the **top** of the Geplant tab, above the search bar + saved lists section. Default tab switched from `'patienten'` to `'geplant'`.
+
+**Resulting layout — Geplant tab (top to bottom):**
+1. Stats row (4 KPIs)
+2. Action buttons (Neue Großvisite + Exportieren)
+3. Scheduled visit cards (`.gv-grid`, 18px bottom margin separates from search)
+4. Search bar ("Pflegeheim suchen…")
+5. Saved lists (collapsible title cards → expandable patient grids)
+
+**Vorherige tab:** unchanged (past visit cards with green "Abgeschlossen" pill).
+
+---
+
 ### 2026-04-19 — Großvisiten: restructure into 3 tabs (Patienten / Geplant / Vorherige)
 
 **Why:** The tab names didn't match the content. The stats + scheduled visit cards belong under "Patienten" (the upcoming roster), the search + saved lists are "Geplant" (visits being prepared), and completed visits need their own "Vorherige" history tab.
