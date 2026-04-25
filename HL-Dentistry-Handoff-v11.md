@@ -145,6 +145,21 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-19 — Großvisiten drill-in: "Karte" checkbox per patient
+
+**Why:** During a Großvisite the Verwaltung tracks which patient's insurance card (Karte) has been collected/verified. A checkbox per patient row lets them mark this directly in the list.
+
+**State:** `S.gvKarte` — object mapping patient IDs to booleans. Initialized lazily (`if(!S.gvKarte)S.gvKarte={}`). Persists across renders while on the Großvisiten page.
+
+**UI per patient row:** a checkbox column on the left (before name), containing:
+- 20×20px custom checkbox (emerald fill + white checkmark when checked, white + border when unchecked)
+- "Karte" label (8px, emerald when checked, gray when unchecked)
+- `onclick` toggles `S.gvKarte[p.id]` without navigating away (uses `event.stopPropagation()`)
+
+Clicking the patient name or chevron still navigates to the 174a tab as before.
+
+---
+
 ### 2026-04-19 — Großvisiten drill-in: patient click opens 174a tab in patient file
 
 **Why:** Clicking a patient in the Großvisiten drill-in view previously opened a standalone print window (`openPatNewWindow`). The user wants it to navigate to the actual patient file's 174a tab instead.
