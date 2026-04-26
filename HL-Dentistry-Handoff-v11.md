@@ -145,6 +145,14 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Wochenplan Heute: remove Heime section below Meine Aufgaben
+
+**Why:** The Heime list underneath the task cards was redundant — Heime are accessible via the Patienten page, Großvisiten, and the Heim detail view. Removing it keeps the Wochenplan focused on today's tasks.
+
+**Change:** Removed the "Heime" `sec-label` + the `HEIME.forEach(...)` card loop (~lines 1717–1720) from `renderHome()` > `homeTab==='heute'` branch. The closing `</div>` for the `.content` wrapper was preserved.
+
+---
+
 ### 2026-04-19 — Karte status: quarterly auto-reset + icon in patient file header
 
 **Why:** The Verwaltung needs to track whether each patient's insurance card has been scanned this quarter. The status must reset automatically every quarter (Jan 1, Apr 1, Jul 1, Sep 1) so stale checks don't carry over.

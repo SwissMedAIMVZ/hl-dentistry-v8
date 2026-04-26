@@ -1714,10 +1714,6 @@ function renderHome(){
         +'<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">'+actions+'</div>'
       +'</div>';
     });
-    /* Heime section */
-    h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
-    HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});
-      h+='<div class="card" onclick="goHeim('+hm.id+')"><div class="card-row"><div><div class="card-title">'+hm.name+'</div><div class="card-sub">'+hm.addr+' \u2014 '+pts.length+' Pat.</div></div><span class="chevron">'+ICO.arrow+'</span></div></div>'});
     h+='</div>';
   } else {
     /* Nächste Woche tab — tasks assigned to the logged-in behandler */
