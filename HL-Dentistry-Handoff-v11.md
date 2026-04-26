@@ -145,6 +145,62 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Fix: Zuweisen button on Patienten page now works
+
+**Bug:** The reassign modal (`renderReassign()`) was only wired into the admin render path (`renderAdminPortal_2`). The Patienten page runs in klinik mode (`S.adminMode=false`), so the modal never rendered even though the state was set.
+
+**Fix:** Added `if(S.reassignIdx_2!==null&&!S.adminMode)html+=renderReassign();` to the klinik overlay section (after the Behandeln modal, ~line 2970). The `!S.adminMode` guard prevents double-rendering when the admin path already handles it.
+
+---
+
+### 2026-04-26 — Patienten search results: "Zuweisen →" button per patient
+
+**Why:** After searching for a patient, the Verwaltung often needs to assign them to a Behandler for an upcoming visit. Adding a "Zuweisen →" button on each search result row saves a trip through the patient file.
+
+**UI change:** each search result row in `renderPatientenPage()` gains a `reassign-btn` on the right (before the chevron was removed). Clicking the avatar or name still navigates to the patient file; clicking "Zuweisen →" opens the existing reassign modal.
+
+**New function `openAssignFromPatPage(patId)`:** pushes a temporary entry to `OFFEN_PAT` with the patient's name + heim, then opens the reassign modal (`S.reassignIdx_2`, `S.reassignSrc_2='offen'`) pointing at that index. The existing `saveReassign()` flow handles the rest — creates a TASK in Behandler-Aufgaben with the chosen Behandler + Datum + Behandlung.
+
+---
+
+### 2026-04-26 — Neuer Patient form: rename button to "Patient anlegen und zuweisen"
+
+**Change:** Button label in `renderNewPatientForm()` changed from "Patient anlegen" to "Patient anlegen und zuweisen" to reflect that the form now also schedules a Behandler-Aufgabe.
+
+---
+
+### 2026-04-26 — Neuer Patient form: Versicherungsnummer, Behandler, Datum + auto-schedule task
+
+**Why:** When creating a new patient, the Verwaltung needs to record the insurance number and optionally schedule the first appointment directly — without having to navigate to Behandler-Aufgaben separately.
+
+**New fields in `renderNewPatientForm()` (after Versicherung):**
+- **Versicherungsnummer** (`#npInsNr`) — text input, placeholder "z.B. 123456789". Value stored in `p.insNr` (was always empty string before).
+- **Behandler** (`#npBh`) — dropdown listing all `BEHANDLER` entries. Default: "— kein Termin —" (empty = no scheduling). Optional.
+- **Datum** (`#npDate`) — date input for the scheduled appointment. Optional.
+
+**`saveNewPatient()` changes:**
+- Reads `npInsNr`, `npBh`, `npDate` from the DOM.
+- Sets `p.insNr` to the entered value (previously always `""`).
+- If both `schedBh` and `schedDate` are set, pushes a new TASK to `TASKS`:
+  ```js
+  { id: nextId++, bh: schedBh, name: patName, heim: heimName(heimId),
+    behandlung: 'Erstuntersuchung', status: 'offen',
+    week: weekDiff >= 7 ? 'next' : 'current', date: 'dd.mm.' }
+  ```
+  The task appears in Behandler-Aufgaben under the selected Behandler, on the scheduled date, with "Erstuntersuchung" as the default treatment type.
+
+**If no Behandler/Datum selected:** no task is created — the patient is just added to the roster without scheduling (existing behaviour).
+
+---
+
+### 2026-04-26 — Wochenplan Heute: remove Heime section below Meine Aufgaben
+
+**Why:** The Heime list underneath the task cards was redundant — Heime are accessible via the Patienten page, Großvisiten, and the Heim detail view. Removing it keeps the Wochenplan focused on today's tasks.
+
+**Change:** Removed the "Heime" `sec-label` + the `HEIME.forEach(...)` card loop (~lines 1717–1720) from `renderHome()` > `homeTab==='heute'` branch. The closing `</div>` for the `.content` wrapper was preserved.
+
+---
+
 ### 2026-04-19 — Karte status: quarterly auto-reset + icon in patient file header
 
 **Why:** The Verwaltung needs to track whether each patient's insurance card has been scanned this quarter. The status must reset automatically every quarter (Jan 1, Apr 1, Jul 1, Sep 1) so stale checks don't carry over.

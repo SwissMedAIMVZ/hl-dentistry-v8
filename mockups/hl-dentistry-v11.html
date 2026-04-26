@@ -1714,10 +1714,6 @@ function renderHome(){
         +'<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border)" onclick="event.stopPropagation()">'+actions+'</div>'
       +'</div>';
     });
-    /* Heime section */
-    h+='<div class="sec-label" style="margin:16px -20px 12px">Heime</div>';
-    HEIME.forEach(function(hm){var pts=PATIENTS.filter(function(p){return p.heim===hm.id});
-      h+='<div class="card" onclick="goHeim('+hm.id+')"><div class="card-row"><div><div class="card-title">'+hm.name+'</div><div class="card-sub">'+hm.addr+' \u2014 '+pts.length+' Pat.</div></div><span class="chevron">'+ICO.arrow+'</span></div></div>'});
     h+='</div>';
   } else {
     /* Nächste Woche tab — tasks assigned to the logged-in behandler */
@@ -2971,6 +2967,8 @@ function render(){
   if(S.rescheduleModal)html+=renderRescheduleModal();
   /* Home task Behandeln modal */
   if(S.behandelnModal)html+=renderBehandelnModal();
+  /* Reassign modal (also used from Patienten page) */
+  if(S.reassignIdx_2!==null&&!S.adminMode)html+=renderReassign();
   /* Horizontal odontogram zoom overlay */
   if(S.odoZoom)html+=renderOdoZoom();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */
@@ -3003,6 +3001,17 @@ function toggleKarte(patId){
 }
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
 function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
+function openAssignFromPatPage(patId){
+  var p=PATIENTS.find(function(x){return x.id===patId});if(!p)return;
+  OFFEN_PAT.push({name:p.name,heim:heimName(p.heim),since:0});
+  var idx=OFFEN_PAT.length-1;
+  S._assignFromPatPage=idx;
+  S.reassignIdx_2=idx;
+  S.reassignSrc_2='offen';
+  S.reassignForm_2={bh:'',date:'',behandlung:''};
+  S.reassignErr_2='';
+  render();
+}
 function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";trackRecentPat(id);render()}
 function openPatNewWindow(id){
   var p=PATIENTS.find(function(x){return x.id===id});if(!p)return;
@@ -3166,9 +3175,14 @@ function renderNewPatientForm(){
   [1,2,3,4,5].forEach(function(g){h+='<option value="'+g+'"'+((d.pflegegrad||"3")==g?' selected':'')+'>Grad '+g+'</option>'});
   h+='</select></div><div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Geburtsdatum</label><input id="npGeb" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" value="'+(d.geb||'')+'"></div></div>';
   h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Versicherung</label><input id="npIns" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" placeholder="z.B. TK, AOK, Barmer" value="'+(d.ins||'')+'"></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Versicherungsnummer</label><input id="npInsNr" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" placeholder="z.B. 123456789" value="'+(d.insNr||'')+'"></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Behandler</label><select id="npBh" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--white)"><option value="">— kein Termin —</option>';
+  BEHANDLER.forEach(function(b){h+='<option value="'+b.id+'"'+(d.bh===b.id?' selected':'')+'>'+b.name+'</option>'});
+  h+='</select></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Datum</label><input id="npDate" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" value="'+(d.schedDate||'')+'"></div>';
   h+='</div>';
   h+='<div style="display:flex;gap:8px;margin-top:16px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-3);border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="S.showNewPatient=false;render()">Abbrechen</button>';
-  h+='<button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveNewPatient()">Patient anlegen</button></div>';
+  h+='<button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveNewPatient()">Patient anlegen und zuweisen</button></div>';
   h+='</div></div>';return h;
 }
 function saveNewPatient(){
@@ -3179,12 +3193,23 @@ function saveNewPatient(){
   var dupCheck=PATIENTS.find(function(x){return x.name.toLowerCase().includes(nach.toLowerCase())&&x.heim===heimId});
   if(dupCheck&&!S.dupConfirmed){S.duplicateWarning={name:dupCheck.name,heim:heimName(dupCheck.heim)};render();return}
   var ins=document.getElementById("npIns")?document.getElementById("npIns").value.trim():"";
+  var insNr=document.getElementById("npInsNr")?document.getElementById("npInsNr").value.trim():"";
   var geb=document.getElementById("npGeb")?document.getElementById("npGeb").value:"";
   var pfl=document.getElementById("npPflege")?document.getElementById("npPflege").value:"3";
+  var schedBh=document.getElementById("npBh")?document.getElementById("npBh").value:"";
+  var schedDate=document.getElementById("npDate")?document.getElementById("npDate").value:"";
   var age=geb?Math.floor((Date.now()-new Date(geb).getTime())/(365.25*D)):80;
   var nid=PATIENTS.reduce(function(m,x){return Math.max(m,x.id)},0)+1;
+  var patName=nach+", "+vor;
   var emptyOdo={tl:["f","f","f","f","f","f","f","f"],tr:["f","f","f","f","f","f","f","f"],bl:["f","f","f","f","f","f","f","f"],br:["f","f","f","f","f","f","f","f"]};
-  PATIENTS.push({id:nid,name:nach+", "+vor,heim:heimId,room:wohn,age:age,ins:ins||"GKV",insNr:"",z1Nr:"Z1-"+new Date().getFullYear()+"-"+String(nid).padStart(4,"0"),rel:false,odo:emptyOdo,tx:[],txPlan:{},ze:null,pa:null,odoHist:[],visits:[],photos:[],pflegegrad:parseInt(pfl)});
+  PATIENTS.push({id:nid,name:patName,heim:heimId,room:wohn,age:age,ins:ins||"GKV",insNr:insNr,z1Nr:"Z1-"+new Date().getFullYear()+"-"+String(nid).padStart(4,"0"),rel:false,odo:emptyOdo,tx:[],txPlan:{},ze:null,pa:null,odoHist:[],visits:[],photos:[],pflegegrad:parseInt(pfl)});
+  /* Schedule a task in Behandler-Aufgaben if Behandler + Datum are set */
+  if(schedBh&&schedDate){
+    var sd=new Date(schedDate);
+    var dateStr=String(sd.getDate()).padStart(2,'0')+'.'+String(sd.getMonth()+1).padStart(2,'0')+'.';
+    var weekDiff=Math.floor((sd.getTime()-TODAY.getTime())/D);
+    TASKS.push({id:nextId++,bh:schedBh,name:patName,heim:heimName(heimId),behandlung:'Erstuntersuchung',status:'offen',week:weekDiff>=7?'next':'current',date:dateStr});
+  }
   S.showNewPatient=false;S.newPatData={};S.dupConfirmed=false;S.duplicateWarning=null;S.patId=nid;S.screen="patient";S.patTab="Details";render();
 }
 
@@ -5344,13 +5369,13 @@ function renderPatientenPage(){
   /* Search results */
   if(pq){
     filtered.forEach(function(p){
-      h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
-        +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-3)">'+p.name.charAt(0)+'</div>'
-        +'<div style="flex:1;min-width:0">'
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--surface-2)">'
+        +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-3);cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'+p.name.charAt(0)+'</div>'
+        +'<div style="flex:1;min-width:0;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
           +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+p.name+'</div>'
           +'<div style="font-size:10px;color:var(--text-3)">'+heimName(p.heim)+' · Zi. '+p.room+'</div>'
         +'</div>'
-        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg>'
+        +'<button class="reassign-btn" style="flex-shrink:0" onclick="event.stopPropagation();openAssignFromPatPage('+p.id+')">Zuweisen →</button>'
       +'</div>';
     });
     if(filtered.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
