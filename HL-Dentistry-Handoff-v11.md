@@ -145,6 +145,28 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Desktop: wire all overlays + widen popup sheets
+
+**Why:** The desktop render path (`renderDesktop`) was missing overlay modals — popups like the reassign modal, reschedule modal, Behandeln popup, new patient form, and duplicate warning only rendered in the mobile klinik path. Clicking "Zuweisen" or "Neuer Patient" on desktop did nothing visible.
+
+**Overlay wiring in `renderDesktop()` (~line 2878):** added after `</div> /* close dk-main */`, before the toast:
+```js
+if(S.rescheduleModal) h += renderRescheduleModal();
+if(S.behandelnModal)  h += renderBehandelnModal();
+if(S.reassignIdx_2 !== null) h += renderReassign();
+if(S.showNewPatient) h += renderNewPatientForm();
+if(S.showLogoutConfirm) h += renderLogoutConfirm();
+if(S.duplicateWarning) h += /* inline duplicate warning overlay */;
+```
+
+**Desktop overlay CSS** (inside `@media(min-width:900px)`):
+- `.overlay-bg` → `align-items: center` (vertically centered instead of bottom-aligned).
+- `.overlay-sheet` → `width: 480px` (wider than the 393px mobile default) + `border-radius: var(--r-xl)` on all corners (not just top — since it's centered, not bottom-sheet-style).
+
+**Result:** all task popups (Aufgabe zuweisen, Neu planen, Neue Aufgabe, Neuer Patient, Behandeln, duplicate warning) now render correctly on desktop as centered modal dialogs.
+
+---
+
 ### 2026-04-26 — All task popups: add Beschreibung field (max 300 chars)
 
 **Why:** Consistency — all task assignment and scheduling popups should have the same description field.
