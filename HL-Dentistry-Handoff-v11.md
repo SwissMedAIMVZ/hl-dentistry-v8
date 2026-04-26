@@ -145,6 +145,12 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Neuer Patient form: rename button to "Patient anlegen und zuweisen"
+
+**Change:** Button label in `renderNewPatientForm()` changed from "Patient anlegen" to "Patient anlegen und zuweisen" to reflect that the form now also schedules a Behandler-Aufgabe.
+
+---
+
 ### 2026-04-26 — Neuer Patient form: Versicherungsnummer, Behandler, Datum + auto-schedule task
 
 **Why:** When creating a new patient, the Verwaltung needs to record the insurance number and optionally schedule the first appointment directly — without having to navigate to Behandler-Aufgaben separately.

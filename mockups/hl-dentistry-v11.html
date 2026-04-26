@@ -3169,7 +3169,7 @@ function renderNewPatientForm(){
   h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Datum</label><input id="npDate" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" value="'+(d.schedDate||'')+'"></div>';
   h+='</div>';
   h+='<div style="display:flex;gap:8px;margin-top:16px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-3);border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="S.showNewPatient=false;render()">Abbrechen</button>';
-  h+='<button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveNewPatient()">Patient anlegen</button></div>';
+  h+='<button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveNewPatient()">Patient anlegen und zuweisen</button></div>';
   h+='</div></div>';return h;
 }
 function saveNewPatient(){
