@@ -145,6 +145,16 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Patienten search results: "Zuweisen →" button per patient
+
+**Why:** After searching for a patient, the Verwaltung often needs to assign them to a Behandler for an upcoming visit. Adding a "Zuweisen →" button on each search result row saves a trip through the patient file.
+
+**UI change:** each search result row in `renderPatientenPage()` gains a `reassign-btn` on the right (before the chevron was removed). Clicking the avatar or name still navigates to the patient file; clicking "Zuweisen →" opens the existing reassign modal.
+
+**New function `openAssignFromPatPage(patId)`:** pushes a temporary entry to `OFFEN_PAT` with the patient's name + heim, then opens the reassign modal (`S.reassignIdx_2`, `S.reassignSrc_2='offen'`) pointing at that index. The existing `saveReassign()` flow handles the rest — creates a TASK in Behandler-Aufgaben with the chosen Behandler + Datum + Behandlung.
+
+---
+
 ### 2026-04-26 — Neuer Patient form: rename button to "Patient anlegen und zuweisen"
 
 **Change:** Button label in `renderNewPatientForm()` changed from "Patient anlegen" to "Patient anlegen und zuweisen" to reflect that the form now also schedules a Behandler-Aufgabe.

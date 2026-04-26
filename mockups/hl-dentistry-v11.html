@@ -2999,6 +2999,17 @@ function toggleKarte(patId){
 }
 function goPat(id){S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
 function goPatFromAdmin(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="Historie";trackRecentPat(id);render()}
+function openAssignFromPatPage(patId){
+  var p=PATIENTS.find(function(x){return x.id===patId});if(!p)return;
+  OFFEN_PAT.push({name:p.name,heim:heimName(p.heim),since:0});
+  var idx=OFFEN_PAT.length-1;
+  S._assignFromPatPage=idx;
+  S.reassignIdx_2=idx;
+  S.reassignSrc_2='offen';
+  S.reassignForm_2={bh:'',date:'',behandlung:''};
+  S.reassignErr_2='';
+  render();
+}
 function goPatTo174a(id){S.adminMode=false;S.screen="patient";S.patId=id;S.patTab="174a";trackRecentPat(id);render()}
 function openPatNewWindow(id){
   var p=PATIENTS.find(function(x){return x.id===id});if(!p)return;
@@ -5356,13 +5367,13 @@ function renderPatientenPage(){
   /* Search results */
   if(pq){
     filtered.forEach(function(p){
-      h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--surface-2);cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
-        +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-3)">'+p.name.charAt(0)+'</div>'
-        +'<div style="flex:1;min-width:0">'
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--surface-2)">'
+        +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-3);cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'+p.name.charAt(0)+'</div>'
+        +'<div style="flex:1;min-width:0;cursor:pointer" onclick="goPatFromAdmin('+p.id+')">'
           +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+p.name+'</div>'
           +'<div style="font-size:10px;color:var(--text-3)">'+heimName(p.heim)+' · Zi. '+p.room+'</div>'
         +'</div>'
-        +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg>'
+        +'<button class="reassign-btn" style="flex-shrink:0" onclick="event.stopPropagation();openAssignFromPatPage('+p.id+')">Zuweisen →</button>'
       +'</div>';
     });
     if(filtered.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
