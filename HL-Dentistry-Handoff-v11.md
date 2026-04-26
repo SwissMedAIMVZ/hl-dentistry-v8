@@ -145,6 +145,18 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Großvisiten drill-in: green border on visited patients
+
+**Why:** During a Großvisite the Verwaltung works through the patient list one by one. Marking visited patients with a green left border gives visual progress — at a glance you see who's been seen and who's still pending.
+
+**State:** `S.gvVisited` — object mapping patient IDs to `true`. Set to `true` automatically when the user clicks a patient row (name or chevron) to open their 174a tab.
+
+**Visual:** patient rows in the drill-in list get `border-left: 3px solid var(--emerald)` + `padding-left: 8px` when `S.gvVisited[p.id]` is truthy. Unvisited rows have `transparent` border (no shift). `transition: all .2s` on the row for smooth colour appearance.
+
+**Persistence:** `S.gvVisited` persists during the session. It resets on page reload (in-memory state). In production this would be backed by a visit-log table.
+
+---
+
 ### 2026-04-26 — Großvisiten Geplant: move search bar to the top
 
 **Why:** The search bar was buried below the stats row, action buttons, and visit cards. On mobile especially, the user had to scroll down to find it. Placing it at the very top of the Geplant overview makes it the first thing visible.
