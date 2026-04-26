@@ -5463,7 +5463,30 @@ function renderGrossvisiten(){
       });
       if(filteredPats.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
     } else {
-    /* Overview: stats + cards */
+    /* Overview: search bar at top + stats + cards + saved lists */
+    if(!S.gvSavedLists)S.gvSavedLists=[];
+    var gvQ=(S.gvHeimSearch||'').toLowerCase();
+    var matchedHeime=gvQ?HEIME.filter(function(hm){return hm.name.toLowerCase().indexOf(gvQ)!==-1}):[];
+    h+='<div style="position:relative;margin-bottom:16px">'
+      +'<div style="position:relative">'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+        +'<input type="search" id="gvHeimSearch" placeholder="Pflegeheim suchen…" value="'+(S.gvHeimSearch||'').replace(/"/g,'&quot;')+'" oninput="S.gvHeimSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid '+(gvQ&&matchedHeime.length>0?'var(--blue)':'var(--border)')+';border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text);transition:border .2s" autocomplete="off">'
+      +'</div>';
+    if(gvQ&&matchedHeime.length>0){
+      h+='<div style="border:1.5px solid var(--blue);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--white);overflow:hidden;box-shadow:var(--sh-md)">';
+      matchedHeime.forEach(function(hm){
+        var patCount=PATIENTS.filter(function(p){return p.heim===hm.id}).length;
+        h+='<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--surface-2);font-size:12px;transition:background .1s" onmouseover="this.style.background=\'var(--blue-25)\'" onmouseout="this.style.background=\'var(--white)\'" onclick="gvSaveList('+hm.id+')">'
+          +'<div style="font-weight:600;color:var(--text)">'+hm.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+hm.addr+' · '+patCount+' Patienten</div>'
+        +'</div>';
+      });
+      h+='</div>';
+    }
+    if(gvQ&&matchedHeime.length===0){
+      h+='<div style="padding:12px 14px;font-size:11px;color:var(--text-4);text-align:center;background:var(--surface);border-radius:0 0 var(--r-md) var(--r-md);border:1px solid var(--border);border-top:none">Kein Pflegeheim gefunden</div>';
+    }
+    h+='</div>';
     var totalPat=0;gvItems.forEach(function(g){totalPat+=g.patients});
     h+='<div class="mgr-stats" style="margin-bottom:16px">'
       +'<div class="mgr-stat"><div class="num" style="color:var(--navy)">'+gvItems.length+'</div><div class="label">Geplant</div></div>'
@@ -5498,32 +5521,6 @@ function renderGrossvisiten(){
         +'</div>'
       +'</div>';
     });
-    h+='</div>';
-    /* Saved patient lists */
-    if(!S.gvSavedLists)S.gvSavedLists=[];
-    /* Search bar */
-    var gvQ=(S.gvHeimSearch||'').toLowerCase();
-    var matchedHeime=gvQ?HEIME.filter(function(hm){return hm.name.toLowerCase().indexOf(gvQ)!==-1}):[];
-    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Pflegeheim suchen</div>'
-      +'<div style="position:relative;margin-bottom:16px">'
-        +'<div style="position:relative">'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-          +'<input type="search" id="gvHeimSearch" placeholder="Pflegeheim suchen…" value="'+(S.gvHeimSearch||'').replace(/"/g,'&quot;')+'" oninput="S.gvHeimSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid '+(gvQ&&matchedHeime.length>0?'var(--blue)':'var(--border)')+';border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text);transition:border .2s" autocomplete="off">'
-        +'</div>';
-    if(gvQ&&matchedHeime.length>0){
-      h+='<div style="border:1.5px solid var(--blue);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--white);overflow:hidden;box-shadow:var(--sh-md)">';
-      matchedHeime.forEach(function(hm){
-        var patCount=PATIENTS.filter(function(p){return p.heim===hm.id}).length;
-        h+='<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--surface-2);font-size:12px;transition:background .1s" onmouseover="this.style.background=\'var(--blue-25)\'" onmouseout="this.style.background=\'var(--white)\'" onclick="gvSaveList('+hm.id+')">'
-          +'<div style="font-weight:600;color:var(--text)">'+hm.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+hm.addr+' · '+patCount+' Patienten</div>'
-        +'</div>';
-      });
-      h+='</div>';
-    }
-    if(gvQ&&matchedHeime.length===0){
-      h+='<div style="padding:12px 14px;font-size:11px;color:var(--text-4);text-align:center;background:var(--surface);border-radius:0 0 var(--r-md) var(--r-md);border:1px solid var(--border);border-top:none">Kein Pflegeheim gefunden</div>';
-    }
     h+='</div>';
     /* Saved lists */
     if(S.gvSavedLists.length>0){

@@ -145,6 +145,23 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Großvisiten Geplant: move search bar to the top
+
+**Why:** The search bar was buried below the stats row, action buttons, and visit cards. On mobile especially, the user had to scroll down to find it. Placing it at the very top of the Geplant overview makes it the first thing visible.
+
+**Change:** Moved the Pflegeheim search bar + autocomplete block from below the visit cards to above the stats row — it's now the first element in the Geplant overview (`else` branch). Removed the old "PFLEGEHEIM SUCHEN" uppercase overline (the input's placeholder is self-explanatory). Removed the duplicate `if(!S.gvSavedLists)` init and `gvQ`/`matchedHeime` declarations from the old position — they now live in the new top-of-overview block.
+
+**Layout order (Geplant overview, top to bottom):**
+1. Search bar (Pflegeheim suchen) + autocomplete suggestions
+2. Stats row (4 KPIs)
+3. Action buttons (Neue Großvisite + Exportieren)
+4. Visit cards (.gv-grid)
+5. Saved lists (Gespeicherte Listen)
+
+**Desktop:** no extra CSS needed — the search bar already uses `width:100%` + `var(--r-md)` border-radius, which works inside `.dk-verw-content`.
+
+---
+
 ### 2026-04-26 — Desktop: wire all overlays + widen popup sheets
 
 **Why:** The desktop render path (`renderDesktop`) was missing overlay modals — popups like the reassign modal, reschedule modal, Behandeln popup, new patient form, and duplicate warning only rendered in the mobile klinik path. Clicking "Zuweisen" or "Neuer Patient" on desktop did nothing visible.
