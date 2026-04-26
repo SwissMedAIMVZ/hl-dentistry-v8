@@ -1008,7 +1008,7 @@ var S={adminMode: false,
   filter_2: 'offen',
   openBh_2: {hFeld:true,hHess:true,hGomez:true},
   showAdd_2: false,
-  addForm_2: {patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:'current',date:'',status:'offen'},
+  addForm_2: {patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:'current',date:'',status:'offen',desc:''},
   addErr_2: '',
   reassignIdx_2: null,
   reassignSrc_2: null,
@@ -1363,7 +1363,7 @@ function openRescheduleModal(k){
   var tomorrow=new Date(TODAY.getTime()+D);
   var iso=tomorrow.getFullYear()+'-'+String(tomorrow.getMonth()+1).padStart(2,'0')+'-'+String(tomorrow.getDate()).padStart(2,'0');
   S.rescheduleModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
-  S.rescheduleForm={date:iso,bh:curBh};
+  S.rescheduleForm={date:iso,bh:curBh,desc:''};
   render();
 }
 function closeRescheduleModal(){S.rescheduleModal=null;render()}
@@ -1403,6 +1403,8 @@ function renderRescheduleModal(){
       +'<select class="form-select" id="rschBh" onchange="S.rescheduleForm.bh=this.value">'
         +BEHANDLER.map(function(b){return'<option value="'+b.id+'"'+(f.bh===b.id?' selected':'')+'>'+b.name+'</option>';}).join('')
       +'</select>'
+      +'<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+      +'<textarea id="rschDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung…" style="resize:vertical;font-family:inherit" oninput="S.rescheduleForm.desc=this.value">'+(f.desc||'')+'</textarea>'
       +'<button class="save-btn" onclick="saveRescheduleModal()">Neu planen</button>'
     +'</div>'
   +'</div>';
@@ -3690,6 +3692,8 @@ function renderAdd_2(){
       +'<option value="erledigt"'+(f.status==='erledigt'?' selected':'')+'>Erledigt</option>'
     +'</select>';
 
+  h+='<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+    +'<textarea id="aDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung der Aufgabe…" style="resize:vertical;font-family:inherit" oninput="S.addForm_2.desc=this.value">'+(f.desc||'')+'</textarea>';
   h+='<div class="form-err" id="addErr">'+S.addErr_2+'</div>';
   h+='<button class="save-btn" onclick="saveTask()">Aufgabe speichern</button>';
   h+='</div></div>';
@@ -4182,7 +4186,7 @@ function saveReassign(){
 function setTab(t){S.tab_2=t;render()}
 function setFilter(f){S.filter_2=f;render()}
 function toggleBh(id){S.openBh_2[id]=!S.openBh_2[id];render()}
-function openAdd(){S.showAdd_2=true;S.addErr_2='';S._addPatSearch='';S.addForm_2={patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:S.tab_2==='woche'?'next':'current',date:'',status:'offen'};render()}
+function openAdd(){S.showAdd_2=true;S.addErr_2='';S._addPatSearch='';S.addForm_2={patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:S.tab_2==='woche'?'next':'current',date:'',status:'offen',desc:''};render()}
 function closeAdd(){S.showAdd_2=false;S._addPatSearch='';render()}
 function setPatType(t){S.addForm_2.patType=t;S.addForm_2.existingPatId='';S._addPatSearch='';render()}
 /* selectExPat removed — replaced by inline search selection in renderAdd_2 */

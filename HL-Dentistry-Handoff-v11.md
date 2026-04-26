@@ -145,6 +145,20 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — All task popups: add Beschreibung field (max 300 chars)
+
+**Why:** Consistency — all task assignment and scheduling popups should have the same description field.
+
+**Popups updated (3 total, in addition to the "Aufgabe zuweisen" modal done earlier):**
+
+1. **"Aufgabe neu planen"** (reschedule modal, `renderRescheduleModal`) — textarea `#rschDesc` added after the Behandler select, bound to `S.rescheduleForm.desc`. Init: `desc:''` added to `S.rescheduleForm` in `openRescheduleModal`.
+
+2. **"Neue Aufgabe"** (add task in Verwaltung, `renderAdd_2`) — textarea `#aDesc` added after the Status select, bound to `S.addForm_2.desc`. Init: `desc:''` added to `S.addForm_2` in both the default state object and `openAdd()`.
+
+All three textareas share the same spec: `maxlength="300"`, 3 rows, resizable vertically, label "BESCHREIBUNG (max. 300 Zeichen)", placeholder "Kurze Beschreibung…".
+
+---
+
 ### 2026-04-26 — Aufgabe zuweisen popup: add Beschreibung field (max 300 chars)
 
 **Why:** When assigning a task, the Verwaltung often needs to add a short note (e.g. "Patient klagt über Schmerzen regio 36" or "Prothese sitzt nicht"). A description field captures this context directly in the assign flow.
