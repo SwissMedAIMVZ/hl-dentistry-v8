@@ -2967,6 +2967,8 @@ function render(){
   if(S.rescheduleModal)html+=renderRescheduleModal();
   /* Home task Behandeln modal */
   if(S.behandelnModal)html+=renderBehandelnModal();
+  /* Reassign modal (also used from Patienten page) */
+  if(S.reassignIdx_2!==null&&!S.adminMode)html+=renderReassign();
   /* Horizontal odontogram zoom overlay */
   if(S.odoZoom)html+=renderOdoZoom();
   /* Hamburger menu — shared with Verwaltung (renderMenu_2) */

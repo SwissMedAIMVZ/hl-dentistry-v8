@@ -145,6 +145,14 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Fix: Zuweisen button on Patienten page now works
+
+**Bug:** The reassign modal (`renderReassign()`) was only wired into the admin render path (`renderAdminPortal_2`). The Patienten page runs in klinik mode (`S.adminMode=false`), so the modal never rendered even though the state was set.
+
+**Fix:** Added `if(S.reassignIdx_2!==null&&!S.adminMode)html+=renderReassign();` to the klinik overlay section (after the Behandeln modal, ~line 2970). The `!S.adminMode` guard prevents double-rendering when the admin path already handles it.
+
+---
+
 ### 2026-04-26 — Patienten search results: "Zuweisen →" button per patient
 
 **Why:** After searching for a patient, the Verwaltung often needs to assign them to a Behandler for an upcoming visit. Adding a "Zuweisen →" button on each search result row saves a trip through the patient file.
