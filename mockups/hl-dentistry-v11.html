@@ -3162,6 +3162,11 @@ function renderNewPatientForm(){
   [1,2,3,4,5].forEach(function(g){h+='<option value="'+g+'"'+((d.pflegegrad||"3")==g?' selected':'')+'>Grad '+g+'</option>'});
   h+='</select></div><div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Geburtsdatum</label><input id="npGeb" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" value="'+(d.geb||'')+'"></div></div>';
   h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Versicherung</label><input id="npIns" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" placeholder="z.B. TK, AOK, Barmer" value="'+(d.ins||'')+'"></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Versicherungsnummer</label><input id="npInsNr" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" placeholder="z.B. 123456789" value="'+(d.insNr||'')+'"></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Behandler</label><select id="npBh" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--white)"><option value="">— kein Termin —</option>';
+  BEHANDLER.forEach(function(b){h+='<option value="'+b.id+'"'+(d.bh===b.id?' selected':'')+'>'+b.name+'</option>'});
+  h+='</select></div>';
+  h+='<div><label style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Datum</label><input id="npDate" type="date" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none" value="'+(d.schedDate||'')+'"></div>';
   h+='</div>';
   h+='<div style="display:flex;gap:8px;margin-top:16px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-3);border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="S.showNewPatient=false;render()">Abbrechen</button>';
   h+='<button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="saveNewPatient()">Patient anlegen</button></div>';
@@ -3175,12 +3180,23 @@ function saveNewPatient(){
   var dupCheck=PATIENTS.find(function(x){return x.name.toLowerCase().includes(nach.toLowerCase())&&x.heim===heimId});
   if(dupCheck&&!S.dupConfirmed){S.duplicateWarning={name:dupCheck.name,heim:heimName(dupCheck.heim)};render();return}
   var ins=document.getElementById("npIns")?document.getElementById("npIns").value.trim():"";
+  var insNr=document.getElementById("npInsNr")?document.getElementById("npInsNr").value.trim():"";
   var geb=document.getElementById("npGeb")?document.getElementById("npGeb").value:"";
   var pfl=document.getElementById("npPflege")?document.getElementById("npPflege").value:"3";
+  var schedBh=document.getElementById("npBh")?document.getElementById("npBh").value:"";
+  var schedDate=document.getElementById("npDate")?document.getElementById("npDate").value:"";
   var age=geb?Math.floor((Date.now()-new Date(geb).getTime())/(365.25*D)):80;
   var nid=PATIENTS.reduce(function(m,x){return Math.max(m,x.id)},0)+1;
+  var patName=nach+", "+vor;
   var emptyOdo={tl:["f","f","f","f","f","f","f","f"],tr:["f","f","f","f","f","f","f","f"],bl:["f","f","f","f","f","f","f","f"],br:["f","f","f","f","f","f","f","f"]};
-  PATIENTS.push({id:nid,name:nach+", "+vor,heim:heimId,room:wohn,age:age,ins:ins||"GKV",insNr:"",z1Nr:"Z1-"+new Date().getFullYear()+"-"+String(nid).padStart(4,"0"),rel:false,odo:emptyOdo,tx:[],txPlan:{},ze:null,pa:null,odoHist:[],visits:[],photos:[],pflegegrad:parseInt(pfl)});
+  PATIENTS.push({id:nid,name:patName,heim:heimId,room:wohn,age:age,ins:ins||"GKV",insNr:insNr,z1Nr:"Z1-"+new Date().getFullYear()+"-"+String(nid).padStart(4,"0"),rel:false,odo:emptyOdo,tx:[],txPlan:{},ze:null,pa:null,odoHist:[],visits:[],photos:[],pflegegrad:parseInt(pfl)});
+  /* Schedule a task in Behandler-Aufgaben if Behandler + Datum are set */
+  if(schedBh&&schedDate){
+    var sd=new Date(schedDate);
+    var dateStr=String(sd.getDate()).padStart(2,'0')+'.'+String(sd.getMonth()+1).padStart(2,'0')+'.';
+    var weekDiff=Math.floor((sd.getTime()-TODAY.getTime())/D);
+    TASKS.push({id:nextId++,bh:schedBh,name:patName,heim:heimName(heimId),behandlung:'Erstuntersuchung',status:'offen',week:weekDiff>=7?'next':'current',date:dateStr});
+  }
   S.showNewPatient=false;S.newPatData={};S.dupConfirmed=false;S.duplicateWarning=null;S.patId=nid;S.screen="patient";S.patTab="Details";render();
 }
 

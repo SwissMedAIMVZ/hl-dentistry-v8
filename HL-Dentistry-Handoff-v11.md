@@ -145,6 +145,30 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Neuer Patient form: Versicherungsnummer, Behandler, Datum + auto-schedule task
+
+**Why:** When creating a new patient, the Verwaltung needs to record the insurance number and optionally schedule the first appointment directly — without having to navigate to Behandler-Aufgaben separately.
+
+**New fields in `renderNewPatientForm()` (after Versicherung):**
+- **Versicherungsnummer** (`#npInsNr`) — text input, placeholder "z.B. 123456789". Value stored in `p.insNr` (was always empty string before).
+- **Behandler** (`#npBh`) — dropdown listing all `BEHANDLER` entries. Default: "— kein Termin —" (empty = no scheduling). Optional.
+- **Datum** (`#npDate`) — date input for the scheduled appointment. Optional.
+
+**`saveNewPatient()` changes:**
+- Reads `npInsNr`, `npBh`, `npDate` from the DOM.
+- Sets `p.insNr` to the entered value (previously always `""`).
+- If both `schedBh` and `schedDate` are set, pushes a new TASK to `TASKS`:
+  ```js
+  { id: nextId++, bh: schedBh, name: patName, heim: heimName(heimId),
+    behandlung: 'Erstuntersuchung', status: 'offen',
+    week: weekDiff >= 7 ? 'next' : 'current', date: 'dd.mm.' }
+  ```
+  The task appears in Behandler-Aufgaben under the selected Behandler, on the scheduled date, with "Erstuntersuchung" as the default treatment type.
+
+**If no Behandler/Datum selected:** no task is created — the patient is just added to the roster without scheduling (existing behaviour).
+
+---
+
 ### 2026-04-26 — Wochenplan Heute: remove Heime section below Meine Aufgaben
 
 **Why:** The Heime list underneath the task cards was redundant — Heime are accessible via the Patienten page, Großvisiten, and the Heim detail view. Removing it keeps the Wochenplan focused on today's tasks.
