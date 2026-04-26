@@ -10,7 +10,7 @@ SwissMedAI GmbH · CEO: Jesus Gomez Rossi
 
 **[Open Health Ledger landing](https://swissmedaimvz.github.io/hl-dentistry-v8/)**
 
-The landing page links to all mockups, brand assets, and documentation. Jump straight to the current version: **[hl-dentistry-v10.html](mockups/hl-dentistry-v10.html)**.
+The landing page links to all mockups, brand assets, and documentation. Jump straight to the current version: **[hl-dentistry-v11.html](mockups/hl-dentistry-v11.html)**.
 
 ### Login Credentials
 
@@ -33,11 +33,13 @@ The landing page links to all mockups, brand assets, and documentation. Jump str
 ├── HL-DENTISTRY-CONTEXT.md              — architecture, data model, stack
 ├── HL-Dentistry-Handoff-v2.md           — legacy full technical reference
 ├── HL-Dentistry-Handoff-v9.md           — v8→v9 change log (frozen)
-├── HL-Dentistry-Handoff-v10.md          — v9→v10 change log (living)
+├── HL-Dentistry-Handoff-v10.md          — v9→v10 change log (frozen)
+├── HL-Dentistry-Handoff-v11.md          — v10→v11 change log (living)
 │
 ├── mockups/                             — interactive HTML prototypes
-│   ├── hl-dentistry-v10.html            — current working version
-│   ├── hl-dentistry-v9.html             — frozen previous version
+│   ├── hl-dentistry-v11.html            — current working version
+│   ├── hl-dentistry-v10.html            — frozen previous version
+│   ├── hl-dentistry-v9.html             — frozen
 │   ├── hl-dentistry-v8.html             — frozen (original baseline)
 │   ├── hl-dentistry-v7.html             — early iteration
 │   ├── hl-admin-v3.html                 — standalone admin portal
@@ -109,6 +111,6 @@ The production React Native app (separate repo) uses:
 
 ## Documentation
 
-Start with `HL-Dentistry-Handoff-v10.md` for the most recent change log and current state. For the full architecture and domain knowledge, read `HL-DENTISTRY-CONTEXT.md` and `HL-Dentistry-Handoff-v2.md`.
+Start with `HL-Dentistry-Handoff-v11.md` for the most recent change log and current state. For the v9→v10 delta, see `HL-Dentistry-Handoff-v10.md` (frozen). For the full architecture and domain knowledge, read `HL-DENTISTRY-CONTEXT.md` and `HL-Dentistry-Handoff-v2.md`.
 
 For deployment of the brand assets and CSS in the production app, see [`assets/README.md`](assets/README.md).
