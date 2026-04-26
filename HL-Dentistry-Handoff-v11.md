@@ -145,15 +145,23 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
-### 2026-04-26 — Großvisiten drill-in: green border on visited patients
+### 2026-04-26 — Großvisiten drill-in: green border when §174a completed today
 
-**Why:** During a Großvisite the Verwaltung works through the patient list one by one. Marking visited patients with a green left border gives visual progress — at a glance you see who's been seen and who's still pending.
+**Why:** The green border should reflect actual clinical documentation, not just "the user clicked the row". A patient counts as visited when the 1st step of the §174a form has been completed — which creates a `forms174a` entry with today's date.
 
-**State:** `S.gvVisited` — object mapping patient IDs to `true`. Set to `true` automatically when the user clicks a patient row (name or chevron) to open their 174a tab.
+**Logic:** replaced `S.gvVisited` (click-based) with a data-driven check:
+```js
+var today = new Date(); today.setHours(0,0,0,0);
+var visited = p.forms174a && p.forms174a.some(f => {
+  var fd = new Date(f.date); fd.setHours(0,0,0,0);
+  return fd.getTime() === todayMs;
+});
+```
+Checks if any `p.forms174a[]` entry has a date matching today (same day, ignoring time). This fires when `save174a()` pushes `{date: Date.now(), id: ...}` to the patient's array.
 
-**Visual:** patient rows in the drill-in list get `border-left: 3px solid var(--emerald)` + `padding-left: 8px` when `S.gvVisited[p.id]` is truthy. Unvisited rows have `transparent` border (no shift). `transition: all .2s` on the row for smooth colour appearance.
+**Visual:** unchanged — `border-left: 3px solid var(--emerald)` + `padding-left: 8px` on visited rows, transparent on pending.
 
-**Persistence:** `S.gvVisited` persists during the session. It resets on page reload (in-memory state). In production this would be backed by a visit-log table.
+**Removed:** `S.gvVisited` state + the click-based marking in `onclick` handlers. The green border is now purely data-driven — no manual tracking needed.
 
 ---
 

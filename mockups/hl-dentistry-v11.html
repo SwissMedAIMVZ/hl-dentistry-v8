@@ -5448,19 +5448,19 @@ function renderGrossvisiten(){
         if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
         if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
         var checked=isKarteValid(p.id);
-        if(!S.gvVisited)S.gvVisited={};
-        var visited=!!S.gvVisited[p.id];
+        var today=new Date();today.setHours(0,0,0,0);var todayMs=today.getTime();
+        var visited=p.forms174a&&p.forms174a.some(function(f){var fd=new Date(f.date);fd.setHours(0,0,0,0);return fd.getTime()===todayMs});
         h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2);border-left:3px solid '+(visited?'var(--emerald)':'transparent')+';padding-left:'+(visited?'8px':'0')+';transition:all .2s">'
           +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0" onclick="event.stopPropagation();toggleKarte('+p.id+')">'
             +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:'+(checked?'var(--emerald)':'var(--white)')+';transition:all .15s">'+(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
             +'<div style="font-size:8px;font-weight:600;color:'+(checked?'var(--emerald)':'var(--text-4)')+'">Karte</div>'
           +'</div>'
-          +'<div style="flex:1;min-width:0;cursor:pointer" onclick="if(!S.gvVisited)S.gvVisited={};S.gvVisited['+p.id+']=true;goPatTo174a('+p.id+')">'
+          +'<div style="flex:1;min-width:0;cursor:pointer" onclick="goPatTo174a('+p.id+')">'
             +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+p.name+'</div>'
             +'<div style="font-size:10px;color:var(--text-3);margin-top:1px">Zi. '+p.room+' · '+p.age+' J. · '+p.ins+'</div>'
             +(badges?'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">'+badges+'</div>':'')
           +'</div>'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4);cursor:pointer" onclick="if(!S.gvVisited)S.gvVisited={};S.gvVisited['+p.id+']=true;goPatTo174a('+p.id+')"><polyline points="9 18 15 12 9 6"/></svg>'
+          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="flex-shrink:0;color:var(--text-4);cursor:pointer" onclick="goPatTo174a('+p.id+')"><polyline points="9 18 15 12 9 6"/></svg>'
         +'</div>';
       });
       if(filteredPats.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
