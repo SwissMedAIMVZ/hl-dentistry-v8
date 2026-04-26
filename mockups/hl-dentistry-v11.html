@@ -3008,7 +3008,7 @@ function openAssignFromPatPage(patId){
   S._assignFromPatPage=idx;
   S.reassignIdx_2=idx;
   S.reassignSrc_2='offen';
-  S.reassignForm_2={bh:'',date:'',behandlung:''};
+  S.reassignForm_2={bh:'',date:'',behandlung:'',desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4093,6 +4093,8 @@ function renderReassign(){
         +'<div style="font-size:12px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+p.heim+'</div>'
       +'</div>'
       +bhSelect+dateField+behandlungSelect
+      +'<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+      +'<textarea id="rDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung der Aufgabe…" style="resize:vertical;font-family:inherit" oninput="S.reassignForm_2.desc=this.value">'+(f.desc||'')+'</textarea>'
       +'<div class="form-err" id="rErr">'+S.reassignErr_2+'</div>'
       +'<button class="save-btn" onclick="saveReassign()">Speichern</button>'
     +'</div>'
@@ -4103,7 +4105,7 @@ function openReassign(idx,src){
   S.reassignIdx_2=idx;
   S.reassignSrc_2=src||'offen';
   var prefill=src==='weiterfuehrend'&&WEITERFUEHREND_PAT[idx]?WEITERFUEHREND_PAT[idx].behandlung:'';
-  S.reassignForm_2={bh:'',date:'',behandlung:prefill};
+  S.reassignForm_2={bh:'',date:'',behandlung:prefill,desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4112,7 +4114,7 @@ function openZEEdit(idx,mode,src){
   S.reassignSrc_2=src||'ze';
   S._zeMode=mode||'termin';
   var rec=src==='ex'?EX_PATIENTEN[idx]:ZE_FAELLE[idx];
-  S.reassignForm_2={bh:rec&&rec.bh?rec.bh:'',date:rec&&rec.date?rec.date:'',behandlung:''};
+  S.reassignForm_2={bh:rec&&rec.bh?rec.bh:'',date:rec&&rec.date?rec.date:'',behandlung:'',desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4127,7 +4129,7 @@ function openReassignTask(taskId){
   var dm=/^(\d{1,2})\.(\d{1,2})\.?/;
   var m=t.date&&t.date.match(dm);
   if(m){var yr=TODAY.getFullYear();iso=yr+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');}
-  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||''};
+  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||'',desc:''};
   S.reassignErr_2='';
   render();
 }

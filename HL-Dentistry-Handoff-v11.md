@@ -145,6 +145,20 @@ The Großvisiten page stays intact underneath — no navigation away.
 
 ---
 
+### 2026-04-26 — Aufgabe zuweisen popup: add Beschreibung field (max 300 chars)
+
+**Why:** When assigning a task, the Verwaltung often needs to add a short note (e.g. "Patient klagt über Schmerzen regio 36" or "Prothese sitzt nicht"). A description field captures this context directly in the assign flow.
+
+**Change in `renderReassign()`:** added a `<textarea#rDesc>` below the Behandlung dropdown, with:
+- Label: "BESCHREIBUNG (max. 300 Zeichen)"
+- `maxlength="300"`, 3 rows, resizable vertically
+- Placeholder: "Kurze Beschreibung der Aufgabe…"
+- Bound to `S.reassignForm_2.desc`
+
+**State:** `desc: ''` added to `S.reassignForm_2` initialization in all 4 call sites: `openAssignFromPatPage`, `openReassign`, `openZEEdit`, `openReassignTask`.
+
+---
+
 ### 2026-04-26 — Fix: Zuweisen button on Patienten page now works
 
 **Bug:** The reassign modal (`renderReassign()`) was only wired into the admin render path (`renderAdminPortal_2`). The Patienten page runs in klinik mode (`S.adminMode=false`), so the modal never rendered even though the state was set.
