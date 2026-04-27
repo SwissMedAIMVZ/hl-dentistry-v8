@@ -497,6 +497,9 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
   .dk-verw-content .gv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .dk-verw-content .gv-grid .card{margin-bottom:0}
   .dk-verw-content .mgr-stats{grid-template-columns:repeat(4,1fr)}
+  /* Desktop overlay — wider sheet, centered vertically */
+  .overlay-bg{align-items:center}
+  .overlay-sheet{width:480px;border-radius:var(--r-xl);border-top-left-radius:var(--r-xl);border-top-right-radius:var(--r-xl)}
   /* Desktop login — full viewport, centered card */
   .phone.desktop-login{width:100%;height:100vh;border-radius:0;box-shadow:none;max-width:none;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
   .phone.desktop-login::before{content:'';position:absolute;top:-10%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(61,102,254,0.12) 0%,transparent 60%);border-radius:50%}
@@ -1008,7 +1011,7 @@ var S={adminMode: false,
   filter_2: 'offen',
   openBh_2: {hFeld:true,hHess:true,hGomez:true},
   showAdd_2: false,
-  addForm_2: {patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:'current',date:'',status:'offen'},
+  addForm_2: {patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:'current',date:'',status:'offen',desc:''},
   addErr_2: '',
   reassignIdx_2: null,
   reassignSrc_2: null,
@@ -1363,7 +1366,7 @@ function openRescheduleModal(k){
   var tomorrow=new Date(TODAY.getTime()+D);
   var iso=tomorrow.getFullYear()+'-'+String(tomorrow.getMonth()+1).padStart(2,'0')+'-'+String(tomorrow.getDate()).padStart(2,'0');
   S.rescheduleModal={key:k,patId:patId,patName:p.name,heim:heimName(p.heim),label:parts[2]||'Aufgabe'};
-  S.rescheduleForm={date:iso,bh:curBh};
+  S.rescheduleForm={date:iso,bh:curBh,desc:''};
   render();
 }
 function closeRescheduleModal(){S.rescheduleModal=null;render()}
@@ -1403,6 +1406,8 @@ function renderRescheduleModal(){
       +'<select class="form-select" id="rschBh" onchange="S.rescheduleForm.bh=this.value">'
         +BEHANDLER.map(function(b){return'<option value="'+b.id+'"'+(f.bh===b.id?' selected':'')+'>'+b.name+'</option>';}).join('')
       +'</select>'
+      +'<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+      +'<textarea id="rschDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung…" style="resize:vertical;font-family:inherit" oninput="S.rescheduleForm.desc=this.value">'+(f.desc||'')+'</textarea>'
       +'<button class="save-btn" onclick="saveRescheduleModal()">Neu planen</button>'
     +'</div>'
   +'</div>';
@@ -2871,6 +2876,13 @@ function renderDesktop(){
   }
   } /* close detail-screen else */
   h+='</div>'; /* close dk-main */
+  /* Overlays — shared across desktop pages */
+  if(S.rescheduleModal)h+=renderRescheduleModal();
+  if(S.behandelnModal)h+=renderBehandelnModal();
+  if(S.reassignIdx_2!==null)h+=renderReassign();
+  if(S.showNewPatient)h+=renderNewPatientForm();
+  if(S.showLogoutConfirm)h+=renderLogoutConfirm();
+  if(S.duplicateWarning){h+='<div style="position:absolute;inset:0;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;z-index:115;backdrop-filter:blur(4px)"><div style="width:85%;max-width:400px;background:var(--white);border-radius:var(--r-xl);padding:28px;box-shadow:var(--sh-xl);text-align:center"><div style="font-size:14px;font-weight:700;color:var(--crimson);margin-bottom:6px">Mögliches Duplikat</div><div style="font-size:12px;color:var(--text-2);margin-bottom:20px;line-height:1.5">Patient <strong>'+S.duplicateWarning.name+'</strong> existiert bereits in <strong>'+S.duplicateWarning.heim+'</strong>.</div><div style="display:flex;gap:8px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-2);border:none;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="cancelDuplicate()">Abbrechen</button><button style="flex:1;padding:12px;background:var(--crimson);color:#fff;border:none;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="confirmDuplicate()">Ist ein anderer Patient</button></div></div></div>'}
   /* Toast */
   if(S.toast)h+='<div class="notif-toast" style="background:'+S.toast.color+'">'+S.toast.text+'</div>';
   app.innerHTML=h;
@@ -3008,7 +3020,7 @@ function openAssignFromPatPage(patId){
   S._assignFromPatPage=idx;
   S.reassignIdx_2=idx;
   S.reassignSrc_2='offen';
-  S.reassignForm_2={bh:'',date:'',behandlung:''};
+  S.reassignForm_2={bh:'',date:'',behandlung:'',desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -3690,6 +3702,8 @@ function renderAdd_2(){
       +'<option value="erledigt"'+(f.status==='erledigt'?' selected':'')+'>Erledigt</option>'
     +'</select>';
 
+  h+='<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+    +'<textarea id="aDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung der Aufgabe…" style="resize:vertical;font-family:inherit" oninput="S.addForm_2.desc=this.value">'+(f.desc||'')+'</textarea>';
   h+='<div class="form-err" id="addErr">'+S.addErr_2+'</div>';
   h+='<button class="save-btn" onclick="saveTask()">Aufgabe speichern</button>';
   h+='</div></div>';
@@ -4093,6 +4107,8 @@ function renderReassign(){
         +'<div style="font-size:12px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:4px">'+ICO.pin+' '+p.heim+'</div>'
       +'</div>'
       +bhSelect+dateField+behandlungSelect
+      +'<label class="form-label">Beschreibung <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">(max. 300 Zeichen)</span></label>'
+      +'<textarea id="rDesc" class="form-input" maxlength="300" rows="3" placeholder="Kurze Beschreibung der Aufgabe…" style="resize:vertical;font-family:inherit" oninput="S.reassignForm_2.desc=this.value">'+(f.desc||'')+'</textarea>'
       +'<div class="form-err" id="rErr">'+S.reassignErr_2+'</div>'
       +'<button class="save-btn" onclick="saveReassign()">Speichern</button>'
     +'</div>'
@@ -4103,7 +4119,7 @@ function openReassign(idx,src){
   S.reassignIdx_2=idx;
   S.reassignSrc_2=src||'offen';
   var prefill=src==='weiterfuehrend'&&WEITERFUEHREND_PAT[idx]?WEITERFUEHREND_PAT[idx].behandlung:'';
-  S.reassignForm_2={bh:'',date:'',behandlung:prefill};
+  S.reassignForm_2={bh:'',date:'',behandlung:prefill,desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4112,7 +4128,7 @@ function openZEEdit(idx,mode,src){
   S.reassignSrc_2=src||'ze';
   S._zeMode=mode||'termin';
   var rec=src==='ex'?EX_PATIENTEN[idx]:ZE_FAELLE[idx];
-  S.reassignForm_2={bh:rec&&rec.bh?rec.bh:'',date:rec&&rec.date?rec.date:'',behandlung:''};
+  S.reassignForm_2={bh:rec&&rec.bh?rec.bh:'',date:rec&&rec.date?rec.date:'',behandlung:'',desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4127,7 +4143,7 @@ function openReassignTask(taskId){
   var dm=/^(\d{1,2})\.(\d{1,2})\.?/;
   var m=t.date&&t.date.match(dm);
   if(m){var yr=TODAY.getFullYear();iso=yr+'-'+String(m[2]).padStart(2,'0')+'-'+String(m[1]).padStart(2,'0');}
-  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||''};
+  S.reassignForm_2={bh:'',date:iso,behandlung:t.behandlung||'',desc:''};
   S.reassignErr_2='';
   render();
 }
@@ -4180,7 +4196,7 @@ function saveReassign(){
 function setTab(t){S.tab_2=t;render()}
 function setFilter(f){S.filter_2=f;render()}
 function toggleBh(id){S.openBh_2[id]=!S.openBh_2[id];render()}
-function openAdd(){S.showAdd_2=true;S.addErr_2='';S._addPatSearch='';S.addForm_2={patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:S.tab_2==='woche'?'next':'current',date:'',status:'offen'};render()}
+function openAdd(){S.showAdd_2=true;S.addErr_2='';S._addPatSearch='';S.addForm_2={patType:'existing',existingPatId:'',nachname:'',vorname:'',heim:'',behandlung:'',bh:'',week:S.tab_2==='woche'?'next':'current',date:'',status:'offen',desc:''};render()}
 function closeAdd(){S.showAdd_2=false;S._addPatSearch='';render()}
 function setPatType(t){S.addForm_2.patType=t;S.addForm_2.existingPatId='';S._addPatSearch='';render()}
 /* selectExPat removed — replaced by inline search selection in renderAdd_2 */
@@ -5432,7 +5448,9 @@ function renderGrossvisiten(){
         if(p.pa){var ps=PA_STEPS.find(function(x){return x.id===p.pa.step});if(ps)badges+='<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);background:var(--violet-bg);color:var(--violet)">PA: '+ps.label+'</span>';}
         if(p.tx.length>0)p.tx.forEach(function(t){badges+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:var(--r-full);background:var(--amber-bg);color:var(--amber)">'+t.toUpperCase()+'</span>';});
         var checked=isKarteValid(p.id);
-        h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2)">'
+        var today=new Date();today.setHours(0,0,0,0);var todayMs=today.getTime();
+        var visited=p.forms174a&&p.forms174a.some(function(f){var fd=new Date(f.date);fd.setHours(0,0,0,0);return fd.getTime()===todayMs});
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--surface-2);border-left:3px solid '+(visited?'var(--emerald)':'transparent')+';padding-left:'+(visited?'8px':'0')+';transition:all .2s">'
           +'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0" onclick="event.stopPropagation();toggleKarte('+p.id+')">'
             +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:'+(checked?'var(--emerald)':'var(--white)')+';transition:all .15s">'+(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
             +'<div style="font-size:8px;font-weight:600;color:'+(checked?'var(--emerald)':'var(--text-4)')+'">Karte</div>'
@@ -5447,7 +5465,30 @@ function renderGrossvisiten(){
       });
       if(filteredPats.length===0)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Patienten gefunden</div>';
     } else {
-    /* Overview: stats + cards */
+    /* Overview: search bar at top + stats + cards + saved lists */
+    if(!S.gvSavedLists)S.gvSavedLists=[];
+    var gvQ=(S.gvHeimSearch||'').toLowerCase();
+    var matchedHeime=gvQ?HEIME.filter(function(hm){return hm.name.toLowerCase().indexOf(gvQ)!==-1}):[];
+    h+='<div style="position:relative;margin-bottom:16px">'
+      +'<div style="position:relative">'
+        +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+        +'<input type="search" id="gvHeimSearch" placeholder="Pflegeheim suchen…" value="'+(S.gvHeimSearch||'').replace(/"/g,'&quot;')+'" oninput="S.gvHeimSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid '+(gvQ&&matchedHeime.length>0?'var(--blue)':'var(--border)')+';border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text);transition:border .2s" autocomplete="off">'
+      +'</div>';
+    if(gvQ&&matchedHeime.length>0){
+      h+='<div style="border:1.5px solid var(--blue);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--white);overflow:hidden;box-shadow:var(--sh-md)">';
+      matchedHeime.forEach(function(hm){
+        var patCount=PATIENTS.filter(function(p){return p.heim===hm.id}).length;
+        h+='<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--surface-2);font-size:12px;transition:background .1s" onmouseover="this.style.background=\'var(--blue-25)\'" onmouseout="this.style.background=\'var(--white)\'" onclick="gvSaveList('+hm.id+')">'
+          +'<div style="font-weight:600;color:var(--text)">'+hm.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+hm.addr+' · '+patCount+' Patienten</div>'
+        +'</div>';
+      });
+      h+='</div>';
+    }
+    if(gvQ&&matchedHeime.length===0){
+      h+='<div style="padding:12px 14px;font-size:11px;color:var(--text-4);text-align:center;background:var(--surface);border-radius:0 0 var(--r-md) var(--r-md);border:1px solid var(--border);border-top:none">Kein Pflegeheim gefunden</div>';
+    }
+    h+='</div>';
     var totalPat=0;gvItems.forEach(function(g){totalPat+=g.patients});
     h+='<div class="mgr-stats" style="margin-bottom:16px">'
       +'<div class="mgr-stat"><div class="num" style="color:var(--navy)">'+gvItems.length+'</div><div class="label">Geplant</div></div>'
@@ -5482,32 +5523,6 @@ function renderGrossvisiten(){
         +'</div>'
       +'</div>';
     });
-    h+='</div>';
-    /* Saved patient lists */
-    if(!S.gvSavedLists)S.gvSavedLists=[];
-    /* Search bar */
-    var gvQ=(S.gvHeimSearch||'').toLowerCase();
-    var matchedHeime=gvQ?HEIME.filter(function(hm){return hm.name.toLowerCase().indexOf(gvQ)!==-1}):[];
-    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Pflegeheim suchen</div>'
-      +'<div style="position:relative;margin-bottom:16px">'
-        +'<div style="position:relative">'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
-          +'<input type="search" id="gvHeimSearch" placeholder="Pflegeheim suchen…" value="'+(S.gvHeimSearch||'').replace(/"/g,'&quot;')+'" oninput="S.gvHeimSearch=this.value;render()" style="width:100%;padding:12px 14px 12px 38px;border:1.5px solid '+(gvQ&&matchedHeime.length>0?'var(--blue)':'var(--border)')+';border-radius:var(--r-md);font-size:13px;font-family:inherit;outline:none;background:var(--surface);color:var(--text);transition:border .2s" autocomplete="off">'
-        +'</div>';
-    if(gvQ&&matchedHeime.length>0){
-      h+='<div style="border:1.5px solid var(--blue);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--white);overflow:hidden;box-shadow:var(--sh-md)">';
-      matchedHeime.forEach(function(hm){
-        var patCount=PATIENTS.filter(function(p){return p.heim===hm.id}).length;
-        h+='<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--surface-2);font-size:12px;transition:background .1s" onmouseover="this.style.background=\'var(--blue-25)\'" onmouseout="this.style.background=\'var(--white)\'" onclick="gvSaveList('+hm.id+')">'
-          +'<div style="font-weight:600;color:var(--text)">'+hm.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text-3);margin-top:2px">'+hm.addr+' · '+patCount+' Patienten</div>'
-        +'</div>';
-      });
-      h+='</div>';
-    }
-    if(gvQ&&matchedHeime.length===0){
-      h+='<div style="padding:12px 14px;font-size:11px;color:var(--text-4);text-align:center;background:var(--surface);border-radius:0 0 var(--r-md) var(--r-md);border:1px solid var(--border);border-top:none">Kein Pflegeheim gefunden</div>';
-    }
     h+='</div>';
     /* Saved lists */
     if(S.gvSavedLists.length>0){
