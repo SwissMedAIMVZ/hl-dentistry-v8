@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aranthir — Die Akte, die sie nicht selbst führen können.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink:#16130f;
+    --ink-2:#2a2520;
+    --paper:#f3efe8;
+    --paper-2:#ebe5db;
+    --line:#d6cfc1;
+    --muted:#857d70;
+    --muted-2:#6c6557;
+    --hero:#1a1612;
+    --hero-2:#0f0c09;
+    --accent:#1f3bcc;
+    --accent-2:#152a99;
+    --highlight:#c9b88a;
+    --serif:'Instrument Serif',ui-serif,Georgia,serif;
+    --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    font-size:15px;
+    line-height:1.55;
+    letter-spacing:-0.005em;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  .label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .serif{font-family:var(--serif);font-weight:400;letter-spacing:-0.012em}
+  em.it,.it{font-family:var(--serif);font-style:italic;font-weight:400}
+
+  /* ───── Top bar ───── */
+  .topbar{
+    background:var(--hero);
+    color:#e8e2d6;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .topbar-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 32px;max-width:1180px;margin:0 auto;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;letter-spacing:-0.01em}
+  .brand-mark{
+    width:22px;height:22px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#e8d9b1 0%,#b59a64 55%,#5e4c2a 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15);
+  }
+  .nav{display:flex;align-items:center;gap:34px}
+  .nav a{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;
+    text-transform:uppercase;color:#bdb5a5;transition:color .2s;
+  }
+  .nav a:hover{color:#fff}
+  .nav .pill{
+    color:#16130f;background:#e8e2d6;padding:8px 14px;border-radius:999px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+  }
+  .nav .pill:hover{background:#fff;color:#000}
+
+  /* ───── Hero ───── */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(201,184,138,0.08),transparent 60%),
+      radial-gradient(900px 500px at 5% 110%,rgba(31,59,204,0.10),transparent 60%),
+      linear-gradient(180deg,var(--hero) 0%,var(--hero-2) 100%);
+    color:#ece5d6;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,0.025) 1px,transparent 1px);
+    background-size:3px 3px;mix-blend-mode:overlay;opacity:.45;
+  }
+  .hero-inner{
+    position:relative;z-index:1;
+    max-width:1180px;margin:0 auto;padding:120px 32px 140px;
+  }
+  .hero-eyebrow{
+    color:#8e8775;margin-bottom:36px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .hero-eyebrow .dot{
+    width:6px;height:6px;border-radius:50%;background:#c9b88a;
+    box-shadow:0 0 0 4px rgba(201,184,138,0.12);
+  }
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(44px,6.8vw,98px);
+    line-height:0.98;
+    letter-spacing:-0.025em;
+    color:#f5eedc;
+    max-width:14ch;
+  }
+  .hero h1 .it{
+    font-style:italic;
+    color:#e2d6b5;
+  }
+  .hero-lede{
+    margin-top:44px;max-width:48ch;font-size:16.5px;line-height:1.6;
+    color:#bcb4a2;font-weight:300;
+  }
+  .hero-lede strong{color:#ece5d6;font-weight:500}
+  .hero-cta{
+    margin-top:48px;display:flex;gap:14px;flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:0.16em;
+    text-transform:uppercase;padding:16px 26px;border-radius:999px;
+    border:1px solid transparent;cursor:pointer;transition:all .2s;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .btn-primary{background:#ece5d6;color:#16130f}
+  .btn-primary:hover{background:#fff}
+  .btn-ghost{background:transparent;color:#ece5d6;border-color:rgba(236,229,214,0.25)}
+  .btn-ghost:hover{border-color:rgba(236,229,214,0.6)}
+  .btn .arrow{transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(3px)}
+
+  .hero-meta{
+    margin-top:96px;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;
+    padding-top:28px;border-top:1px solid rgba(236,229,214,0.10);
+  }
+  .hero-meta .k{color:#8e8775;font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase}
+  .hero-meta .v{margin-top:8px;font-family:var(--serif);font-size:22px;color:#ece5d6;letter-spacing:-0.01em}
+
+  /* horizontal frame line going across hero */
+  .hero-line{
+    position:absolute;right:-2%;top:48%;width:55%;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(201,184,138,0.45) 30%,rgba(201,184,138,0.45) 70%,transparent);
+  }
+
+  /* ───── Section frame ───── */
+  section.chapter{padding:120px 0;border-top:1px solid var(--line)}
+  .chapter-head{
+    display:grid;grid-template-columns:80px 1fr;gap:40px;
+    align-items:start;margin-bottom:80px;
+  }
+  .chapter-num{
+    font-family:var(--serif);font-style:italic;font-size:44px;
+    color:var(--muted);line-height:1;padding-top:6px;
+  }
+  .chapter-title{
+    font-family:var(--serif);font-weight:400;
+    font-size:clamp(32px,4.4vw,58px);
+    line-height:1.02;letter-spacing:-0.02em;
+    max-width:22ch;
+  }
+  .chapter-title .it{color:var(--muted-2)}
+
+  /* ───── Section I — three columns ───── */
+  .triptych{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:48px;
+    padding-top:24px;border-top:1px solid var(--line);
+  }
+  .col{position:relative;padding-top:28px}
+  .col-num{
+    position:absolute;top:-14px;left:0;
+    background:var(--paper);padding-right:14px;
+    font-family:var(--serif);font-style:italic;font-size:22px;color:var(--muted);
+  }
+  .col h3{
+    font-family:var(--serif);font-weight:400;font-size:24px;
+    line-height:1.2;letter-spacing:-0.012em;margin-bottom:18px;
+    max-width:18ch;
+  }
+  .col p{color:var(--muted-2);font-size:14.5px;line-height:1.65;max-width:34ch}
+  .col .tags{margin-top:22px;display:flex;flex-wrap:wrap;gap:6px}
+  .col .tags span{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--muted);padding:5px 10px;border:1px solid var(--line);border-radius:999px;
+  }
+
+  /* ───── Final CTA ───── */
+  .cta{
+    position:relative;overflow:hidden;color:#eef0ff;
+    background:
+      radial-gradient(900px 500px at 80% -20%,rgba(255,255,255,0.18),transparent 60%),
+      radial-gradient(700px 400px at 10% 110%,rgba(0,0,0,0.35),transparent 60%),
+      linear-gradient(160deg,#2a4dd9 0%,#1d3bbb 45%,#0f2585 100%);
+    padding:140px 32px 130px;
+  }
+  .cta::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,0.05) 1px,transparent 1px);
+    background-size:3px 3px;mix-blend-mode:overlay;opacity:.5;
+  }
+  .cta-inner{position:relative;z-index:1;max-width:880px;margin:0 auto;text-align:center}
+  .cta .label{color:rgba(255,255,255,0.55)}
+  .cta h2{
+    margin-top:24px;font-family:var(--serif);font-weight:400;
+    font-size:clamp(40px,5.5vw,76px);letter-spacing:-0.022em;line-height:1.02;
+    color:#fff;
+  }
+  .cta h2 .it{color:#cdd5ff}
+  .cta p{
+    margin:24px auto 0;max-width:46ch;color:rgba(238,240,255,0.78);
+    font-weight:300;font-size:16px;line-height:1.6;
+  }
+  .cta-cta{margin-top:40px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+  .cta .btn-primary{background:#fff;color:#0f2585}
+  .cta .btn-primary:hover{background:#e8ebff}
+  .cta .btn-ghost{color:#fff;border-color:rgba(255,255,255,0.35)}
+  .cta .btn-ghost:hover{border-color:#fff}
+  .cta-meta{
+    margin-top:60px;display:flex;justify-content:center;gap:36px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+    text-transform:uppercase;color:rgba(238,240,255,0.55);
+  }
+
+  /* ───── Footer ───── */
+  footer.foot{
+    background:var(--paper);padding:90px 0 40px;border-top:1px solid var(--line);
+  }
+  .foot-head{display:grid;grid-template-columns:80px 1fr;gap:40px;margin-bottom:64px}
+  .foot-num{font-family:var(--serif);font-style:italic;font-size:44px;color:var(--muted);line-height:1;padding-top:6px}
+  .foot-title{
+    font-family:var(--serif);font-weight:400;
+    font-size:clamp(28px,3.8vw,46px);letter-spacing:-0.02em;line-height:1.05;max-width:24ch;
+  }
+  .foot-title .it{color:var(--muted-2)}
+  .foot-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:36px;
+    padding-top:36px;border-top:1px solid var(--line);
+  }
+  .foot-col h6{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+  }
+  .foot-col a,.foot-col p{
+    display:block;color:var(--ink-2);font-size:14px;line-height:1.7;
+  }
+  .foot-col a:hover{color:var(--accent)}
+  .foot-bottom{
+    margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--muted);
+  }
+
+  /* ───── Section V — FAQ ───── */
+  .faq{border-top:1px solid var(--ink)}
+  .q{
+    display:grid;grid-template-columns:60px 1.1fr 1.6fr;gap:24px;
+    padding:24px 4px;border-bottom:1px solid var(--line);
+    align-items:start;cursor:pointer;transition:background .15s;
+  }
+  .q:hover{background:rgba(214,207,193,0.25)}
+  .q .qn{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--muted);padding-top:6px}
+  .q .qt{
+    font-family:var(--serif);font-weight:400;font-size:22px;
+    letter-spacing:-0.012em;line-height:1.25;max-width:28ch;
+  }
+  .q .qa{color:var(--muted-2);font-size:14px;line-height:1.65;max-width:54ch}
+
+  /* ───── Section IV — Authors ───── */
+  .authors{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  }
+  .author{
+    border:1px solid var(--line);background:var(--paper);
+    display:flex;flex-direction:column;
+    transition:transform .25s ease,border-color .25s ease;
+  }
+  .author:hover{transform:translateY(-3px);border-color:var(--ink-2)}
+  .author .portrait{
+    aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:130px;letter-spacing:-0.02em;
+    color:#f3efe8;background:#1a1612;
+  }
+  .author.invert .portrait{background:#0f0c09;color:#c9b88a}
+  .author.dark .portrait{background:var(--ink);color:#e2d6b5}
+  .author-body{padding:24px 24px 28px}
+  .author h6{
+    font-family:var(--serif);font-weight:400;font-size:22px;
+    letter-spacing:-0.012em;line-height:1.15;
+  }
+  .author .role{
+    margin-top:4px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);
+  }
+  .author p{
+    margin-top:14px;color:var(--muted-2);font-size:13.5px;line-height:1.6;
+  }
+  .author .credit{
+    margin-top:18px;padding-top:14px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--muted);
+  }
+
+  /* ───── Section III — Bauplan table ───── */
+  .bauplan{
+    border-top:1px solid var(--ink);
+  }
+  .row{
+    display:grid;grid-template-columns:140px 1fr 1.4fr;gap:24px;
+    padding:28px 4px;border-bottom:1px solid var(--line);align-items:start;
+  }
+  .row .rk{
+    display:flex;flex-direction:column;gap:4px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .row .rk .num{
+    font-family:var(--serif);font-style:italic;font-size:20px;
+    letter-spacing:0;text-transform:none;color:var(--ink);
+  }
+  .row h5{
+    font-family:var(--serif);font-weight:400;font-size:22px;
+    letter-spacing:-0.012em;line-height:1.2;max-width:24ch;
+  }
+  .row p{color:var(--muted-2);font-size:14px;line-height:1.6;max-width:54ch}
+  .row p .check{
+    display:inline-block;width:14px;height:14px;border-radius:50%;
+    background:var(--ink);color:var(--paper);font-size:9px;line-height:14px;
+    text-align:center;margin-right:8px;vertical-align:1px;
+  }
+
+  /* ───── Section II — Vordruck grid ───── */
+  .vordrucke{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--line);
+    border-left:1px solid var(--line);
+  }
+  .vordruck{
+    padding:34px 30px 30px;
+    border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    transition:background .2s;
+    position:relative;
+    min-height:220px;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .vordruck:hover{background:var(--paper-2)}
+  .vordruck .code{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .vordruck h4{
+    font-family:var(--serif);font-weight:400;font-size:24px;
+    line-height:1.15;letter-spacing:-0.012em;margin-top:14px;
+    max-width:18ch;
+  }
+  .vordruck p{
+    margin-top:14px;color:var(--muted-2);font-size:13.5px;line-height:1.6;
+    max-width:32ch;
+  }
+  .vordruck .meta{
+    margin-top:24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .vordruck .meta .arrow{font-family:var(--sans);font-style:normal;letter-spacing:0;font-size:14px}
+
+  @media (max-width:880px){
+    .triptych{grid-template-columns:1fr;gap:48px}
+    .chapter-head{grid-template-columns:1fr;gap:18px;margin-bottom:56px}
+    section.chapter{padding:80px 0}
+    .vordrucke{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr;gap:10px}
+    .authors{grid-template-columns:1fr}
+    .q{grid-template-columns:1fr;gap:10px}
+    .foot-grid{grid-template-columns:repeat(2,1fr);gap:28px}
+    .foot-head{grid-template-columns:1fr;gap:18px}
+    .cta{padding:100px 24px 96px}
+  }
+  @media (max-width:760px){
+    .nav a:not(.pill){display:none}
+    .hero-inner{padding:80px 24px 96px}
+    .hero-meta{grid-template-columns:repeat(2,1fr);gap:22px}
+    .wrap{padding:0 24px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Aranthir</span>
+    </a>
+    <nav class="nav">
+      <a href="#produkt">Produkt</a>
+      <a href="#vordrucke">Vordrucke</a>
+      <a href="#bauplan">Bauplan</a>
+      <a href="#autoren">Autoren</a>
+      <a href="#fragen">Fragen</a>
+      <a href="#testen" class="pill">Aranthir testen ›</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-line" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow label">
+      <span class="dot"></span>
+      <span>Heimakte · §174a · Deutschland</span>
+    </div>
+
+    <h1>
+      Aranthir gibt Heimbewohnern <span class="it">die Akte, die sie nicht selbst führen können.</span>
+    </h1>
+
+    <p class="hero-lede">
+      Eine schmale Plattform für Pflegeheime, Zahnärzte und gesetzliche Betreuer.
+      <strong>Sie diktieren — Aranthir schreibt mit.</strong> Jeder deutsche Vordruck ist
+      vorinstalliert, jeder Eintrag ist revisionssicher, jede Unterschrift ist auffindbar.
+    </p>
+
+    <div class="hero-cta">
+      <a href="#testen" class="btn btn-primary">Aranthir testen <span class="arrow">→</span></a>
+      <a href="#rueckruf" class="btn btn-ghost">Rückruf bitten</a>
+    </div>
+
+    <div class="hero-meta">
+      <div><div class="k">Pilot</div><div class="v">3 Heime</div></div>
+      <div><div class="k">Bewohner</div><div class="v">412</div></div>
+      <div><div class="k">Diktate / Tag</div><div class="v">~ 1.840</div></div>
+      <div><div class="k">DSGVO-Hosting</div><div class="v">Frankfurt a. M.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ I — Mitgeschrieben, nicht nachgeschrieben ═══ -->
+<section class="chapter" id="produkt">
+  <div class="wrap">
+    <div class="chapter-head">
+      <div class="chapter-num">i</div>
+      <h2 class="chapter-title">
+        Die Behandlung wird mitgeschrieben — <span class="it">nicht nachgeschrieben.</span>
+      </h2>
+    </div>
+
+    <div class="triptych">
+      <article class="col">
+        <span class="col-num">i</span>
+        <h3>Während der Behandlung. Mit Handschuhen. Ohne Schreibtisch.</h3>
+        <p>
+          Aranthir hört zu, sortiert die Begriffe und legt den Eintrag direkt in die
+          Bewohnerakte. Wer am Stuhl steht, dokumentiert nicht abends auf dem Stationsflur.
+        </p>
+        <div class="tags"><span>Diktat</span><span>Echtzeit</span><span>Hands-free</span></div>
+      </article>
+
+      <article class="col">
+        <span class="col-num">ii</span>
+        <h3>Die KI füllt den passenden deutschen Vordruck.</h3>
+        <p>
+          Kein freies Textfeld, kein „Sonstiges". Aranthir kennt §132a, §174a, MDK-Berichte,
+          Heil- und Kostenpläne — und trägt jedes Datum in die Spalte, in die es gehört.
+        </p>
+        <div class="tags"><span>BMV-Z</span><span>SGB XI</span><span>§174a</span></div>
+      </article>
+
+      <article class="col">
+        <span class="col-num">iii</span>
+        <h3>Sie unter­schreiben, freigeben, fertig.</h3>
+        <p>
+          Der Eintrag bleibt revisionssicher abgelegt. Betreuer, Heimleitung und Abrechnung
+          sehen genau den Ausschnitt, den sie sehen dürfen — nicht mehr, nicht weniger.
+        </p>
+        <div class="tags"><span>Audit-Log</span><span>RBAC</span><span>BSI C5</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ II — Vordrucke ═══ -->
+<section class="chapter" id="vordrucke">
+  <div class="wrap">
+    <div class="chapter-head">
+      <div class="chapter-num">ii</div>
+      <h2 class="chapter-title">
+        Jeder deutsche Vordruck ist <span class="it">bereits vorinstalliert.</span>
+      </h2>
+    </div>
+
+    <div class="vordrucke">
+      <article class="vordruck">
+        <div>
+          <div class="code">§ 174a · SGB XI</div>
+          <h4>Heimvertrag &amp; Bewohnerakte</h4>
+          <p>Erstaufnahme, Pflegegrad-Veränderung, Verlegung, Sterbefall — alle Pflichtfelder, vorbelegt aus den Stammdaten.</p>
+        </div>
+        <div class="meta"><span>14 Formulare</span><span class="arrow">→</span></div>
+      </article>
+
+      <article class="vordruck">
+        <div>
+          <div class="code">BMV-Z · Anlage 14a</div>
+          <h4>Heil- und Kostenplan</h4>
+          <p>HKP für Zahnersatz inkl. KZBV-Befundklasse, Festzuschuss-Berechnung und Härtefallregelung — direkt aus dem Diktat.</p>
+        </div>
+        <div class="meta"><span>2025-Q2 aktuell</span><span class="arrow">→</span></div>
+      </article>
+
+      <article class="vordruck">
+        <div>
+          <div class="code">MDK / MD</div>
+          <h4>Pflegegutachten-Bogen</h4>
+          <p>Module 1–6 strukturiert. Aranthir markiert Lücken, bevor der Gutachter kommt — keine Nachforderungen mehr.</p>
+        </div>
+        <div class="meta"><span>6 Module</span><span class="arrow">→</span></div>
+      </article>
+
+      <article class="vordruck">
+        <div>
+          <div class="code">§ 132a SGB V</div>
+          <h4>Häusliche Krankenpflege</h4>
+          <p>Verordnung, Folgeverordnung, Ablehnung. Felder kommen aus der Visite, Unterschrift kommt vom Hausarzt per Mail-Link.</p>
+        </div>
+        <div class="meta"><span>3 Vordrucke</span><span class="arrow">→</span></div>
+      </article>
+
+      <article class="vordruck">
+        <div>
+          <div class="code">§ 1820 BGB</div>
+          <h4>Betreuer-Einwilligung</h4>
+          <p>Freiheitsentziehende Maßnahmen, ärztliche Eingriffe, Heimwechsel — sauber dokumentiert für Betreuungsgericht.</p>
+        </div>
+        <div class="meta"><span>9 Anlässe</span><span class="arrow">→</span></div>
+      </article>
+
+      <article class="vordruck">
+        <div>
+          <div class="code">DSGVO Art. 9</div>
+          <h4>Schweigepflicht­entbindung</h4>
+          <p>Pro Empfänger, pro Datenkategorie, mit Widerrufsdatum. Wird automatisch ungültig — nicht erst bei der Prüfung.</p>
+        </div>
+        <div class="meta"><span>Granular</span><span class="arrow">→</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ III — Bauplan ═══ -->
+<section class="chapter" id="bauplan">
+  <div class="wrap">
+    <div class="chapter-head">
+      <div class="chapter-num">iii</div>
+      <h2 class="chapter-title">
+        Vorschrift ist nicht das Ende der Liste — <span class="it">sie ist der Bauplan.</span>
+      </h2>
+    </div>
+
+    <div class="bauplan">
+      <div class="row">
+        <div class="rk"><span class="num">01</span><span>Aufnahme</span></div>
+        <h5>Aufnahmegespräch &amp; Pflegeplanung</h5>
+        <p>
+          <span class="check">✓</span>Biographie, Medikation, Patientenverfügung — alles in einem Gespräch
+          erfasst. Aranthir erkennt, welche Felder für §174a, MDK und Hausarzt jeweils gebraucht werden,
+          und legt drei saubere Versionen ab.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="rk"><span class="num">02</span><span>Visite</span></div>
+        <h5>Hausarzt- und Zahnarztbesuch</h5>
+        <p>
+          <span class="check">✓</span>Diktat während der Untersuchung, Befund landet im richtigen Modul.
+          KZBV-konforme HKP-Vorschau noch im Zimmer, mit Festzuschuss und Härtefall-Hinweis.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="rk"><span class="num">03</span><span>Pflege</span></div>
+        <h5>Tägliche Pflegedoku­men­tation</h5>
+        <p>
+          <span class="check">✓</span>Trinkprotokoll, Lagerung, Sturzereignis. Aranthir verbindet Eintrag
+          und Bewohnerakte automatisch — keine doppelten Tabellen, keine Excel-Listen mehr.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="rk"><span class="num">04</span><span>Einwilligung</span></div>
+        <h5>Betreuer- und Schweige­pflicht­entbindungen</h5>
+        <p>
+          <span class="check">✓</span>Generierung, Versand, Rückläufer-Tracking. Pro Empfänger und pro
+          Datenkategorie — mit Verfallsdatum, das Aranthir selbst überwacht.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="rk"><span class="num">05</span><span>Abrechnung</span></div>
+        <h5>Quartalsweise Übergabe an die KZV</h5>
+        <p>
+          <span class="check">✓</span>BEMA, GOZ, Zuschlagsdokumentation. Maschinenlesbares xml-Paket für
+          die KZV, prüfbar im Browser, mit Spur zurück zum Diktat.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="rk"><span class="num">06</span><span>Audit</span></div>
+        <h5>Heimaufsicht und MDK-Prüfung</h5>
+        <p>
+          <span class="check">✓</span>Ein Knopf, ein Prüfraum, eine Akte. Prüfer sehen, was sie sehen
+          dürfen — Bewohnerintimes bleibt unter Verschluss. Hash-Kette belegt, dass nichts
+          nachträglich verschoben wurde.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ IV — Autoren ═══ -->
+<section class="chapter" id="autoren">
+  <div class="wrap">
+    <div class="chapter-head">
+      <div class="chapter-num">iv</div>
+      <h2 class="chapter-title">
+        Geschrieben von einem Zahnarzt, <span class="it">der den §174a selbst kennt.</span>
+      </h2>
+    </div>
+
+    <div class="authors">
+      <article class="author">
+        <div class="portrait">JG</div>
+        <div class="author-body">
+          <h6>Dr. Jonas Greve</h6>
+          <div class="role">Zahnarzt · Gründer</div>
+          <p>Sieben Jahre Praxis, davon vier mit aufsuchender Versorgung in drei Heimen im Münsterland. Schreibt jeden HKP, den Aranthir kennt, vorher mit der Hand.</p>
+          <div class="credit">Aufsuchend · MdK-erfahren</div>
+        </div>
+      </article>
+
+      <article class="author dark">
+        <div class="portrait">CW</div>
+        <div class="author-body">
+          <h6>Corinna Weigert</h6>
+          <div class="role">Pflegedienstleitung</div>
+          <p>Zwölf Jahre Heimleitung, drei Trägerwechsel, zwei MDK-Großprüfungen. Liest jedes Formular, bevor es als Vordruck in Aranthir ankommt.</p>
+          <div class="credit">PDL · §80 SGB XI</div>
+        </div>
+      </article>
+
+      <article class="author invert">
+        <div class="portrait">SMA</div>
+        <div class="author-body">
+          <h6>SwissMedAI MVZ</h6>
+          <div class="role">Technischer Träger</div>
+          <p>MVZ-Plattform mit Rechenzentrum in Frankfurt. Hostet Aranthir gemäß BSI C5 und §75c SGB V — auditiert, dokumentiert, bezahlbar.</p>
+          <div class="credit">DSGVO · BSI C5 · ISO 27001</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ V — Sieben Fragen ═══ -->
+<section class="chapter" id="fragen">
+  <div class="wrap">
+    <div class="chapter-head">
+      <div class="chapter-num">v</div>
+      <h2 class="chapter-title">
+        Sieben Fragen, <span class="it">die wir vorher klären.</span>
+      </h2>
+    </div>
+
+    <div class="faq">
+      <div class="q">
+        <div class="qn">01</div>
+        <div class="qt">Ersetzt Aranthir unser Heimverwaltungs­system?</div>
+        <div class="qa">Nein. Aranthir liegt davor — als Diktat- und Aktenschicht — und schreibt zurück in Vivendi, MD Medicus oder Senso. Wir haben Konnektoren für die drei meistverbreiteten Systeme; weitere bauen wir auf Anfrage.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">02</div>
+        <div class="qt">Wie laut darf das Stationszimmer sein?</div>
+        <div class="qa">So laut, wie es ist. Aranthir trennt Sprecher, kennt die Stimmen Ihres Teams nach drei Tagen Einlernen und überschreibt nichts ohne Bestätigung — auch dann nicht, wenn jemand mitspricht.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">03</div>
+        <div class="qt">Was passiert bei einem Stromausfall?</div>
+        <div class="qa">Diktate werden lokal gepuffert und synchronisieren, sobald das Netz zurückkommt. Die Akte selbst liegt im Rechenzentrum — kein Heim verliert Einträge, weil das WLAN abends instabil ist.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">04</div>
+        <div class="qt">Wer haftet, wenn die KI einen Fehler einträgt?</div>
+        <div class="qa">Niemand fragt eine Maschine — wir freigeben jeden Eintrag durch Unterschrift. Aranthir ist Werkzeug, nicht Aussteller. Wir liefern den Audit-Trail, der das im Streitfall belegt.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">05</div>
+        <div class="qt">Wo liegen die Daten?</div>
+        <div class="qa">Frankfurt am Main, in einem nach BSI C5 testierten Rechenzentrum. Kein Datentransfer außerhalb der EU, keine Trainingsverwertung Ihrer Diktate — vertraglich festgehalten.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">06</div>
+        <div class="qt">Können Betreuer mitlesen?</div>
+        <div class="qa">Sie sehen genau das, was nach §1820 BGB für sie bestimmt ist — nicht mehr. Jede Freigabe wird einzeln protokolliert; jede Aufhebung wirkt sofort.</div>
+      </div>
+
+      <div class="q">
+        <div class="qn">07</div>
+        <div class="qt">Was kostet es?</div>
+        <div class="qa">Pro Bewohner und Monat, gestaffelt nach Heimgröße. Pilotpreise im ersten Halbjahr, Kündigung jederzeit zum Monatsende. Den Preisplan schicken wir nach dem Vorgespräch — er soll zum Heim passen, nicht umgekehrt.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta" id="testen">
+  <div class="cta-inner">
+    <div class="label">Pilot · Sommer 2026</div>
+    <h2>
+      Aranthir <span class="it">testen.</span>
+    </h2>
+    <p>
+      Drei Wochen, Ihre Akten, Ihr Tempo. Wir richten ein, schulen einen Nachmittag,
+      sehen mit. Wenn Sie nach drei Wochen nicht weiterführen wollen, ziehen wir
+      die Daten zurück und die Sache ist erledigt.
+    </p>
+    <div class="cta-cta">
+      <a href="#" class="btn btn-primary">Pilot anfragen <span class="arrow">→</span></a>
+      <a href="#rueckruf" class="btn btn-ghost">Rückruf bitten</a>
+    </div>
+    <div class="cta-meta">
+      <span>Frankfurt a. M.</span>
+      <span>BSI C5</span>
+      <span>§ 75c SGB V</span>
+      <span>DSGVO Art. 9</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="foot" id="rueckruf">
+  <div class="wrap">
+    <div class="foot-head">
+      <div class="foot-num">vi</div>
+      <h2 class="foot-title">
+        So sieht, <span class="it">die wir nicht hören.</span>
+      </h2>
+    </div>
+
+    <div class="foot-grid">
+      <div class="foot-col">
+        <h6>Aranthir</h6>
+        <a href="#produkt">Produkt</a>
+        <a href="#vordrucke">Vordrucke</a>
+        <a href="#bauplan">Bauplan</a>
+        <a href="#fragen">Fragen &amp; Antworten</a>
+      </div>
+      <div class="foot-col">
+        <h6>Träger</h6>
+        <p>SwissMedAI MVZ GmbH</p>
+        <p>Mainzer Landstraße 49</p>
+        <p>60329 Frankfurt am Main</p>
+        <p>Deutschland</p>
+      </div>
+      <div class="foot-col">
+        <h6>Recht</h6>
+        <a href="#">Impressum</a>
+        <a href="#">Datenschutz</a>
+        <a href="#">AGB</a>
+        <a href="#">Auftragsverarbeitung</a>
+      </div>
+      <div class="foot-col">
+        <h6>Kontakt</h6>
+        <a href="mailto:hallo@aranthir.de">hallo@aranthir.de</a>
+        <a href="tel:+496900000000">+49 69 — auf Anfrage</a>
+        <p style="margin-top:14px;color:var(--muted)">Mo–Fr · 9–17 Uhr</p>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div>© 2026 Aranthir · ein Projekt der SwissMedAI MVZ GmbH</div>
+      <div>Made in Frankfurt · für deutsche Heime</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
