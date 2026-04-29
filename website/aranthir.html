@@ -6,7 +6,7 @@
 <title>Aranthir — Die Akte, die sie nicht selbst führen können.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@300..600&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -25,9 +25,10 @@
     --accent:#2a45ff;
     --accent-2:#1730e6;
     --signal:#d8ff3d;
-    --serif:'Instrument Serif',ui-serif,Georgia,serif;
-    --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,sans-serif;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --display:'Geist','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --serif:'Geist','Inter Tight',ui-sans-serif,system-ui,sans-serif;
+    --sans:'Inter Tight','Geist',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   html{scroll-behavior:smooth}
   body{
@@ -58,8 +59,8 @@
     text-transform:uppercase;
     color:var(--muted);
   }
-  .serif{font-family:var(--serif);font-weight:400;letter-spacing:-0.012em}
-  em.it,.it{font-family:var(--serif);font-style:italic;font-weight:400}
+  .serif{font-family:var(--display);font-weight:500;letter-spacing:-0.022em}
+  em.it,.it{font-family:var(--display);font-style:italic;font-weight:300;letter-spacing:-0.025em}
 
   /* ───── Scroll progress + system strip ───── */
   .scroll-progress{
@@ -101,7 +102,7 @@
     display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
     padding:22px 32px;max-width:1320px;margin:0 auto;
   }
-  .brand{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:24px;letter-spacing:-0.012em;color:#fff}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:500;font-size:20px;letter-spacing:-0.025em;color:#fff}
   .brand-mark{
     width:22px;height:22px;border-radius:0;
     background:#fff;position:relative;
@@ -168,18 +169,19 @@
     box-shadow:0 0 0 4px rgba(216,255,61,0.10);
   }
   .hero h1{
-    font-family:var(--serif);
-    font-weight:400;
+    font-family:var(--display);
+    font-weight:500;
     font-size:clamp(54px,9.2vw,168px);
     line-height:0.92;
-    letter-spacing:-0.038em;
+    letter-spacing:-0.052em;
     color:#fff;
     max-width:13ch;
   }
   .hero h1 .it{
     font-style:italic;
-    color:#cfcfc8;
-    letter-spacing:-0.034em;
+    font-weight:300;
+    color:#a6a69e;
+    letter-spacing:-0.042em;
   }
   .hero-lede{
     margin-top:56px;max-width:52ch;font-size:17px;line-height:1.55;
@@ -212,13 +214,13 @@
   }
   .hero-meta > div:last-child{border-right:0}
   .hero-meta .k{color:#7a7a72;font-family:var(--mono);font-size:10px;letter-spacing:0.20em;text-transform:uppercase}
-  .hero-meta .v{margin-top:10px;font-family:var(--serif);font-size:30px;color:#fff;letter-spacing:-0.015em;font-feature-settings:"tnum"}
+  .hero-meta .v{margin-top:10px;font-family:var(--display);font-weight:500;font-size:28px;color:#fff;letter-spacing:-0.035em;font-feature-settings:"tnum"}
 
   /* hero giant ghost wordmark */
   .hero-ghost{
     position:absolute;right:-2%;bottom:-8%;
-    font-family:var(--serif);font-style:italic;font-size:28vw;line-height:1;
-    color:rgba(255,255,255,0.025);letter-spacing:-0.04em;
+    font-family:var(--display);font-weight:300;font-style:italic;font-size:28vw;line-height:1;
+    color:rgba(255,255,255,0.025);letter-spacing:-0.06em;
     pointer-events:none;user-select:none;z-index:0;
   }
 
@@ -243,26 +245,26 @@
     padding-bottom:32px;border-bottom:1px solid var(--line);
   }
   .chapter-num{
-    font-family:var(--serif);font-style:italic;
+    font-family:var(--display);font-weight:300;font-style:italic;
     font-size:clamp(120px,18vw,260px);
-    color:var(--ink);line-height:0.85;letter-spacing:-0.04em;
-    margin-left:-8px;
+    color:var(--ink);line-height:0.82;letter-spacing:-0.07em;
+    margin-left:-12px;
   }
   .chapter-title{
-    font-family:var(--serif);font-weight:400;
+    font-family:var(--display);font-weight:500;
     font-size:clamp(34px,5vw,72px);
-    line-height:0.98;letter-spacing:-0.028em;
+    line-height:0.98;letter-spacing:-0.045em;
     max-width:24ch;color:var(--ink);
   }
-  .chapter-title .it{color:var(--muted-2)}
+  .chapter-title .it{color:var(--muted-2);font-weight:300;letter-spacing:-0.038em}
   .chapter-meta{
     position:absolute;right:0;bottom:32px;text-align:right;
     font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
     text-transform:uppercase;color:var(--muted);
   }
   .chapter-meta .v{
-    display:block;color:var(--ink);font-family:var(--serif);
-    font-size:18px;letter-spacing:-0.01em;text-transform:none;margin-top:4px;
+    display:block;color:var(--ink);font-family:var(--display);font-weight:500;
+    font-size:18px;letter-spacing:-0.025em;text-transform:none;margin-top:4px;
   }
 
   /* ───── Section I — three columns ───── */
@@ -280,10 +282,10 @@
     font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
     text-transform:uppercase;color:var(--muted);margin-bottom:24px;
   }
-  .col-num em{font-family:var(--serif);font-style:italic;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);margin-right:8px}
+  .col-num em{font-family:var(--display);font-style:italic;font-weight:400;font-size:13px;letter-spacing:-0.02em;text-transform:none;color:var(--ink);margin-right:8px}
   .col h3{
-    font-family:var(--serif);font-weight:400;font-size:30px;
-    line-height:1.05;letter-spacing:-0.02em;margin-bottom:20px;
+    font-family:var(--display);font-weight:500;font-size:28px;
+    line-height:1.05;letter-spacing:-0.035em;margin-bottom:20px;
     max-width:18ch;color:var(--ink);
   }
   .col p{color:var(--muted-2);font-size:14.5px;line-height:1.6;max-width:36ch}
@@ -324,19 +326,19 @@
   }
   .cta-ghost{
     position:absolute;left:-3%;bottom:-12%;
-    font-family:var(--serif);font-style:italic;font-size:34vw;line-height:1;
-    color:rgba(255,255,255,0.04);letter-spacing:-0.04em;
+    font-family:var(--display);font-weight:300;font-style:italic;font-size:34vw;line-height:1;
+    color:rgba(255,255,255,0.04);letter-spacing:-0.075em;
     pointer-events:none;user-select:none;
   }
   .cta-inner{position:relative;z-index:1;max-width:1180px;margin:0 auto}
   .cta .label{color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:14px}
   .cta .label::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 4px rgba(216,255,61,0.10)}
   .cta h2{
-    margin-top:36px;font-family:var(--serif);font-weight:400;
-    font-size:clamp(64px,11vw,200px);letter-spacing:-0.04em;line-height:0.92;
+    margin-top:36px;font-family:var(--display);font-weight:500;
+    font-size:clamp(64px,11vw,200px);letter-spacing:-0.06em;line-height:0.92;
     color:#fff;max-width:14ch;
   }
-  .cta h2 .it{color:#aebbff}
+  .cta h2 .it{color:#aebbff;font-weight:300;letter-spacing:-0.05em}
   .cta p{
     margin-top:48px;max-width:52ch;color:rgba(238,240,255,0.72);
     font-weight:300;font-size:17px;line-height:1.55;
@@ -355,7 +357,7 @@
   }
   .cta-meta > div:last-child{border-right:0}
   .cta-meta .k{font-family:var(--mono);font-size:10px;letter-spacing:0.20em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
-  .cta-meta .v{margin-top:10px;font-family:var(--serif);font-size:24px;color:#fff;letter-spacing:-0.012em}
+  .cta-meta .v{margin-top:10px;font-family:var(--display);font-weight:500;font-size:22px;color:#fff;letter-spacing:-0.03em}
 
   /* ───── Footer ───── */
   footer.foot{
@@ -367,16 +369,16 @@
     padding-bottom:32px;border-bottom:1px solid #1a1a1f;position:relative;
   }
   .foot-num{
-    font-family:var(--serif);font-style:italic;
+    font-family:var(--display);font-weight:300;font-style:italic;
     font-size:clamp(120px,18vw,260px);
-    color:#fff;line-height:0.85;letter-spacing:-0.04em;margin-left:-8px;
+    color:#fff;line-height:0.82;letter-spacing:-0.07em;margin-left:-12px;
   }
   .foot-title{
-    font-family:var(--serif);font-weight:400;
-    font-size:clamp(34px,5vw,72px);letter-spacing:-0.028em;line-height:0.98;
+    font-family:var(--display);font-weight:500;
+    font-size:clamp(34px,5vw,72px);letter-spacing:-0.045em;line-height:0.98;
     max-width:24ch;color:#fff;
   }
-  .foot-title .it{color:#7a7a72}
+  .foot-title .it{color:#7a7a72;font-weight:300;letter-spacing:-0.038em}
   .foot-grid{
     display:grid;grid-template-columns:repeat(4,1fr);gap:0;
     border-top:1px solid #1a1a1f;border-left:1px solid #1a1a1f;
@@ -413,13 +415,13 @@
   }
   .q:hover{background:rgba(8,8,10,0.03)}
   .q .qn{
-    font-family:var(--serif);font-style:italic;font-size:34px;
-    color:var(--ink);letter-spacing:-0.02em;line-height:.9;
+    font-family:var(--display);font-style:italic;font-weight:300;font-size:36px;
+    color:var(--ink);letter-spacing:-0.05em;line-height:.9;
     font-feature-settings:"tnum";
   }
   .q .qt{
-    font-family:var(--serif);font-weight:400;font-size:26px;
-    letter-spacing:-0.02em;line-height:1.1;max-width:28ch;color:var(--ink);
+    font-family:var(--display);font-weight:500;font-size:24px;
+    letter-spacing:-0.035em;line-height:1.1;max-width:28ch;color:var(--ink);
   }
   .q .qa{color:var(--muted-2);font-size:14.5px;line-height:1.6;max-width:56ch;padding-top:6px}
 
@@ -435,8 +437,8 @@
   .author .portrait{
     aspect-ratio:1/1;display:flex;align-items:flex-end;justify-content:flex-start;
     padding:28px;
-    font-family:var(--serif);font-style:italic;font-size:clamp(120px,16vw,200px);
-    letter-spacing:-0.04em;line-height:.85;
+    font-family:var(--display);font-weight:300;font-style:italic;font-size:clamp(120px,16vw,200px);
+    letter-spacing:-0.075em;line-height:.85;
     color:#fff;background:var(--ink);position:relative;overflow:hidden;
   }
   .author .portrait::before{
@@ -456,8 +458,8 @@
   .author.dark .portrait{background:var(--ink-2)}
   .author-body{padding:28px 28px 32px;flex:1;display:flex;flex-direction:column}
   .author h6{
-    font-family:var(--serif);font-weight:400;font-size:28px;
-    letter-spacing:-0.018em;line-height:1.05;color:var(--ink);
+    font-family:var(--display);font-weight:500;font-size:24px;
+    letter-spacing:-0.035em;line-height:1.05;color:var(--ink);
   }
   .author .role{
     margin-top:8px;font-family:var(--mono);font-size:10.5px;
@@ -490,8 +492,8 @@
   }
   .row:hover{background:rgba(8,8,10,0.03)}
   .row .rn{
-    font-family:var(--serif);font-style:italic;font-size:36px;
-    color:var(--ink);line-height:.9;letter-spacing:-0.02em;
+    font-family:var(--display);font-style:italic;font-weight:300;font-size:40px;
+    color:var(--ink);line-height:.88;letter-spacing:-0.05em;
     font-feature-settings:"tnum";
   }
   .row .rk{
@@ -499,9 +501,9 @@
     text-transform:uppercase;color:var(--ink);padding-top:14px;
   }
   .row h5{
-    font-family:var(--serif);font-weight:400;font-size:24px;
-    letter-spacing:-0.018em;line-height:1.15;max-width:24ch;color:var(--ink);
-    padding-top:6px;
+    font-family:var(--display);font-weight:500;font-size:22px;
+    letter-spacing:-0.032em;line-height:1.15;max-width:24ch;color:var(--ink);
+    padding-top:8px;
   }
   .row p{color:var(--muted-2);font-size:14px;line-height:1.6;max-width:56ch;padding-top:8px}
   .row p .check{
@@ -541,8 +543,8 @@
     text-transform:uppercase;color:var(--muted);transition:color .2s;
   }
   .vordruck h4{
-    font-family:var(--serif);font-weight:400;font-size:30px;
-    line-height:1.08;letter-spacing:-0.02em;margin-top:18px;
+    font-family:var(--display);font-weight:500;font-size:28px;
+    line-height:1.05;letter-spacing:-0.035em;margin-top:18px;
     max-width:16ch;color:var(--ink);transition:color .2s;
   }
   .vordruck p{
