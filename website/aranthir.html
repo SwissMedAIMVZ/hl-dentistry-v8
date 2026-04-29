@@ -10,18 +10,21 @@
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --ink:#16130f;
-    --ink-2:#2a2520;
-    --paper:#f3efe8;
-    --paper-2:#ebe5db;
-    --line:#d6cfc1;
-    --muted:#857d70;
-    --muted-2:#6c6557;
-    --hero:#1a1612;
-    --hero-2:#0f0c09;
-    --accent:#1f3bcc;
-    --accent-2:#152a99;
-    --highlight:#c9b88a;
+    --ink:#08080a;
+    --ink-2:#16161a;
+    --ink-3:#26262c;
+    --paper:#f2f2ee;
+    --paper-2:#e6e6e0;
+    --paper-3:#d8d8d2;
+    --line:#cfcfc8;
+    --line-2:#1f1f24;
+    --muted:#6f6f6a;
+    --muted-2:#3a3a3a;
+    --hero:#08080a;
+    --hero-2:#000;
+    --accent:#2a45ff;
+    --accent-2:#1730e6;
+    --signal:#d8ff3d;
     --serif:'Instrument Serif',ui-serif,Georgia,serif;
     --sans:'Inter Tight',ui-sans-serif,system-ui,-apple-system,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -34,9 +37,17 @@
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
     font-size:15px;
-    line-height:1.55;
-    letter-spacing:-0.005em;
+    line-height:1.5;
+    letter-spacing:-0.011em;
+    font-feature-settings:"ss01","cv11","tnum";
   }
+  /* fine baseline/column ruler visible on all chapters */
+  .chapter::before{
+    content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;
+    background:linear-gradient(180deg,transparent,var(--line) 8%,var(--line) 92%,transparent);
+    opacity:.0;pointer-events:none;
+  }
+  section.chapter{position:relative}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
   .label{
@@ -50,352 +61,560 @@
   .serif{font-family:var(--serif);font-weight:400;letter-spacing:-0.012em}
   em.it,.it{font-family:var(--serif);font-style:italic;font-weight:400}
 
+  /* ───── Scroll progress + system strip ───── */
+  .scroll-progress{
+    position:fixed;top:0;left:0;height:2px;width:0;
+    background:var(--accent);z-index:99;
+    transition:width .05s linear;
+  }
+  .sysbar{
+    position:sticky;top:0;z-index:50;
+    background:var(--ink);color:#a6a6a0;
+    border-bottom:1px solid #1a1a1f;
+    font-family:var(--mono);font-size:10px;letter-spacing:0.18em;
+    text-transform:uppercase;
+  }
+  .sysbar-inner{
+    display:grid;grid-template-columns:1fr auto 1fr;gap:16px;
+    padding:9px 32px;max-width:1320px;margin:0 auto;align-items:center;
+  }
+  .sysbar .left{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .sysbar .right{display:flex;gap:18px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+  .sysbar .sig{
+    color:#fff;display:inline-flex;align-items:center;gap:8px;
+  }
+  .sysbar .sig::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--signal);box-shadow:0 0 0 4px rgba(216,255,61,0.12);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .sysbar .div{opacity:.4}
+
   /* ───── Top bar ───── */
   .topbar{
     background:var(--hero);
-    color:#e8e2d6;
-    border-bottom:1px solid rgba(255,255,255,0.06);
+    color:#e8e8e2;
+    border-bottom:1px solid #1a1a1f;
   }
   .topbar-inner{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:18px 32px;max-width:1180px;margin:0 auto;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+    padding:22px 32px;max-width:1320px;margin:0 auto;
   }
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:22px;letter-spacing:-0.01em}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:24px;letter-spacing:-0.012em;color:#fff}
   .brand-mark{
-    width:22px;height:22px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,#e8d9b1 0%,#b59a64 55%,#5e4c2a 100%);
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15);
+    width:22px;height:22px;border-radius:0;
+    background:#fff;position:relative;
+    transform:rotate(45deg);
   }
-  .nav{display:flex;align-items:center;gap:34px}
+  .brand-mark::after{
+    content:"";position:absolute;inset:5px;background:var(--ink);
+  }
+  .nav{display:flex;align-items:center;gap:30px;justify-self:center}
   .nav a{
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;
-    text-transform:uppercase;color:#bdb5a5;transition:color .2s;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:#9d9d97;transition:color .2s;
   }
   .nav a:hover{color:#fff}
+  .nav-cta{justify-self:end}
   .nav .pill{
-    color:#16130f;background:#e8e2d6;padding:8px 14px;border-radius:999px;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+    color:var(--ink);background:#fff;padding:11px 18px;border-radius:0;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.18em;
+    text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;
+    border:1px solid #fff;transition:all .2s;
   }
-  .nav .pill:hover{background:#fff;color:#000}
+  .nav .pill:hover{background:transparent;color:#fff}
 
   /* ───── Hero ───── */
   .hero{
     position:relative;
-    background:
-      radial-gradient(1200px 600px at 80% -10%,rgba(201,184,138,0.08),transparent 60%),
-      radial-gradient(900px 500px at 5% 110%,rgba(31,59,204,0.10),transparent 60%),
-      linear-gradient(180deg,var(--hero) 0%,var(--hero-2) 100%);
-    color:#ece5d6;
+    background:var(--hero);
+    color:#f4f4ee;
     overflow:hidden;
+    border-bottom:1px solid #1a1a1f;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:
+      linear-gradient(to right,rgba(255,255,255,0.04) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(255,255,255,0.025) 1px,transparent 1px);
+    background-size:80px 80px;
   }
   .hero::after{
     content:"";position:absolute;inset:0;pointer-events:none;
-    background-image:radial-gradient(rgba(255,255,255,0.025) 1px,transparent 1px);
-    background-size:3px 3px;mix-blend-mode:overlay;opacity:.45;
+    background-image:radial-gradient(rgba(255,255,255,0.04) 1px,transparent 1px);
+    background-size:3px 3px;mix-blend-mode:overlay;opacity:.6;
   }
   .hero-inner{
     position:relative;z-index:1;
-    max-width:1180px;margin:0 auto;padding:120px 32px 140px;
+    max-width:1320px;margin:0 auto;padding:140px 32px 110px;
+  }
+  .hero-tag{
+    position:absolute;left:32px;top:36px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:#7a7a72;
+  }
+  .hero-tag-r{
+    position:absolute;right:32px;top:36px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:#7a7a72;
   }
   .hero-eyebrow{
-    color:#8e8775;margin-bottom:36px;
-    display:flex;align-items:center;gap:12px;
+    color:#9d9d95;margin-bottom:48px;
+    display:flex;align-items:center;gap:14px;
   }
   .hero-eyebrow .dot{
-    width:6px;height:6px;border-radius:50%;background:#c9b88a;
-    box-shadow:0 0 0 4px rgba(201,184,138,0.12);
+    width:7px;height:7px;border-radius:50%;background:var(--signal);
+    box-shadow:0 0 0 4px rgba(216,255,61,0.10);
   }
   .hero h1{
     font-family:var(--serif);
     font-weight:400;
-    font-size:clamp(44px,6.8vw,98px);
-    line-height:0.98;
-    letter-spacing:-0.025em;
-    color:#f5eedc;
-    max-width:14ch;
+    font-size:clamp(54px,9.2vw,168px);
+    line-height:0.92;
+    letter-spacing:-0.038em;
+    color:#fff;
+    max-width:13ch;
   }
   .hero h1 .it{
     font-style:italic;
-    color:#e2d6b5;
+    color:#cfcfc8;
+    letter-spacing:-0.034em;
   }
   .hero-lede{
-    margin-top:44px;max-width:48ch;font-size:16.5px;line-height:1.6;
-    color:#bcb4a2;font-weight:300;
+    margin-top:56px;max-width:52ch;font-size:17px;line-height:1.55;
+    color:#a6a69e;font-weight:300;
   }
-  .hero-lede strong{color:#ece5d6;font-weight:500}
+  .hero-lede strong{color:#fff;font-weight:500}
   .hero-cta{
-    margin-top:48px;display:flex;gap:14px;flex-wrap:wrap;
+    margin-top:52px;display:flex;gap:12px;flex-wrap:wrap;
   }
   .btn{
-    font-family:var(--mono);font-size:11.5px;letter-spacing:0.16em;
-    text-transform:uppercase;padding:16px 26px;border-radius:999px;
+    font-family:var(--mono);font-size:11px;letter-spacing:0.20em;
+    text-transform:uppercase;padding:18px 26px;border-radius:0;
     border:1px solid transparent;cursor:pointer;transition:all .2s;
-    display:inline-flex;align-items:center;gap:10px;
+    display:inline-flex;align-items:center;gap:14px;
+    font-weight:500;
   }
-  .btn-primary{background:#ece5d6;color:#16130f}
-  .btn-primary:hover{background:#fff}
-  .btn-ghost{background:transparent;color:#ece5d6;border-color:rgba(236,229,214,0.25)}
-  .btn-ghost:hover{border-color:rgba(236,229,214,0.6)}
-  .btn .arrow{transition:transform .2s}
-  .btn:hover .arrow{transform:translateX(3px)}
+  .btn-primary{background:#fff;color:var(--ink);border-color:#fff}
+  .btn-primary:hover{background:transparent;color:#fff}
+  .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,0.22)}
+  .btn-ghost:hover{border-color:#fff}
+  .btn .arrow{transition:transform .2s;font-family:var(--sans);font-style:normal;letter-spacing:0;font-size:14px}
+  .btn:hover .arrow{transform:translateX(4px)}
 
   .hero-meta{
-    margin-top:96px;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;
-    padding-top:28px;border-top:1px solid rgba(236,229,214,0.10);
+    margin-top:120px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    padding-top:0;border-top:1px solid rgba(255,255,255,0.10);
   }
-  .hero-meta .k{color:#8e8775;font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase}
-  .hero-meta .v{margin-top:8px;font-family:var(--serif);font-size:22px;color:#ece5d6;letter-spacing:-0.01em}
+  .hero-meta > div{
+    padding:24px 24px 0 0;border-right:1px solid rgba(255,255,255,0.08);
+  }
+  .hero-meta > div:last-child{border-right:0}
+  .hero-meta .k{color:#7a7a72;font-family:var(--mono);font-size:10px;letter-spacing:0.20em;text-transform:uppercase}
+  .hero-meta .v{margin-top:10px;font-family:var(--serif);font-size:30px;color:#fff;letter-spacing:-0.015em;font-feature-settings:"tnum"}
 
-  /* horizontal frame line going across hero */
-  .hero-line{
-    position:absolute;right:-2%;top:48%;width:55%;height:1px;
-    background:linear-gradient(90deg,transparent,rgba(201,184,138,0.45) 30%,rgba(201,184,138,0.45) 70%,transparent);
+  /* hero giant ghost wordmark */
+  .hero-ghost{
+    position:absolute;right:-2%;bottom:-8%;
+    font-family:var(--serif);font-style:italic;font-size:28vw;line-height:1;
+    color:rgba(255,255,255,0.025);letter-spacing:-0.04em;
+    pointer-events:none;user-select:none;z-index:0;
   }
+
+  .hero-line{display:none}
 
   /* ───── Section frame ───── */
-  section.chapter{padding:120px 0;border-top:1px solid var(--line)}
+  section.chapter{padding:140px 0 120px;border-top:1px solid var(--ink);position:relative;overflow:hidden}
+  section.chapter:first-of-type{border-top:0}
+  .chapter-marker{
+    position:absolute;left:32px;top:24px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .chapter-marker-r{
+    position:absolute;right:32px;top:24px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--muted);
+  }
   .chapter-head{
-    display:grid;grid-template-columns:80px 1fr;gap:40px;
-    align-items:start;margin-bottom:80px;
+    display:grid;grid-template-columns:1fr;gap:24px;
+    align-items:end;margin-bottom:88px;position:relative;
+    padding-bottom:32px;border-bottom:1px solid var(--line);
   }
   .chapter-num{
-    font-family:var(--serif);font-style:italic;font-size:44px;
-    color:var(--muted);line-height:1;padding-top:6px;
+    font-family:var(--serif);font-style:italic;
+    font-size:clamp(120px,18vw,260px);
+    color:var(--ink);line-height:0.85;letter-spacing:-0.04em;
+    margin-left:-8px;
   }
   .chapter-title{
     font-family:var(--serif);font-weight:400;
-    font-size:clamp(32px,4.4vw,58px);
-    line-height:1.02;letter-spacing:-0.02em;
-    max-width:22ch;
+    font-size:clamp(34px,5vw,72px);
+    line-height:0.98;letter-spacing:-0.028em;
+    max-width:24ch;color:var(--ink);
   }
   .chapter-title .it{color:var(--muted-2)}
+  .chapter-meta{
+    position:absolute;right:0;bottom:32px;text-align:right;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .chapter-meta .v{
+    display:block;color:var(--ink);font-family:var(--serif);
+    font-size:18px;letter-spacing:-0.01em;text-transform:none;margin-top:4px;
+  }
 
   /* ───── Section I — three columns ───── */
   .triptych{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:48px;
-    padding-top:24px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border-top:1px solid var(--ink);
   }
-  .col{position:relative;padding-top:28px}
+  .col{
+    position:relative;padding:36px 32px 36px 0;border-right:1px solid var(--line);
+    min-height:340px;display:flex;flex-direction:column;
+  }
+  .col:last-child{border-right:0;padding-right:0}
+  .col + .col{padding-left:32px}
   .col-num{
-    position:absolute;top:-14px;left:0;
-    background:var(--paper);padding-right:14px;
-    font-family:var(--serif);font-style:italic;font-size:22px;color:var(--muted);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:24px;
   }
+  .col-num em{font-family:var(--serif);font-style:italic;font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);margin-right:8px}
   .col h3{
-    font-family:var(--serif);font-weight:400;font-size:24px;
-    line-height:1.2;letter-spacing:-0.012em;margin-bottom:18px;
-    max-width:18ch;
+    font-family:var(--serif);font-weight:400;font-size:30px;
+    line-height:1.05;letter-spacing:-0.02em;margin-bottom:20px;
+    max-width:18ch;color:var(--ink);
   }
-  .col p{color:var(--muted-2);font-size:14.5px;line-height:1.65;max-width:34ch}
-  .col .tags{margin-top:22px;display:flex;flex-wrap:wrap;gap:6px}
+  .col p{color:var(--muted-2);font-size:14.5px;line-height:1.6;max-width:36ch}
+  .col .tags{margin-top:auto;padding-top:28px;display:flex;flex-wrap:wrap;gap:6px}
   .col .tags span{
-    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--muted);padding:5px 10px;border:1px solid var(--line);border-radius:999px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--ink);padding:5px 9px;border:1px solid var(--ink);border-radius:0;
+    background:transparent;
   }
 
   /* ───── Final CTA ───── */
   .cta{
     position:relative;overflow:hidden;color:#eef0ff;
-    background:
-      radial-gradient(900px 500px at 80% -20%,rgba(255,255,255,0.18),transparent 60%),
-      radial-gradient(700px 400px at 10% 110%,rgba(0,0,0,0.35),transparent 60%),
-      linear-gradient(160deg,#2a4dd9 0%,#1d3bbb 45%,#0f2585 100%);
-    padding:140px 32px 130px;
+    background:linear-gradient(180deg,#0c1aa6 0%,#0a1488 100%);
+    padding:160px 32px 140px;border-top:1px solid #0a1488;
+  }
+  .cta::before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.6;
+    background-image:
+      linear-gradient(to right,rgba(255,255,255,0.05) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(255,255,255,0.04) 1px,transparent 1px);
+    background-size:80px 80px;
   }
   .cta::after{
     content:"";position:absolute;inset:0;pointer-events:none;
-    background-image:radial-gradient(rgba(255,255,255,0.05) 1px,transparent 1px);
+    background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);
     background-size:3px 3px;mix-blend-mode:overlay;opacity:.5;
   }
-  .cta-inner{position:relative;z-index:1;max-width:880px;margin:0 auto;text-align:center}
-  .cta .label{color:rgba(255,255,255,0.55)}
+  .cta-tag{
+    position:absolute;left:32px;top:24px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:rgba(255,255,255,0.45);
+  }
+  .cta-tag-r{
+    position:absolute;right:32px;top:24px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:rgba(255,255,255,0.45);
+  }
+  .cta-ghost{
+    position:absolute;left:-3%;bottom:-12%;
+    font-family:var(--serif);font-style:italic;font-size:34vw;line-height:1;
+    color:rgba(255,255,255,0.04);letter-spacing:-0.04em;
+    pointer-events:none;user-select:none;
+  }
+  .cta-inner{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+  .cta .label{color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:14px}
+  .cta .label::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 4px rgba(216,255,61,0.10)}
   .cta h2{
-    margin-top:24px;font-family:var(--serif);font-weight:400;
-    font-size:clamp(40px,5.5vw,76px);letter-spacing:-0.022em;line-height:1.02;
-    color:#fff;
+    margin-top:36px;font-family:var(--serif);font-weight:400;
+    font-size:clamp(64px,11vw,200px);letter-spacing:-0.04em;line-height:0.92;
+    color:#fff;max-width:14ch;
   }
-  .cta h2 .it{color:#cdd5ff}
+  .cta h2 .it{color:#aebbff}
   .cta p{
-    margin:24px auto 0;max-width:46ch;color:rgba(238,240,255,0.78);
-    font-weight:300;font-size:16px;line-height:1.6;
+    margin-top:48px;max-width:52ch;color:rgba(238,240,255,0.72);
+    font-weight:300;font-size:17px;line-height:1.55;
   }
-  .cta-cta{margin-top:40px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-  .cta .btn-primary{background:#fff;color:#0f2585}
-  .cta .btn-primary:hover{background:#e8ebff}
-  .cta .btn-ghost{color:#fff;border-color:rgba(255,255,255,0.35)}
+  .cta-cta{margin-top:52px;display:flex;gap:12px;flex-wrap:wrap}
+  .cta .btn-primary{background:#fff;color:#0a1488;border-color:#fff}
+  .cta .btn-primary:hover{background:transparent;color:#fff}
+  .cta .btn-ghost{color:#fff;border-color:rgba(255,255,255,0.30)}
   .cta .btn-ghost:hover{border-color:#fff}
   .cta-meta{
-    margin-top:60px;display:flex;justify-content:center;gap:36px;flex-wrap:wrap;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
-    text-transform:uppercase;color:rgba(238,240,255,0.55);
+    margin-top:120px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    padding-top:0;border-top:1px solid rgba(255,255,255,0.15);
   }
+  .cta-meta > div{
+    padding:24px 24px 0 0;border-right:1px solid rgba(255,255,255,0.10);
+  }
+  .cta-meta > div:last-child{border-right:0}
+  .cta-meta .k{font-family:var(--mono);font-size:10px;letter-spacing:0.20em;text-transform:uppercase;color:rgba(255,255,255,0.45)}
+  .cta-meta .v{margin-top:10px;font-family:var(--serif);font-size:24px;color:#fff;letter-spacing:-0.012em}
 
   /* ───── Footer ───── */
   footer.foot{
-    background:var(--paper);padding:90px 0 40px;border-top:1px solid var(--line);
+    background:var(--ink);color:#a6a69e;
+    padding:120px 0 40px;border-top:1px solid #1a1a1f;position:relative;
   }
-  .foot-head{display:grid;grid-template-columns:80px 1fr;gap:40px;margin-bottom:64px}
-  .foot-num{font-family:var(--serif);font-style:italic;font-size:44px;color:var(--muted);line-height:1;padding-top:6px}
+  .foot-head{
+    display:grid;grid-template-columns:1fr;gap:24px;margin-bottom:88px;
+    padding-bottom:32px;border-bottom:1px solid #1a1a1f;position:relative;
+  }
+  .foot-num{
+    font-family:var(--serif);font-style:italic;
+    font-size:clamp(120px,18vw,260px);
+    color:#fff;line-height:0.85;letter-spacing:-0.04em;margin-left:-8px;
+  }
   .foot-title{
     font-family:var(--serif);font-weight:400;
-    font-size:clamp(28px,3.8vw,46px);letter-spacing:-0.02em;line-height:1.05;max-width:24ch;
+    font-size:clamp(34px,5vw,72px);letter-spacing:-0.028em;line-height:0.98;
+    max-width:24ch;color:#fff;
   }
-  .foot-title .it{color:var(--muted-2)}
+  .foot-title .it{color:#7a7a72}
   .foot-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:36px;
-    padding-top:36px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+    border-top:1px solid #1a1a1f;border-left:1px solid #1a1a1f;
+  }
+  .foot-col{
+    padding:28px 28px 32px;border-right:1px solid #1a1a1f;border-bottom:1px solid #1a1a1f;
   }
   .foot-col h6{
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
-    text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:#7a7a72;margin-bottom:18px;
   }
   .foot-col a,.foot-col p{
-    display:block;color:var(--ink-2);font-size:14px;line-height:1.7;
+    display:block;color:#d4d4ce;font-size:14px;line-height:1.8;
   }
-  .foot-col a:hover{color:var(--accent)}
+  .foot-col a:hover{color:#fff}
   .foot-bottom{
-    margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    margin-top:48px;padding-top:24px;border-top:1px solid #1a1a1f;
     display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.14em;
-    text-transform:uppercase;color:var(--muted);
+    font-family:var(--mono);font-size:10px;letter-spacing:0.20em;
+    text-transform:uppercase;color:#7a7a72;
+  }
+  .foot-mark{
+    position:absolute;right:32px;top:32px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:#7a7a72;
   }
 
   /* ───── Section V — FAQ ───── */
   .faq{border-top:1px solid var(--ink)}
   .q{
-    display:grid;grid-template-columns:60px 1.1fr 1.6fr;gap:24px;
-    padding:24px 4px;border-bottom:1px solid var(--line);
-    align-items:start;cursor:pointer;transition:background .15s;
+    display:grid;grid-template-columns:90px 1.1fr 1.6fr;gap:24px;
+    padding:32px 4px;border-bottom:1px solid var(--line);
+    align-items:start;transition:background .15s;
   }
-  .q:hover{background:rgba(214,207,193,0.25)}
-  .q .qn{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--muted);padding-top:6px}
+  .q:hover{background:rgba(8,8,10,0.03)}
+  .q .qn{
+    font-family:var(--serif);font-style:italic;font-size:34px;
+    color:var(--ink);letter-spacing:-0.02em;line-height:.9;
+    font-feature-settings:"tnum";
+  }
   .q .qt{
-    font-family:var(--serif);font-weight:400;font-size:22px;
-    letter-spacing:-0.012em;line-height:1.25;max-width:28ch;
+    font-family:var(--serif);font-weight:400;font-size:26px;
+    letter-spacing:-0.02em;line-height:1.1;max-width:28ch;color:var(--ink);
   }
-  .q .qa{color:var(--muted-2);font-size:14px;line-height:1.65;max-width:54ch}
+  .q .qa{color:var(--muted-2);font-size:14.5px;line-height:1.6;max-width:56ch;padding-top:6px}
 
   /* ───── Section IV — Authors ───── */
   .authors{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border-top:1px solid var(--ink);border-left:1px solid var(--line);
   }
   .author{
-    border:1px solid var(--line);background:var(--paper);
-    display:flex;flex-direction:column;
-    transition:transform .25s ease,border-color .25s ease;
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:transparent;display:flex;flex-direction:column;position:relative;
   }
-  .author:hover{transform:translateY(-3px);border-color:var(--ink-2)}
   .author .portrait{
-    aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
-    font-family:var(--serif);font-size:130px;letter-spacing:-0.02em;
-    color:#f3efe8;background:#1a1612;
+    aspect-ratio:1/1;display:flex;align-items:flex-end;justify-content:flex-start;
+    padding:28px;
+    font-family:var(--serif);font-style:italic;font-size:clamp(120px,16vw,200px);
+    letter-spacing:-0.04em;line-height:.85;
+    color:#fff;background:var(--ink);position:relative;overflow:hidden;
   }
-  .author.invert .portrait{background:#0f0c09;color:#c9b88a}
-  .author.dark .portrait{background:var(--ink);color:#e2d6b5}
-  .author-body{padding:24px 24px 28px}
+  .author .portrait::before{
+    content:"";position:absolute;inset:0;
+    background-image:
+      linear-gradient(to right,rgba(255,255,255,0.04) 1px,transparent 1px),
+      linear-gradient(to bottom,rgba(255,255,255,0.04) 1px,transparent 1px);
+    background-size:40px 40px;opacity:.5;
+  }
+  .author .portrait::after{
+    content:attr(data-tag);position:absolute;top:24px;left:28px;right:28px;
+    display:flex;justify-content:space-between;
+    font-family:var(--mono);font-style:normal;font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:#9d9d97;
+  }
+  .author.invert .portrait{background:#000}
+  .author.dark .portrait{background:var(--ink-2)}
+  .author-body{padding:28px 28px 32px;flex:1;display:flex;flex-direction:column}
   .author h6{
-    font-family:var(--serif);font-weight:400;font-size:22px;
-    letter-spacing:-0.012em;line-height:1.15;
+    font-family:var(--serif);font-weight:400;font-size:28px;
+    letter-spacing:-0.018em;line-height:1.05;color:var(--ink);
   }
   .author .role{
-    margin-top:4px;font-family:var(--mono);font-size:10.5px;
-    letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);
+    margin-top:8px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:0.20em;text-transform:uppercase;color:var(--muted);
   }
   .author p{
-    margin-top:14px;color:var(--muted-2);font-size:13.5px;line-height:1.6;
+    margin-top:20px;color:var(--muted-2);font-size:13.5px;line-height:1.6;flex:1;
   }
   .author .credit{
-    margin-top:18px;padding-top:14px;border-top:1px solid var(--line);
-    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;
+    margin-top:24px;padding-top:18px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:10px;letter-spacing:0.18em;
     text-transform:uppercase;color:var(--muted);
+    display:flex;justify-content:space-between;align-items:center;
   }
+  .author .credit .arrow{font-family:var(--sans);font-size:14px;letter-spacing:0;text-transform:none;color:var(--ink);transition:transform .2s}
+  .author:hover .credit .arrow{transform:translateX(4px)}
 
   /* ───── Section III — Bauplan table ───── */
-  .bauplan{
-    border-top:1px solid var(--ink);
-  }
-  .row{
-    display:grid;grid-template-columns:140px 1fr 1.4fr;gap:24px;
-    padding:28px 4px;border-bottom:1px solid var(--line);align-items:start;
-  }
-  .row .rk{
-    display:flex;flex-direction:column;gap:4px;
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
+  .bauplan{border-top:1px solid var(--ink)}
+  .bauplan-head{
+    display:grid;grid-template-columns:90px 180px 1fr 1.4fr;gap:24px;
+    padding:14px 4px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:10px;letter-spacing:0.20em;
     text-transform:uppercase;color:var(--muted);
   }
-  .row .rk .num{
-    font-family:var(--serif);font-style:italic;font-size:20px;
-    letter-spacing:0;text-transform:none;color:var(--ink);
+  .row{
+    display:grid;grid-template-columns:90px 180px 1fr 1.4fr;gap:24px;
+    padding:30px 4px;border-bottom:1px solid var(--line);align-items:start;
+    transition:background .2s;cursor:default;
+  }
+  .row:hover{background:rgba(8,8,10,0.03)}
+  .row .rn{
+    font-family:var(--serif);font-style:italic;font-size:36px;
+    color:var(--ink);line-height:.9;letter-spacing:-0.02em;
+    font-feature-settings:"tnum";
+  }
+  .row .rk{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:var(--ink);padding-top:14px;
   }
   .row h5{
-    font-family:var(--serif);font-weight:400;font-size:22px;
-    letter-spacing:-0.012em;line-height:1.2;max-width:24ch;
+    font-family:var(--serif);font-weight:400;font-size:24px;
+    letter-spacing:-0.018em;line-height:1.15;max-width:24ch;color:var(--ink);
+    padding-top:6px;
   }
-  .row p{color:var(--muted-2);font-size:14px;line-height:1.6;max-width:54ch}
+  .row p{color:var(--muted-2);font-size:14px;line-height:1.6;max-width:56ch;padding-top:8px}
   .row p .check{
-    display:inline-block;width:14px;height:14px;border-radius:50%;
+    display:inline-block;width:14px;height:14px;
     background:var(--ink);color:var(--paper);font-size:9px;line-height:14px;
-    text-align:center;margin-right:8px;vertical-align:1px;
+    text-align:center;margin-right:10px;vertical-align:1px;
   }
 
   /* ───── Section II — Vordruck grid ───── */
   .vordrucke{
     display:grid;grid-template-columns:repeat(3,1fr);
-    border-top:1px solid var(--line);
+    border-top:1px solid var(--ink);
     border-left:1px solid var(--line);
   }
   .vordruck{
-    padding:34px 30px 30px;
+    padding:32px 28px 26px;
     border-right:1px solid var(--line);
     border-bottom:1px solid var(--line);
-    background:var(--paper);
-    transition:background .2s;
+    background:transparent;
+    transition:all .25s;
     position:relative;
-    min-height:220px;
+    min-height:240px;
     display:flex;flex-direction:column;justify-content:space-between;
+    overflow:hidden;
   }
-  .vordruck:hover{background:var(--paper-2)}
+  .vordruck::before{
+    content:"";position:absolute;left:0;top:0;width:100%;height:2px;
+    background:var(--ink);transform:scaleX(0);transform-origin:left;
+    transition:transform .3s ease;
+  }
+  .vordruck:hover{background:var(--ink);color:#f4f4ee}
+  .vordruck:hover::before{transform:scaleX(1)}
+  .vordruck:hover .code,.vordruck:hover p,.vordruck:hover .meta{color:#9d9d97}
+  .vordruck:hover h4{color:#fff}
   .vordruck .code{
-    font-family:var(--mono);font-size:10.5px;letter-spacing:0.16em;
-    text-transform:uppercase;color:var(--muted);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:var(--muted);transition:color .2s;
   }
   .vordruck h4{
-    font-family:var(--serif);font-weight:400;font-size:24px;
-    line-height:1.15;letter-spacing:-0.012em;margin-top:14px;
-    max-width:18ch;
+    font-family:var(--serif);font-weight:400;font-size:30px;
+    line-height:1.08;letter-spacing:-0.02em;margin-top:18px;
+    max-width:16ch;color:var(--ink);transition:color .2s;
   }
   .vordruck p{
-    margin-top:14px;color:var(--muted-2);font-size:13.5px;line-height:1.6;
-    max-width:32ch;
+    margin-top:16px;color:var(--muted-2);font-size:13.5px;line-height:1.55;
+    max-width:32ch;transition:color .2s;
   }
   .vordruck .meta{
-    margin-top:24px;display:flex;justify-content:space-between;align-items:center;
-    font-family:var(--mono);font-size:10px;letter-spacing:0.14em;
-    text-transform:uppercase;color:var(--muted);
+    margin-top:24px;padding-top:18px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:10px;letter-spacing:0.18em;
+    text-transform:uppercase;color:var(--muted);transition:color .2s;
   }
-  .vordruck .meta .arrow{font-family:var(--sans);font-style:normal;letter-spacing:0;font-size:14px}
+  .vordruck:hover .meta{border-top-color:#26262c}
+  .vordruck .meta .arrow{font-family:var(--sans);font-style:normal;letter-spacing:0;font-size:16px;transition:transform .25s}
+  .vordruck:hover .meta .arrow{transform:translateX(4px)}
 
   @media (max-width:880px){
-    .triptych{grid-template-columns:1fr;gap:48px}
-    .chapter-head{grid-template-columns:1fr;gap:18px;margin-bottom:56px}
-    section.chapter{padding:80px 0}
+    .triptych{grid-template-columns:1fr}
+    .col{border-right:0;border-bottom:1px solid var(--line);padding:32px 0}
+    .col + .col{padding-left:0}
+    .chapter-head{margin-bottom:56px}
+    section.chapter{padding:90px 0 80px}
+    .chapter-meta{position:static;text-align:left;margin-top:8px}
     .vordrucke{grid-template-columns:1fr}
-    .row{grid-template-columns:1fr;gap:10px}
+    .bauplan-head{display:none}
+    .row{grid-template-columns:1fr;gap:8px;padding:24px 4px}
+    .row .rn{font-size:28px}
     .authors{grid-template-columns:1fr}
-    .q{grid-template-columns:1fr;gap:10px}
-    .foot-grid{grid-template-columns:repeat(2,1fr);gap:28px}
-    .foot-head{grid-template-columns:1fr;gap:18px}
-    .cta{padding:100px 24px 96px}
+    .q{grid-template-columns:1fr;gap:8px}
+    .foot-grid{grid-template-columns:repeat(2,1fr)}
+    .cta{padding:110px 24px 96px}
+    .cta-meta{grid-template-columns:repeat(2,1fr)}
+    .cta-meta > div{border-right:0;border-bottom:1px solid rgba(255,255,255,0.10);padding-bottom:18px}
+    .hero-meta > div:nth-child(2){border-right:0}
+    .hero-meta{grid-template-columns:repeat(2,1fr)}
+    .sysbar-inner{grid-template-columns:1fr;text-align:center}
+    .sysbar .left,.sysbar .right{justify-content:center}
   }
   @media (max-width:760px){
-    .nav a:not(.pill){display:none}
-    .hero-inner{padding:80px 24px 96px}
-    .hero-meta{grid-template-columns:repeat(2,1fr);gap:22px}
+    .nav{display:none}
+    .topbar-inner{grid-template-columns:1fr auto;gap:16px}
+    .hero-inner{padding:90px 24px 80px}
+    .hero h1{font-size:clamp(48px,12vw,80px)}
+    .hero-tag,.hero-tag-r{display:none}
     .wrap{padding:0 24px}
+    .chapter-marker,.chapter-marker-r{position:static;display:inline-block;margin:0 12px 12px 0}
+    .foot-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
+
+<div class="scroll-progress" id="sp"></div>
+
+<!-- ═══ SYSTEM STATUS STRIP ═══ -->
+<div class="sysbar">
+  <div class="sysbar-inner">
+    <div class="left">
+      <span class="sig">System · Operational</span>
+      <span class="div">/</span>
+      <span>Build 2026.04 · v0.9.7</span>
+      <span class="div">/</span>
+      <span>Frankfurt · DE</span>
+    </div>
+    <div>Aranthir — Edition № 01</div>
+    <div class="right">
+      <span id="clock">00:00:00 CET</span>
+      <span class="div">/</span>
+      <span>BSI C5 · § 75c SGB V</span>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ TOP BAR ═══ -->
 <header class="topbar">
@@ -405,19 +624,23 @@
       <span>Aranthir</span>
     </a>
     <nav class="nav">
-      <a href="#produkt">Produkt</a>
-      <a href="#vordrucke">Vordrucke</a>
-      <a href="#bauplan">Bauplan</a>
-      <a href="#autoren">Autoren</a>
-      <a href="#fragen">Fragen</a>
-      <a href="#testen" class="pill">Aranthir testen ›</a>
+      <a href="#produkt">i · Produkt</a>
+      <a href="#vordrucke">ii · Vordrucke</a>
+      <a href="#bauplan">iii · Bauplan</a>
+      <a href="#autoren">iv · Autoren</a>
+      <a href="#fragen">v · Fragen</a>
     </nav>
+    <div class="nav-cta">
+      <a href="#testen" class="pill">Aranthir testen <span>→</span></a>
+    </div>
   </div>
 </header>
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
-  <div class="hero-line" aria-hidden="true"></div>
+  <div class="hero-tag">№ 00 — Auftakt</div>
+  <div class="hero-tag-r">Edition 2026 / DE</div>
+  <div class="hero-ghost" aria-hidden="true">Aranthir</div>
   <div class="hero-inner">
     <div class="hero-eyebrow label">
       <span class="dot"></span>
@@ -442,25 +665,28 @@
     <div class="hero-meta">
       <div><div class="k">Pilot</div><div class="v">3 Heime</div></div>
       <div><div class="k">Bewohner</div><div class="v">412</div></div>
-      <div><div class="k">Diktate / Tag</div><div class="v">~ 1.840</div></div>
-      <div><div class="k">DSGVO-Hosting</div><div class="v">Frankfurt a. M.</div></div>
+      <div><div class="k">Diktate / Tag</div><div class="v">1.840</div></div>
+      <div><div class="k">Hosting</div><div class="v">Frankfurt</div></div>
     </div>
   </div>
 </section>
 
 <!-- ═══ I — Mitgeschrieben, nicht nachgeschrieben ═══ -->
 <section class="chapter" id="produkt">
+  <div class="chapter-marker">№ 01 — Produkt</div>
+  <div class="chapter-marker-r">01 / 05</div>
   <div class="wrap">
     <div class="chapter-head">
-      <div class="chapter-num">i</div>
+      <div class="chapter-num">i.</div>
       <h2 class="chapter-title">
         Die Behandlung wird mitgeschrieben — <span class="it">nicht nachgeschrieben.</span>
       </h2>
+      <div class="chapter-meta">Methode<span class="v">Diktat → Akte</span></div>
     </div>
 
     <div class="triptych">
       <article class="col">
-        <span class="col-num">i</span>
+        <div class="col-num"><em>i.</em>Erfassung</div>
         <h3>Während der Behandlung. Mit Handschuhen. Ohne Schreibtisch.</h3>
         <p>
           Aranthir hört zu, sortiert die Begriffe und legt den Eintrag direkt in die
@@ -470,7 +696,7 @@
       </article>
 
       <article class="col">
-        <span class="col-num">ii</span>
+        <div class="col-num"><em>ii.</em>Strukturierung</div>
         <h3>Die KI füllt den passenden deutschen Vordruck.</h3>
         <p>
           Kein freies Textfeld, kein „Sonstiges". Aranthir kennt §132a, §174a, MDK-Berichte,
@@ -480,7 +706,7 @@
       </article>
 
       <article class="col">
-        <span class="col-num">iii</span>
+        <div class="col-num"><em>iii.</em>Freigabe</div>
         <h3>Sie unter­schreiben, freigeben, fertig.</h3>
         <p>
           Der Eintrag bleibt revisionssicher abgelegt. Betreuer, Heimleitung und Abrechnung
@@ -494,12 +720,15 @@
 
 <!-- ═══ II — Vordrucke ═══ -->
 <section class="chapter" id="vordrucke">
+  <div class="chapter-marker">№ 02 — Vordrucke</div>
+  <div class="chapter-marker-r">02 / 05</div>
   <div class="wrap">
     <div class="chapter-head">
-      <div class="chapter-num">ii</div>
+      <div class="chapter-num">ii.</div>
       <h2 class="chapter-title">
         Jeder deutsche Vordruck ist <span class="it">bereits vorinstalliert.</span>
       </h2>
+      <div class="chapter-meta">Aktiv<span class="v">42 Formulare</span></div>
     </div>
 
     <div class="vordrucke">
@@ -562,17 +791,25 @@
 
 <!-- ═══ III — Bauplan ═══ -->
 <section class="chapter" id="bauplan">
+  <div class="chapter-marker">№ 03 — Bauplan</div>
+  <div class="chapter-marker-r">03 / 05</div>
   <div class="wrap">
     <div class="chapter-head">
-      <div class="chapter-num">iii</div>
+      <div class="chapter-num">iii.</div>
       <h2 class="chapter-title">
         Vorschrift ist nicht das Ende der Liste — <span class="it">sie ist der Bauplan.</span>
       </h2>
+      <div class="chapter-meta">Phasen<span class="v">06 Stationen</span></div>
     </div>
 
     <div class="bauplan">
+      <div class="bauplan-head">
+        <div>№</div><div>Phase</div><div>Station</div><div>Beschreibung</div>
+      </div>
+
       <div class="row">
-        <div class="rk"><span class="num">01</span><span>Aufnahme</span></div>
+        <div class="rn">01</div>
+        <div class="rk">Aufnahme</div>
         <h5>Aufnahmegespräch &amp; Pflegeplanung</h5>
         <p>
           <span class="check">✓</span>Biographie, Medikation, Patientenverfügung — alles in einem Gespräch
@@ -582,7 +819,8 @@
       </div>
 
       <div class="row">
-        <div class="rk"><span class="num">02</span><span>Visite</span></div>
+        <div class="rn">02</div>
+        <div class="rk">Visite</div>
         <h5>Hausarzt- und Zahnarztbesuch</h5>
         <p>
           <span class="check">✓</span>Diktat während der Untersuchung, Befund landet im richtigen Modul.
@@ -591,7 +829,8 @@
       </div>
 
       <div class="row">
-        <div class="rk"><span class="num">03</span><span>Pflege</span></div>
+        <div class="rn">03</div>
+        <div class="rk">Pflege</div>
         <h5>Tägliche Pflegedoku­men­tation</h5>
         <p>
           <span class="check">✓</span>Trinkprotokoll, Lagerung, Sturzereignis. Aranthir verbindet Eintrag
@@ -600,7 +839,8 @@
       </div>
 
       <div class="row">
-        <div class="rk"><span class="num">04</span><span>Einwilligung</span></div>
+        <div class="rn">04</div>
+        <div class="rk">Einwilligung</div>
         <h5>Betreuer- und Schweige­pflicht­entbindungen</h5>
         <p>
           <span class="check">✓</span>Generierung, Versand, Rückläufer-Tracking. Pro Empfänger und pro
@@ -609,7 +849,8 @@
       </div>
 
       <div class="row">
-        <div class="rk"><span class="num">05</span><span>Abrechnung</span></div>
+        <div class="rn">05</div>
+        <div class="rk">Abrechnung</div>
         <h5>Quartalsweise Übergabe an die KZV</h5>
         <p>
           <span class="check">✓</span>BEMA, GOZ, Zuschlagsdokumentation. Maschinenlesbares xml-Paket für
@@ -618,7 +859,8 @@
       </div>
 
       <div class="row">
-        <div class="rk"><span class="num">06</span><span>Audit</span></div>
+        <div class="rn">06</div>
+        <div class="rk">Audit</div>
         <h5>Heimaufsicht und MDK-Prüfung</h5>
         <p>
           <span class="check">✓</span>Ein Knopf, ein Prüfraum, eine Akte. Prüfer sehen, was sie sehen
@@ -632,42 +874,45 @@
 
 <!-- ═══ IV — Autoren ═══ -->
 <section class="chapter" id="autoren">
+  <div class="chapter-marker">№ 04 — Autoren</div>
+  <div class="chapter-marker-r">04 / 05</div>
   <div class="wrap">
     <div class="chapter-head">
-      <div class="chapter-num">iv</div>
+      <div class="chapter-num">iv.</div>
       <h2 class="chapter-title">
         Geschrieben von einem Zahnarzt, <span class="it">der den §174a selbst kennt.</span>
       </h2>
+      <div class="chapter-meta">Team<span class="v">Klein, gemischt</span></div>
     </div>
 
     <div class="authors">
       <article class="author">
-        <div class="portrait">JG</div>
+        <div class="portrait" data-tag="№ 01 · Zahnarzt">JG</div>
         <div class="author-body">
           <h6>Dr. Jonas Greve</h6>
           <div class="role">Zahnarzt · Gründer</div>
           <p>Sieben Jahre Praxis, davon vier mit aufsuchender Versorgung in drei Heimen im Münsterland. Schreibt jeden HKP, den Aranthir kennt, vorher mit der Hand.</p>
-          <div class="credit">Aufsuchend · MdK-erfahren</div>
+          <div class="credit"><span>Aufsuchend · MdK-erfahren</span><span class="arrow">→</span></div>
         </div>
       </article>
 
       <article class="author dark">
-        <div class="portrait">CW</div>
+        <div class="portrait" data-tag="№ 02 · PDL">CW</div>
         <div class="author-body">
           <h6>Corinna Weigert</h6>
           <div class="role">Pflegedienstleitung</div>
           <p>Zwölf Jahre Heimleitung, drei Trägerwechsel, zwei MDK-Großprüfungen. Liest jedes Formular, bevor es als Vordruck in Aranthir ankommt.</p>
-          <div class="credit">PDL · §80 SGB XI</div>
+          <div class="credit"><span>PDL · §80 SGB XI</span><span class="arrow">→</span></div>
         </div>
       </article>
 
       <article class="author invert">
-        <div class="portrait">SMA</div>
+        <div class="portrait" data-tag="№ 03 · Träger">SMA</div>
         <div class="author-body">
           <h6>SwissMedAI MVZ</h6>
           <div class="role">Technischer Träger</div>
           <p>MVZ-Plattform mit Rechenzentrum in Frankfurt. Hostet Aranthir gemäß BSI C5 und §75c SGB V — auditiert, dokumentiert, bezahlbar.</p>
-          <div class="credit">DSGVO · BSI C5 · ISO 27001</div>
+          <div class="credit"><span>DSGVO · BSI C5 · ISO 27001</span><span class="arrow">→</span></div>
         </div>
       </article>
     </div>
@@ -676,12 +921,15 @@
 
 <!-- ═══ V — Sieben Fragen ═══ -->
 <section class="chapter" id="fragen">
+  <div class="chapter-marker">№ 05 — Fragen</div>
+  <div class="chapter-marker-r">05 / 05</div>
   <div class="wrap">
     <div class="chapter-head">
-      <div class="chapter-num">v</div>
+      <div class="chapter-num">v.</div>
       <h2 class="chapter-title">
         Sieben Fragen, <span class="it">die wir vorher klären.</span>
       </h2>
+      <div class="chapter-meta">Vorgespräch<span class="v">7 Punkte</span></div>
     </div>
 
     <div class="faq">
@@ -732,34 +980,38 @@
 
 <!-- ═══ CTA ═══ -->
 <section class="cta" id="testen">
+  <div class="cta-tag">№ 06 — Pilot</div>
+  <div class="cta-tag-r">Sommer 2026</div>
+  <div class="cta-ghost" aria-hidden="true">testen.</div>
   <div class="cta-inner">
-    <div class="label">Pilot · Sommer 2026</div>
+    <div class="label">Pilot · drei Wochen · Ihr Tempo</div>
     <h2>
       Aranthir <span class="it">testen.</span>
     </h2>
     <p>
       Drei Wochen, Ihre Akten, Ihr Tempo. Wir richten ein, schulen einen Nachmittag,
       sehen mit. Wenn Sie nach drei Wochen nicht weiterführen wollen, ziehen wir
-      die Daten zurück und die Sache ist erledigt.
+      die Daten zurück — und die Sache ist erledigt.
     </p>
     <div class="cta-cta">
       <a href="#" class="btn btn-primary">Pilot anfragen <span class="arrow">→</span></a>
       <a href="#rueckruf" class="btn btn-ghost">Rückruf bitten</a>
     </div>
     <div class="cta-meta">
-      <span>Frankfurt a. M.</span>
-      <span>BSI C5</span>
-      <span>§ 75c SGB V</span>
-      <span>DSGVO Art. 9</span>
+      <div><div class="k">Hosting</div><div class="v">Frankfurt</div></div>
+      <div><div class="k">Zertifizierung</div><div class="v">BSI C5</div></div>
+      <div><div class="k">Rechtsrahmen</div><div class="v">§ 75c SGB V</div></div>
+      <div><div class="k">Schutz</div><div class="v">DSGVO Art. 9</div></div>
     </div>
   </div>
 </section>
 
 <!-- ═══ FOOTER ═══ -->
 <footer class="foot" id="rueckruf">
+  <div class="foot-mark">№ 07 — Kontakt · End of Page</div>
   <div class="wrap">
     <div class="foot-head">
-      <div class="foot-num">vi</div>
+      <div class="foot-num">vi.</div>
       <h2 class="foot-title">
         So sieht, <span class="it">die wir nicht hören.</span>
       </h2>
@@ -791,16 +1043,38 @@
         <h6>Kontakt</h6>
         <a href="mailto:hallo@aranthir.de">hallo@aranthir.de</a>
         <a href="tel:+496900000000">+49 69 — auf Anfrage</a>
-        <p style="margin-top:14px;color:var(--muted)">Mo–Fr · 9–17 Uhr</p>
+        <p style="margin-top:14px;color:#7a7a72">Mo–Fr · 9–17 Uhr</p>
       </div>
     </div>
 
     <div class="foot-bottom">
-      <div>© 2026 Aranthir · ein Projekt der SwissMedAI MVZ GmbH</div>
+      <div>© 2026 Aranthir — ein Projekt der SwissMedAI MVZ GmbH</div>
       <div>Made in Frankfurt · für deutsche Heime</div>
     </div>
   </div>
 </footer>
+
+<script>
+  // scroll progress
+  const sp = document.getElementById('sp');
+  function onScroll(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    sp.style.width = pct + '%';
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // clock
+  const clock = document.getElementById('clock');
+  function tick(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    clock.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' CET';
+  }
+  tick(); setInterval(tick, 1000);
+</script>
 
 </body>
 </html>
