@@ -301,7 +301,45 @@
   /* ───── Phone frame + scene cycle ───── */
   .phone-wrap{
     position:relative;justify-self:end;align-self:start;
-    perspective:1400px;
+    perspective:1400px;display:flex;flex-direction:column;align-items:flex-end;gap:24px;
+  }
+
+  /* caption strip */
+  .phone-caption{
+    width:340px;padding:20px 22px;border-radius:20px;
+    background:var(--surface);border:1px solid var(--line);
+    backdrop-filter:blur(22px) saturate(140%);
+    -webkit-backdrop-filter:blur(22px) saturate(140%);
+    position:relative;min-height:124px;overflow:hidden;
+  }
+  .phone-caption .meta{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:12px;
+  }
+  .phone-caption .meta::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(61,108,255,0.18);margin-right:8px;vertical-align:-1px;animation:pulse 2s ease-in-out infinite}
+  .phone-caption .meta .num{color:var(--ink-3)}
+  .phone-caption .body{
+    position:relative;height:64px;
+  }
+  .phone-caption .body article{
+    position:absolute;inset:0;opacity:0;
+    animation:caption-cycle 15s ease-in-out infinite;
+  }
+  .phone-caption .body article:nth-child(1){animation-delay:0s}
+  .phone-caption .body article:nth-child(2){animation-delay:-10s}
+  .phone-caption .body article:nth-child(3){animation-delay:-5s}
+  @keyframes caption-cycle{
+    0%, 1%      {opacity:0;transform:translateY(8px)}
+    4%, 30%     {opacity:1;transform:translateY(0)}
+    33%, 100%   {opacity:0;transform:translateY(-8px)}
+  }
+  .phone-caption h4{
+    font-family:var(--display);font-weight:500;font-size:22px;
+    letter-spacing:-0.035em;line-height:1.05;color:var(--ink);max-width:18ch;
+  }
+  .phone-caption p{
+    margin-top:6px;font-size:13px;line-height:1.45;color:var(--ink-2);opacity:.82;max-width:32ch;
   }
   .phone-glow{
     position:absolute;inset:-30% -20%;pointer-events:none;
@@ -329,6 +367,17 @@
     background:#f3efe6;overflow:hidden;
     box-shadow:0 0 0 1px rgba(255,255,255,0.04) inset;
   }
+  .phone-screen::after{
+    content:"";position:absolute;left:0;right:0;top:-30%;height:30%;
+    background:linear-gradient(180deg,transparent,rgba(91,141,255,0.10),transparent);
+    pointer-events:none;z-index:8;
+    animation:scanline 5s ease-in-out infinite;
+  }
+  @keyframes scanline{
+    0%, 60% {transform:translateY(0)}
+    80%     {transform:translateY(380%)}
+    100%    {transform:translateY(380%);opacity:0}
+  }
   .phone-notch{
     position:absolute;top:10px;left:50%;transform:translateX(-50%);
     width:96px;height:28px;border-radius:20px;background:#000;z-index:5;
@@ -354,14 +403,18 @@
     position:absolute;inset:0;padding:42px 18px 28px;
     background:#f4eede;color:#1a1612;
     font-family:'Inter Tight',var(--sans);
-    opacity:0;animation:cycle 10s ease-in-out infinite;
+    opacity:0;animation:cycle 15s cubic-bezier(.65,.05,.35,1) infinite;
+    will-change:opacity,transform,filter;
   }
   .scene-1{animation-delay:0s}
-  .scene-2{animation-delay:-6.66s}
-  .scene-3{animation-delay:-3.33s}
+  .scene-2{animation-delay:-10s}
+  .scene-3{animation-delay:-5s}
   @keyframes cycle{
-    0%, 30%   {opacity:1;transform:translateY(0)}
-    33%, 100% {opacity:0;transform:translateY(-1.5%)}
+    0%   {opacity:0;transform:translate3d(8%,0,0) scale(1.02);filter:blur(6px)}
+    3%   {opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+    30%  {opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+    33%  {opacity:0;transform:translate3d(-8%,0,0) scale(0.98);filter:blur(6px)}
+    100% {opacity:0;transform:translate3d(-8%,0,0) scale(0.98);filter:blur(6px)}
   }
   /* ── Scene 1 — Dashboard ── */
   .scene-1{padding-top:48px}
@@ -386,7 +439,23 @@
   .s1-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
   .s1-bar .lbl{font-size:9px;color:#6e655a;font-weight:600}
   .s1-bar .bg{flex:1;width:100%;background:#f1ead8;border-radius:6px 6px 4px 4px;position:relative;display:flex;align-items:flex-end;overflow:hidden}
-  .s1-bar .bg i{display:block;width:100%;background:#0a2585;border-radius:6px 6px 4px 4px}
+  .s1-bar .bg i{
+    display:block;width:100%;background:#0a2585;border-radius:6px 6px 4px 4px;
+    position:relative;overflow:hidden;
+  }
+  .s1-bar .bg i::after{
+    content:"";position:absolute;left:-40%;top:0;width:30%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.30),transparent);
+    animation:bar-sweep 3.5s ease-in-out infinite;
+  }
+  .s1-bar:nth-child(2) .bg i::after{animation-delay:.4s}
+  .s1-bar:nth-child(3) .bg i::after{animation-delay:.8s}
+  .s1-bar:nth-child(4) .bg i::after{animation-delay:1.2s}
+  .s1-bar:nth-child(5) .bg i::after{animation-delay:1.6s}
+  @keyframes bar-sweep{
+    0%, 60% {transform:translateX(0)}
+    80%, 100% {transform:translateX(420%)}
+  }
   .s1-bar .d{font-size:10px;color:#1a1612;font-weight:600;margin-top:2px}
 
   /* ── Scene 2 — Heute ── */
@@ -422,6 +491,11 @@
     width:46px;height:46px;border-radius:50%;background:#0a2585;color:#fff;
     display:flex;align-items:center;justify-content:center;font-size:14px;
     box-shadow:0 6px 16px rgba(10,37,133,0.40);
+    animation:fab-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes fab-pulse{
+    0%, 100% {box-shadow:0 6px 16px rgba(10,37,133,0.40),0 0 0 0 rgba(10,37,133,0.40)}
+    50%      {box-shadow:0 6px 16px rgba(10,37,133,0.40),0 0 0 10px rgba(10,37,133,0)}
   }
 
   /* ── Scene 3 — Tagesprotokoll ── */
@@ -447,27 +521,79 @@
   .s3-entry .t{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px;color:#1a1612;font-weight:500;letter-spacing:0.04em}
   .s3-entry .p{font-size:13px;font-weight:600;color:#1a1612}
   .s3-entry .m{font-size:11px;color:#6e655a;margin-top:2px}
-  .s3-btn{margin-top:14px;background:#0a2585;color:#fff;text-align:center;padding:13px;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:0.02em}
-
-  /* progress dots */
-  .phone-dots{
-    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
-    display:flex;gap:6px;z-index:7;
+  .s3-btn{
+    margin-top:14px;background:#0a2585;color:#fff;text-align:center;
+    padding:13px;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:0.02em;
+    box-shadow:0 6px 16px rgba(10,37,133,0.40);
+    animation:btn-glow 2.6s ease-in-out infinite;
   }
-  .phone-dots span{
-    width:18px;height:3px;border-radius:2px;background:rgba(0,0,0,0.18);
+  @keyframes btn-glow{
+    0%, 100% {box-shadow:0 6px 16px rgba(10,37,133,0.40),0 0 0 0 rgba(10,37,133,0.40)}
+    50%      {box-shadow:0 6px 16px rgba(10,37,133,0.40),0 0 0 8px rgba(10,37,133,0)}
+  }
+
+  /* scrubber + scene label */
+  .phone-scrub{
+    position:absolute;left:24px;right:24px;bottom:22px;z-index:7;
+    display:flex;flex-direction:column;gap:8px;pointer-events:none;
+  }
+  .phone-scrub .meta{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:8.5px;letter-spacing:0.20em;
+    text-transform:uppercase;color:#1a1612;font-weight:600;
+  }
+  .phone-scrub .meta .l{
+    position:relative;height:11px;flex:1;overflow:hidden;
+  }
+  .phone-scrub .meta .l span{
+    position:absolute;inset:0;opacity:0;
+    animation:label-cycle 15s ease-in-out infinite;
+  }
+  .phone-scrub .meta .l span:nth-child(1){animation-delay:0s}
+  .phone-scrub .meta .l span:nth-child(2){animation-delay:-10s}
+  .phone-scrub .meta .l span:nth-child(3){animation-delay:-5s}
+  @keyframes label-cycle{
+    0%, 1%      {opacity:0;transform:translateY(4px)}
+    4%, 30%     {opacity:1;transform:translateY(0)}
+    33%, 100%   {opacity:0;transform:translateY(-4px)}
+  }
+  .phone-scrub .idx{color:#6e655a}
+  .phone-scrub .track{display:flex;gap:4px}
+  .phone-scrub .track span{
+    flex:1;height:2px;border-radius:2px;background:rgba(0,0,0,0.16);
     overflow:hidden;position:relative;
   }
-  .phone-dots span::after{
+  .phone-scrub .track span::after{
     content:"";position:absolute;inset:0;background:var(--accent);
-    transform-origin:left;animation:dot-fill 10s linear infinite;
+    transform-origin:left;transform:scaleX(0);
+    animation:fill 15s linear infinite;
   }
-  .phone-dots span:nth-child(2)::after{animation-delay:-6.66s}
-  .phone-dots span:nth-child(3)::after{animation-delay:-3.33s}
-  @keyframes dot-fill{
-    0%, 33%   {transform:scaleX(0)}
-    33.01%, 66% {transform:scaleX(1)}
-    66.01%, 100% {transform:scaleX(0)}
+  .phone-scrub .track span:nth-child(1)::after{animation-delay:0s}
+  .phone-scrub .track span:nth-child(2)::after{animation-delay:-10s}
+  .phone-scrub .track span:nth-child(3)::after{animation-delay:-5s}
+  @keyframes fill{
+    0%             {transform:scaleX(0)}
+    33%            {transform:scaleX(1)}
+    33.01%, 100%   {transform:scaleX(0)}
+  }
+
+  /* LIVE badge */
+  .phone-live{
+    position:absolute;top:54px;right:18px;z-index:6;
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(197,74,42,0.10);border:1px solid rgba(197,74,42,0.25);
+    color:#c54a2a;font-family:var(--mono);font-size:8.5px;
+    font-weight:600;letter-spacing:0.22em;padding:3px 7px 3px 6px;
+    border-radius:999px;text-transform:uppercase;
+  }
+  .phone-live::before{
+    content:"";width:5px;height:5px;border-radius:50%;background:#c54a2a;
+    box-shadow:0 0 0 0 rgba(197,74,42,0.40);
+    animation:live-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes live-pulse{
+    0%, 100% {box-shadow:0 0 0 0 rgba(197,74,42,0.55)}
+    50%      {box-shadow:0 0 0 6px rgba(197,74,42,0.0)}
   }
 
   /* hero giant ghost wordmark */
@@ -1004,7 +1130,18 @@
             <span>9:41</span>
             <span class="right"><span>•••</span><span>5G</span><span>▮</span></span>
           </div>
-          <div class="phone-dots"><span></span><span></span><span></span></div>
+          <div class="phone-live">Live Demo</div>
+          <div class="phone-scrub">
+            <div class="meta">
+              <div class="l">
+                <span>i. Dashboard</span>
+                <span>ii. Heute</span>
+                <span>iii. Tagesprotokoll</span>
+              </div>
+              <div class="idx">01 · 02 · 03</div>
+            </div>
+            <div class="track"><span></span><span></span><span></span></div>
+          </div>
 
           <!-- Scene 1 — Dashboard -->
           <div class="scene scene-1">
@@ -1113,6 +1250,24 @@
 
         </div>
         <div class="phone-home"></div>
+      </div>
+
+      <div class="phone-caption">
+        <div class="meta"><span>Live Demo · 15 Sek.</span><span class="num">№ 01 / 03</span></div>
+        <div class="body">
+          <article>
+            <h4>Management-Übersicht.</h4>
+            <p>Patienten, aktive ZE/PA, offene Labore — auf einer Kachel, in Echtzeit.</p>
+          </article>
+          <article>
+            <h4>Heute. Nächste Woche.</h4>
+            <p>Aufgaben pro Heim. Nichts geht verloren — auch nicht zwischen zwei Schichten.</p>
+          </article>
+          <article>
+            <h4>Tagesprotokoll &amp; PDF.</h4>
+            <p>Pro Behandler, pro Tag. Ein Knopf für Heimleitung, ein Knopf für die Abrechnung.</p>
+          </article>
+        </div>
       </div>
     </div>
   </div>
