@@ -94,6 +94,36 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Assistenz Planung: monthly calendar planner
+
+**Why:** The Assistenz team needs a visual monthly overview showing who works where on which day — matching the physical wall calendar they currently use (photo reference: Juni 2026 with staff names + P/H codes per day).
+
+**`renderAssistenzPlanung()` rewritten** from placeholder to a full monthly calendar planner.
+
+**Data model:**
+- `ASST_STAFF = ['Huda', 'Luana', 'Ola', 'Besja']` — the 4 assistant staff members.
+- `ASST_TYPES` — location codes: `P` (Praxis, navy), `H` (Heim, emerald), `(N)P` (Nachmittag Praxis, violet).
+- `ASST_SCHEDULE` — object keyed by ISO date (`'2026-06-01'`), each value an array of `{n: name, t: type}`. Demo data for June 2026 built from a weekly pattern matching the photo (Mon–Fri, weekends empty).
+
+**Layout (top to bottom):**
+1. **Month navigation** — left/right arrows + "Juni 2026" title. State: `S.asstMonth = {year, month}`.
+2. **Calendar grid** (`.asst-cal`) — CSS Grid 7 columns (Mo–So). Each cell contains:
+   - Day number (top-left, bold)
+   - Staff entries: name + type code (P/H) with color-coded type indicator
+3. **Day detail panel** — clicking a day cell sets `S.asstSelDay` and shows an expanded panel below the calendar with each staff member as a row (avatar initial, name, location badge). "× Schließen" to dismiss.
+4. **Legend** — P = Praxis (navy dot), H = Heim (green dot), (N) = Nachmittag (violet dot).
+
+**CSS (`.asst-cal-*` classes):**
+- `.asst-cal` — 7-column grid, 1px gap (border shows through as grid lines), rounded corners.
+- `.asst-cal-hdr` — navy background, white uppercase day names.
+- `.asst-cal-cell` — white background, 54px min-height on mobile, 80px on desktop. Hover: `--blue-25`. Weekend cells: `--surface-2`. Today: blue-25 + 2px navy inset box-shadow.
+- `.asst-cal-entry` — 8px name + 7px type code on mobile; 10px/9px on desktop.
+- Desktop overrides via `.dk-verw-content .asst-cal-*` for larger cells, text, and headers.
+
+**`asstMonthDays(year, month)`** helper — returns an array of day numbers (1–31) padded with nulls for the leading empty cells (Monday-aligned) and trailing cells to fill the last row.
+
+---
+
 ### 2026-04-26 — New page: "Assistenz Planung" — first Assistenz-exclusive menu item
 
 **Why:** The Assistenz role needs its own planning page for coordinating assistant tasks and schedules. This is the first page unique to the Assistenz/Assistenz Manager roles (not a duplicate of an existing Admin page).
