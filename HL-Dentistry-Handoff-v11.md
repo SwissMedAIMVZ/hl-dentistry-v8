@@ -1,7 +1,7 @@
 # HL-Dentistry v11 — Change Handoff
 
-**Living document — updated as changes are made to `hl-dentistry-v11.html`**
-SwissMedAI GmbH — Started 2026-04-19
+**FROZEN — v11 is superseded by v12. This file is kept for historical reference.**
+SwissMedAI GmbH — 2026-04-19 → 2026-04-26
 
 ---
 
