@@ -94,17 +94,23 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
-### 2026-04-26 — Admin/Verwaltung: "Assistenz" menu item to view Assistenz perspective
+### 2026-04-26 — Admin/Verwaltung: "Assistenz" dropdown with sub-items (Wochenplan + Großvisiten)
 
-**Why:** Admins and Verwaltung users need to see what the Assistenz and Assistenz Manager roles can access — for supervision, training, or to use the same streamlined views (Großvisiten, Wochenplan) themselves.
+**Why:** Admins and Verwaltung users need to see what the Assistenz and Assistenz Manager roles can access. Instead of a single link, a collapsible dropdown mirrors the Assistenz menu structure — any page added for Assistenz roles should also be added here.
 
-**Mobile burger menu:** new "Assistenz" button added between "Verwaltung" and "Großvisiten" in the full menu (CEO/Verwaltung only). Icon: person + plus sign. `onclick` sets `S._assistenzView=true` and navigates to Großvisiten.
+**Desktop sidebar:** "Assistenz" is now a collapsible dropdown (like Management/Verwaltung). Toggled via `toggleDkGroup('assistenz')`. When open, shows:
+- **Wochenplan** (→ `goDesktopVerwSub('uebersicht')`) — Behandler-Aufgaben overview
+- **Großvisiten** (→ `goDesktopVerwSub('grossvisiten')`)
 
-**Desktop sidebar:** new "Assistenz" button added between the Verwaltung dropdown and Behandler. Toggles `S._assistenzView` — when active, highlights as the current nav item. Clicking navigates to the Großvisiten page (which is the Assistenz's primary workspace).
+Sub-items set `S._assistenzView=true` so they highlight under the Assistenz group. Uses `chevUp`/`chevDown` arrows, same pattern as other dropdowns.
 
-**What it does:** provides a quick-access entry point to the pages that Assistenz users work with (Großvisiten, Wochenplan via Verwaltung Übersicht). The admin can still navigate freely to any other page — "Assistenz" is an entry point, not a mode lock.
+**Mobile burger menu:** "Assistenz" section replaces the single button. Shows an uppercase section header "ASSISTENZ" followed by indented sub-items (padding-left 28px, font-size 12px):
+- Wochenplan (calendar icon)
+- Großvisiten (calendar-dots icon)
 
-**`S._assistenzView`:** transient boolean used to highlight the sidebar item. No actual access restriction is applied — admins/verwaltung always have full access.
+The standalone Großvisiten button (`gvBtn`) was removed from the full menu since it's now inside the Assistenz section.
+
+**Maintenance rule:** when adding new pages to the Assistenz or Assistenz Manager menus, also add them as sub-items here.
 
 ---
 
