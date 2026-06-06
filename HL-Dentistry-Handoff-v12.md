@@ -57,4 +57,39 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v12.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
-*(No changes yet — v12 starts as a clean copy of v11.)*
+### 2026-04-26 — New role: Assistenz (restricted access)
+
+**Why:** The practice has assistants who need to look up patients, check the weekly plan, and support Großvisiten — but shouldn't see Management, Verwaltung admin, Labor, Nachrichten, or billing.
+
+**New user:** `{email:"assistenz@swissmedai.com", pw:"demo", name:"A. Schulze", role:"assistenz"}` added to `USERS`.
+
+**`roleLabel`:** returns `'Assistenz'` for `role==='assistenz'`, `'Assistenz Manager'` for `role==='assistenz_mgr'` (prepared for next role).
+
+**Login routing:** Assistenz lands on `S.screen='patienten'` (the Patienten search page). Desktop default page: `'patienten'`.
+
+**Mobile burger menu (`renderMenu_2`):** role-aware. For Assistenz shows only:
+- Patienten
+- Wochenplan (→ Verwaltung Übersicht, shows all Behandler tasks)
+- Großvisiten
+- Abmelden
+
+All other roles get the full menu (Patienten, Wochenplan, Management, Verwaltung, Großvisiten, Abmelden) — unchanged.
+
+**Desktop sidebar:** role-aware via `isAssistenzSide`. For Assistenz shows only:
+- Patienten (→ `goDesktopPage('patienten')`)
+- Wochenplan (→ `goDesktopVerwSub('uebersicht')` — shows Behandler-Aufgaben with all Behandler)
+- Großvisiten (→ `goDesktopVerwSub('grossvisiten')`)
+
+All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, Labor dropdown, Nachrichten, Suche) are hidden for Assistenz.
+
+**Patient file access:** Assistenz can open patient profiles (via search, Großvisiten drill-in, or Zuletzt gesehen) — `goPatFromAdmin`, `goPatTo174a` have no role guard. The patient file renders the same for all roles.
+
+**What Assistenz cannot access:**
+- Management Dashboard (all tabs)
+- Verwaltung admin (Einverständnis, Archiv, Abrechnung, Pflegeheime, Behandler admin)
+- Labor
+- Nachrichten / Email
+- Pipeline
+- KI-Assistent / KI-Diktat (FAB buttons)
+
+**Assistenz Manager (`assistenz_mgr`):** role label prepared in `roleLabel` but no user account or routing added yet — pending specs.

@@ -911,7 +911,8 @@ var USERS=[
   {email:"hess@swissmedai.com",pw:"demo",name:"Dr. Hess",role:"behandler",bId:"hHess"},
   {email:"verwaltung@swissmedai.com",pw:"demo",name:"Verwaltung",role:"verwaltung"},
   {email:"labor@swissmedai.com",pw:"demo",name:"Labor Techniker",role:"laborant"},
-  {email:"c.weigert@mvz-arzt.de",pw:"admin",name:"C. Weigert",role:"verwaltung"}
+  {email:"c.weigert@mvz-arzt.de",pw:"admin",name:"C. Weigert",role:"verwaltung"},
+  {email:"assistenz@swissmedai.com",pw:"demo",name:"A. Schulze",role:"assistenz"}
 ];
 var LAB_STAGES=["Abdruck","Druck/Guss","Politur/Montage","Abholbereit"];
 var LAB_COLORS=["#D97706","#0A2E9E","#6C47FF","#14C295"];
@@ -1126,7 +1127,7 @@ function renderLogin(){
     +'<div class="login-version">v12.0 \u2014 SwissMedAI GmbH</div>'
     +'</div>';
 }
-function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":"home";S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
+function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":u.role==="assistenz"?"patienten":"home";S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
 
 /* ===== ODONTOGRAM ===== */
 function odoToothColor(x){if(!x)return"var(--t-fehlt)";var p=x.split("+")[0];if(p==="g")return"var(--t-healthy)";if(p==="e"||p==="E")return"var(--t-healthy)";if(p==="c"||p==="C")return"var(--t-caries)";if(p==="ex")return"var(--t-extract)";if(p==="kr"||p==="k"||p==="K")return"var(--t-crown)";if(p==="fu")return"var(--t-composite)";if(p==="f")return"var(--t-fehlt)";if(p==="b"||p==="B")return"var(--t-bridge)";if(p==="i"||p==="I")return"var(--t-crown)";if(p==="t")return"var(--t-teleskop)";if(p==="wr")return"var(--t-wurzelrest)";if(p==="z")return"var(--t-zerstoert)";if(p==="st")return"var(--t-stift)";if(p==="ph")return"var(--t-halte)";if(p==="rt")return"var(--t-retiniert)";return"var(--t-other)"}
@@ -2693,7 +2694,16 @@ function renderDesktopSidebar(){
 
   /* Patienten */
   var patIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  var sideRole=S.user?S.user.role:'';
+  var isAssistenzSide=sideRole==='assistenz';
   h+='<button class="dk-nav-item '+(S.dkPage==='patienten'?'active':'')+'" onclick="goDesktopPage(\'patienten\')">'+patIcon+'<span>Patienten</span></button>';
+
+  /* Wochenplan — Assistenz sees Verwaltung Übersicht (all Behandler), others see Klinik Home */
+  if(isAssistenzSide){
+    h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='uebersicht'?'active':'')+'" onclick="goDesktopVerwSub(\'uebersicht\')">'+calIcon+'<span>Wochenplan</span></button>';
+    /* Großvisiten */
+    h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='grossvisiten'?'active':'')+'" onclick="goDesktopVerwSub(\'grossvisiten\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg><span>Großvisiten</span></button>';
+  } else {
 
   /* Wochenplan */
   h+='<button class="dk-nav-item '+(S.dkPage==='wochenplan'?'active':'')+'" onclick="goDesktopHomeTab(\'heute\')">'+calIcon+'<span>Wochenplan</span></button>';
@@ -2735,6 +2745,8 @@ function renderDesktopSidebar(){
   /* Nachrichten / Suche */
   h+='<button class="dk-nav-item '+(S.dkPage==='nachrichten'?'active':'')+'" onclick="goDesktopPage(\'nachrichten\')">'+ICO.msg+'<span>Nachrichten</span></button>';
   h+='<button class="dk-nav-item '+(S.dkPage==='suche'?'active':'')+'" onclick="goDesktopPage(\'suche\')">'+ICO.search+'<span>Suche</span></button>';
+
+  } /* end non-assistenz sidebar items */
 
   h+='</div>'
     +'<div class="dk-sidebar-user">'
@@ -2806,6 +2818,7 @@ function dkDefaultPage(){
   var role=S.user?S.user.role:'';
   if(role==='laborant')return'labor';
   if(role==='behandler')return'wochenplan';
+  if(role==='assistenz')return'patienten';
   return'manager';
 }
 var DK_TITLES={patienten:'Patienten',manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
@@ -4394,7 +4407,7 @@ function renderAdminBottomNav_2(active){
   +'</div>';
 }
 /* === BEHANDLER OVERVIEW (Verwaltung > Behandler tab) === */
-function roleLabel(r){return r==='behandler'?'Behandler':r==='verwaltung'?'Verwaltung':r==='laborant'?'Laborant':r==='ceo'?'CEO':r||'\u2014'}
+function roleLabel(r){return r==='behandler'?'Behandler':r==='verwaltung'?'Verwaltung':r==='laborant'?'Laborant':r==='ceo'?'CEO':r==='assistenz'?'Assistenz':r==='assistenz_mgr'?'Assistenz Manager':r||'\u2014'}
 function renderBehandler_2(){
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Behandler</h1><div class="sub">'+BEHANDLER.length+' aktive Behandler</div></div>'
@@ -5748,14 +5761,22 @@ function toggleMenu_2(){S.showMenu_2=!S.showMenu_2;render();}
 function closeMenu_2(){S.showMenu_2=false;render();}
 function renderMenu_2(){
   if(!S.showMenu_2)return'';
+  var role=S.user?S.user.role:'';
+  var isAssistenz=role==='assistenz';
+  var patBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'patienten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Patienten</button>';
+  var wochBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>';
+  var gvBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'grossvisiten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> Großvisiten</button>';
+  var logoutBtn='<button class="menu-item menu-divider" onclick="closeMenu_2();doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Abmelden</button>';
+  if(isAssistenz){
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+logoutBtn+'</div>';
+  }
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'patienten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Patienten</button>'
+      +patBtn
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'home\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>'
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'manager\';S.mgrTab=\'\u00dcbersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Management</button>'
+      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'manager\';S.mgrTab=\'Übersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Management</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'grossvisiten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> Großvisiten</button>'
-      +'<button class="menu-item menu-divider" onclick="closeMenu_2();doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Abmelden</button>'
+      +gvBtn+logoutBtn
     +'</div>';
 }
 

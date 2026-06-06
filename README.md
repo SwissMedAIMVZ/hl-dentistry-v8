@@ -22,6 +22,7 @@ The landing page links to all mockups, brand assets, and documentation. Jump str
 | verwaltung@swissmedai.com | demo | Verwaltung (admin) |
 | labor@swissmedai.com | demo | Laborant (lab tech) |
 | c.weigert@mvz-arzt.de | admin | Verwaltung (full rights) |
+| assistenz@swissmedai.com | demo | Assistenz (limited) |
 
 ---
 
