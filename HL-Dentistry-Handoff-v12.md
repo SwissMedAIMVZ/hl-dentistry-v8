@@ -92,4 +92,37 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 - Pipeline
 - KI-Assistent / KI-Diktat (FAB buttons)
 
-**Assistenz Manager (`assistenz_mgr`):** role label prepared in `roleLabel` but no user account or routing added yet — pending specs.
+---
+
+### 2026-04-26 — New role: Assistenz Manager (Assistenz + Verwaltung access)
+
+**Why:** The Assistenz Manager supervises the assistants and handles admin tasks — they need everything the Assistenz sees plus full Verwaltung access (Einverständnis, Archiv, Abrechnung, Pflegeheime).
+
+**New user:** `{email:"assistenz.mgr@swissmedai.com", pw:"demo", name:"B. Richter", role:"assistenz_mgr"}`.
+
+**Login routing:** same as Assistenz — lands on Patienten page.
+
+**Mobile burger menu:** Patienten + Wochenplan + Großvisiten + **Verwaltung** + Abmelden. Verwaltung goes to the full admin portal (`S.adminMode=true; S.adminPage_2='uebersicht'`).
+
+**Desktop sidebar:** same as Assistenz (Patienten, Wochenplan, Großvisiten) plus a **Verwaltung dropdown** showing: Einverständnis, Archiv, Abrechnung, Pflegeheime. The Wochenplan and Großvisiten entries (which are technically Verwaltung sub-pages) are kept as top-level items and excluded from the dropdown to avoid duplication.
+
+**What Assistenz Manager cannot see** (vs. full Verwaltung/CEO):
+- Management Dashboard (all tabs)
+- Labor
+- Nachrichten / Email
+- Pipeline
+- Behandler admin page
+
+**Access comparison table:**
+
+| Feature | Assistenz | Assistenz Mgr | Verwaltung/CEO |
+|---|---|---|---|
+| Patienten (search + profile) | ✓ | ✓ | ✓ |
+| Wochenplan (all Behandler) | ✓ | ✓ | ✓ |
+| Großvisiten | ✓ | ✓ | ✓ |
+| Verwaltung (Einverständnis, Archiv, Abrechnung, Pflegeheime) | ✗ | ✓ | ✓ |
+| Management Dashboard | ✗ | ✗ | ✓ |
+| Labor | ✗ | ✗ | ✓ |
+| Nachrichten | ✗ | ✗ | ✓ |
+| Behandler admin | ✗ | ✗ | ✓ |
+| Pipeline | ✗ | ✗ | ✓ |
