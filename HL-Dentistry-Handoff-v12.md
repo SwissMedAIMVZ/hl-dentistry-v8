@@ -94,23 +94,15 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
-### 2026-04-26 — Admin/Verwaltung: "Assistenz" dropdown with sub-items (Wochenplan + Großvisiten)
+### 2026-04-26 — Admin/Verwaltung: "Assistenz" menu item (no duplicate sub-items)
 
-**Why:** Admins and Verwaltung users need to see what the Assistenz and Assistenz Manager roles can access. Instead of a single link, a collapsible dropdown mirrors the Assistenz menu structure — any page added for Assistenz roles should also be added here.
+**Why:** Wochenplan and Großvisiten already exist in the Admin/Verwaltung menu (top-level Wochenplan + Großvisiten inside Verwaltung dropdown). Duplicating them under Assistenz was confusing. The Assistenz entry is now a simple toggle/link — only NEW pages unique to the Assistenz role will be added as sub-items here in the future.
 
-**Desktop sidebar:** "Assistenz" is now a collapsible dropdown (like Management/Verwaltung). Toggled via `toggleDkGroup('assistenz')`. When open, shows:
-- **Wochenplan** (→ `goDesktopVerwSub('uebersicht')`) — Behandler-Aufgaben overview
-- **Großvisiten** (→ `goDesktopVerwSub('grossvisiten')`)
+**Desktop sidebar:** "Assistenz" is a single nav item (not a dropdown). Toggles `S._assistenzView` for highlight state. No sub-items currently — they'll be added when Assistenz-specific pages are created.
 
-Sub-items set `S._assistenzView=true` so they highlight under the Assistenz group. Uses `chevUp`/`chevDown` arrows, same pattern as other dropdowns.
+**Mobile burger menu:** "Assistenz" is a single menu item (person+plus icon). Toggles `S._assistenzView`. The standalone `gvBtn` (Großvisiten) is restored to the full menu.
 
-**Mobile burger menu:** "Assistenz" section replaces the single button. Shows an uppercase section header "ASSISTENZ" followed by indented sub-items (padding-left 28px, font-size 12px):
-- Wochenplan (calendar icon)
-- Großvisiten (calendar-dots icon)
-
-The standalone Großvisiten button (`gvBtn`) was removed from the full menu since it's now inside the Assistenz section.
-
-**Maintenance rule:** when adding new pages to the Assistenz or Assistenz Manager menus, also add them as sub-items here.
+**Maintenance rule:** when adding pages that are exclusive to the Assistenz/Assistenz Manager roles (not already in the main menu), add them as sub-items under this Assistenz entry.
 
 ---
 
