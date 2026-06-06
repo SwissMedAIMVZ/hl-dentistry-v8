@@ -94,6 +94,20 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Admin/Verwaltung: "Assistenz" menu item to view Assistenz perspective
+
+**Why:** Admins and Verwaltung users need to see what the Assistenz and Assistenz Manager roles can access — for supervision, training, or to use the same streamlined views (Großvisiten, Wochenplan) themselves.
+
+**Mobile burger menu:** new "Assistenz" button added between "Verwaltung" and "Großvisiten" in the full menu (CEO/Verwaltung only). Icon: person + plus sign. `onclick` sets `S._assistenzView=true` and navigates to Großvisiten.
+
+**Desktop sidebar:** new "Assistenz" button added between the Verwaltung dropdown and Behandler. Toggles `S._assistenzView` — when active, highlights as the current nav item. Clicking navigates to the Großvisiten page (which is the Assistenz's primary workspace).
+
+**What it does:** provides a quick-access entry point to the pages that Assistenz users work with (Großvisiten, Wochenplan via Verwaltung Übersicht). The admin can still navigate freely to any other page — "Assistenz" is an entry point, not a mode lock.
+
+**`S._assistenzView`:** transient boolean used to highlight the sidebar item. No actual access restriction is applied — admins/verwaltung always have full access.
+
+---
+
 ### 2026-04-26 — New role: Assistenz Manager (Assistenz + Verwaltung access)
 
 **Why:** The Assistenz Manager supervises the assistants and handles admin tasks — they need everything the Assistenz sees plus full Verwaltung access (Einverständnis, Archiv, Abrechnung, Pflegeheime).
