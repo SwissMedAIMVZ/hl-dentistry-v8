@@ -1149,7 +1149,7 @@ function renderLogin(){
     +'<div class="login-legal">Durch die Anmeldung akzeptieren Sie Datenschutz und Impressum.</div>'
     +'</div>';
 }
-function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":u.role==="assistenz"?"patienten":u.role==="assistenz_mgr"?"patienten":"home";if(u.role==='assistenz'){S.adminMode=true;S.adminPage_2='meineaufgaben'};S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
+function doLogin(){var emEl=document.getElementById("loginEmail")||document.getElementById("dkLoginEmail");var pwEl=document.getElementById("loginPw")||document.getElementById("dkLoginPw");var em=emEl?emEl.value.trim().toLowerCase():'';var pw=pwEl?pwEl.value:'';var u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":u.role==="assistenz"?"patienten":u.role==="assistenz_mgr"?"patienten":"home";if(u.role==='assistenz'){S.adminMode=true;S.adminPage_2='meineaufgaben'};S.showNotifPrompt=true;render()}else{var errEl=document.getElementById("loginErr")||document.getElementById("dkLoginErr");if(errEl)errEl.style.display="block"}}
 
 /* ===== ODONTOGRAM ===== */
 function odoToothColor(x){if(!x)return"var(--t-fehlt)";var p=x.split("+")[0];if(p==="g")return"var(--t-healthy)";if(p==="e"||p==="E")return"var(--t-healthy)";if(p==="c"||p==="C")return"var(--t-caries)";if(p==="ex")return"var(--t-extract)";if(p==="kr"||p==="k"||p==="K")return"var(--t-crown)";if(p==="fu")return"var(--t-composite)";if(p==="f")return"var(--t-fehlt)";if(p==="b"||p==="B")return"var(--t-bridge)";if(p==="i"||p==="I")return"var(--t-crown)";if(p==="t")return"var(--t-teleskop)";if(p==="wr")return"var(--t-wurzelrest)";if(p==="z")return"var(--t-zerstoert)";if(p==="st")return"var(--t-stift)";if(p==="ph")return"var(--t-halte)";if(p==="rt")return"var(--t-retiniert)";return"var(--t-other)"}
@@ -2976,10 +2976,10 @@ function renderDesktopLogin(){
       +'<div class="login-subtitle">Mobile Altenzahnheilkunde</div>'
     +'</div>'
     +'<label>E-Mail</label>'
-    +'<input type="email" id="loginEmail" placeholder="name@swissmedai.com">'
+    +'<input type="email" id="dkLoginEmail" placeholder="name@swissmedai.com">'
     +'<label>Passwort</label>'
-    +'<input type="password" id="loginPw" placeholder="Passwort eingeben" onkeydown="if(event.key===\'Enter\')doLogin()">'
-    +'<div class="login-error" id="loginErr">Ung\u00fcltige E-Mail oder Passwort</div>'
+    +'<input type="password" id="dkLoginPw" placeholder="Passwort eingeben" onkeydown="if(event.key===\'Enter\')doLogin()">'
+    +'<div class="login-error" id="dkLoginErr">Ung\u00fcltige E-Mail oder Passwort</div>'
     +'<button class="login-btn" onclick="doLogin()">Anmelden</button>'
     +'<div class="login-forgot">Passwort vergessen?</div>'
   +'</div>'
