@@ -2727,6 +2727,7 @@ function renderDesktopSidebar(){
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='uebersicht'?'active':'')+'" onclick="goDesktopVerwSub(\'uebersicht\')">'+calIcon+'<span>Wochenplan</span></button>';
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='grossvisiten'?'active':'')+'" onclick="goDesktopVerwSub(\'grossvisiten\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg><span>Großvisiten</span></button>';
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='assistenzplanung'?'active':'')+'" onclick="goDesktopVerwSub(\'assistenzplanung\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Assistenz Planung</span></button>';
+    h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='aufgaben'?'active':'')+'" onclick="goDesktopVerwSub(\'aufgaben\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Aufgaben</span></button>';
     if(isAssistenzMgrSide){
       h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='assistenzhinzu'?'active':'')+'" onclick="goDesktopVerwSub(\'assistenzhinzu\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span>Assistenz hinzufügen</span></button>';
       /* Verwaltung dropdown for Assistenz Manager */
@@ -2769,6 +2770,7 @@ function renderDesktopSidebar(){
   h+='<button class="dk-nav-item '+(S._assistenzView?'active':'')+'" onclick="toggleDkGroup(\'assistenz\')" style="padding-right:10px">'+assistenzIcon+'<span>Assistenz</span>'+(isAsstOpen?chevUp:chevDown)+'</button>';
   if(isAsstOpen){
     h+='<button class="dk-nav-item '+((S._assistenzView&&S.adminPage_2==='assistenzplanung')?'active':'')+'" style="padding-left:44px;font-size:12px" onclick="S._assistenzView=true;goDesktopVerwSub(\'assistenzplanung\')"><span>Assistenz Planung</span></button>';
+    h+='<button class="dk-nav-item '+((S._assistenzView&&S.adminPage_2==='aufgaben')?'active':'')+'" style="padding-left:44px;font-size:12px" onclick="S._assistenzView=true;goDesktopVerwSub(\'aufgaben\')"><span>Aufgaben</span></button>';
     h+='<button class="dk-nav-item '+((S._assistenzView&&S.adminPage_2==='assistenzhinzu')?'active':'')+'" style="padding-left:44px;font-size:12px" onclick="S._assistenzView=true;goDesktopVerwSub(\'assistenzhinzu\')"><span>Assistenz hinzufügen</span></button>';
   }
 
@@ -2867,7 +2869,7 @@ function dkDefaultPage(){
   return'manager';
 }
 var DK_TITLES={patienten:'Patienten',manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
-var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung',assistenzhinzu:'Assistenz hinzufügen'};
+var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung',assistenzhinzu:'Assistenz hinzufügen',aufgaben:'Aufgaben'};
 function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode=true;render()}
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
 function goDesktopMgrTab(t){S.dkPage='manager';S.adminMode=false;S.screen='manager';S.mgrTab=t;render()}
@@ -2887,6 +2889,7 @@ function renderDesktopVerwaltungBody(){
   else if(pg==='grossvisiten') h+=renderGrossvisiten();
   else if(pg==='assistenzplanung') h+=renderAssistenzPlanung();
   else if(pg==='assistenzhinzu') h+=renderAssistenzHinzufuegen();
+  else if(pg==='aufgaben') h+=renderAufgaben();
   h+='</div>';
   return h;
 }
@@ -5462,6 +5465,118 @@ function renderPatientenPage(){
   return h;
 }
 
+/* ===== AUFGABEN (Assistenz task checklist) ===== */
+var AUFGABEN_TASKS=[
+  {section:'Tägliche Aufgaben',tasks:[
+    'Scanner-Batterien aufladen',
+    'Kompressor einschalten',
+    'Kompressor ausschalten',
+    'Filter der Behandlungsstühle reinigen',
+    'Absauganlagen reinigen',
+    'Müll rausbringen',
+    'Geschirr spülen'
+  ]},
+  {section:'Wöchentliche Aufgaben',tasks:[
+    'MONTAGS: Wasserbehälter der Steril prüfen und ggf. reinigen',
+    'MONTAGS: Vakuumtest der Steril durchführen',
+    'MONTAGS: Koffer der Zahnärzte aufräumen',
+    'MONTAGS: Prüfen, ob alle Arbeiten der Woche da sind',
+    'Wäsche waschen (2x pro Woche)',
+    'Bohrer und Feilen aufräumen (wöchentlich)',
+    'Material im Behandlungszimmer auffüllen (Mundschutz, Handschuhe, Hypo, Watterollen, Kanüle, Ampulle, Tofflemyre etc.)',
+    'Gipsraum im Labor prüfen und ggf. reinigen (wöchentlich)',
+    'Schüssel im Labor reinigen (wöchentlich)',
+    'FREITAGS: Eingesetzte Arbeiten von der Wand entfernen'
+  ]},
+  {section:'Praxisreinigung',tasks:[
+    'Großes Behandlungszimmer',
+    'Kleines Behandlungszimmer',
+    'Patienten-WC',
+    'Personal-WC',
+    'Sterilraum',
+    'Vorratsraum',
+    'Rezeption',
+    'Küche',
+    'Büro',
+    'Büro-WC',
+    'Böden wischen',
+    'Staubsaugen'
+  ]}
+];
+if(!S.aufgabenAssign)S.aufgabenAssign={};
+function aufgabenKey(task,date){return task+'|'+date}
+function toggleAufgabe(task,date,staff){
+  var k=aufgabenKey(task,date);
+  if(!S.aufgabenAssign[k])S.aufgabenAssign[k]=staff;
+  else if(S.aufgabenAssign[k]===staff)delete S.aufgabenAssign[k];
+  else S.aufgabenAssign[k]=staff;
+  render();
+}
+function renderAufgaben(){
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Aufgaben</h1><div class="sub">Tägliche &amp; wöchentliche Checkliste</div></div>'
+    +MENU_BTN_2
+  +'</div></div>';
+  h+='<div class="content" style="padding:12px">';
+  var todayKey=new Date().toISOString().split('T')[0];
+  AUFGABEN_TASKS.forEach(function(sec){
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)">'+sec.section+'</div>';
+    sec.tasks.forEach(function(task){
+      var k=aufgabenKey(task,todayKey);
+      var assigned=S.aufgabenAssign[k]||'';
+      var done=!!assigned;
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--surface-2)">'
+        +'<div style="width:20px;height:20px;border:1.5px solid '+(done?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(done?'var(--emerald)':'var(--white)')+';flex-shrink:0">'+(done?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')+'</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:11px;font-weight:600;color:'+(done?'var(--text-3)':'var(--text)')+';'+(done?'text-decoration:line-through':'')+'">'+task+'</div>'
+          +(assigned?'<div style="font-size:9px;color:var(--emerald);font-weight:600;margin-top:1px">'+assigned+'</div>':'')
+        +'</div>'
+        +'<button style="padding:4px 10px;background:var(--blue-50);color:var(--navy);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-sm);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="event.stopPropagation();openAufgabenAssign(\''+task.replace(/'/g,"\\'")+'\')">Zuweisen</button>'
+      +'</div>';
+    });
+  });
+  h+='</div>';
+  /* Assign modal */
+  if(S.aufgabenAssignModal){
+    var af=S.aufgabenAssignForm||{};
+    h+='<div class="overlay-bg" onclick="S.aufgabenAssignModal=null;render()">'
+      +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+        +'<div class="overlay-header">'
+          +'<div class="overlay-title">Aufgabe zuweisen</div>'
+          +'<button class="overlay-close" onclick="S.aufgabenAssignModal=null;render()">×</button>'
+        +'</div>'
+        +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:10px 14px;margin-bottom:14px;font-size:12px;font-weight:600;color:var(--text)">'+S.aufgabenAssignModal+'</div>'
+        +'<label class="form-label" style="margin-top:0">Assistenz</label>'
+        +'<select class="form-select" id="aufgStaff" onchange="S.aufgabenAssignForm.staff=this.value">'
+          +'<option value="">Assistenz wählen…</option>';
+    ASST_STAFF.forEach(function(n){h+='<option value="'+n+'"'+(af.staff===n?' selected':'')+'>'+n+'</option>'});
+    h+='</select>'
+      +'<label class="form-label">Datum</label>'
+      +'<input type="date" class="form-input" id="aufgDate" value="'+(af.date||todayKey)+'" oninput="S.aufgabenAssignForm.date=this.value">'
+      +'<button class="save-btn" onclick="saveAufgabenAssign()">Zuweisen</button>'
+    +'</div></div>';
+  }
+  h+=renderAdminBottomNav_2('aufgaben');
+  return h;
+}
+function openAufgabenAssign(task){
+  S.aufgabenAssignModal=task;
+  S.aufgabenAssignForm={staff:'',date:new Date().toISOString().split('T')[0]};
+  render();
+}
+function saveAufgabenAssign(){
+  var f=S.aufgabenAssignForm||{};
+  var staff=document.getElementById('aufgStaff');
+  var date=document.getElementById('aufgDate');
+  var s=staff?staff.value:(f.staff||'');
+  var d=date?date.value:(f.date||'');
+  if(!s){alert('Bitte Assistenz wählen');return}
+  var k=aufgabenKey(S.aufgabenAssignModal,d);
+  S.aufgabenAssign[k]=s;
+  S.aufgabenAssignModal=null;
+  showToast(S.aufgabenAssignModal+' → '+s,'var(--emerald)');
+}
+
 /* ===== ASSISTENZ PLANUNG ===== */
 var ASST_STAFF=['Huda','Luana','Ola','Besja'];
 var ASST_TYPES={P:{label:'Praxis',color:'var(--navy)'},H:{label:'Heim',color:'var(--emerald)'},'(N)P':{label:'Nachmittag Praxis',color:'var(--violet)'}};
@@ -6026,6 +6141,7 @@ function renderAdminPortal_2(){
   else if(page==='grossvisiten') html=renderGrossvisiten();
   else if(page==='assistenzplanung') html=renderAssistenzPlanung();
   else if(page==='assistenzhinzu') html=renderAssistenzHinzufuegen();
+  else if(page==='aufgaben') html=renderAufgaben();
   /* Admin hamburger */
   if(S.showMenu_2) html+=renderMenu_2();
   /* Overlays */
@@ -6054,13 +6170,14 @@ function renderMenu_2(){
   var wochBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>';
   var gvBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'grossvisiten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> Großvisiten</button>';
   var asstPlanBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>';
+  var aufgabenBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>';
   var logoutBtn='<button class="menu-item menu-divider" onclick="closeMenu_2();doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Abmelden</button>';
   if(isAssistenz){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+aufgabenBtn+logoutBtn+'</div>';
   }
   var asstHinzuBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>';
   if(isAssistenzMgr){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+aufgabenBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
   }
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
@@ -6070,6 +6187,7 @@ function renderMenu_2(){
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz</button>'
       +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>'
+      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>'
       +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>'
       +gvBtn+logoutBtn
     +'</div>';

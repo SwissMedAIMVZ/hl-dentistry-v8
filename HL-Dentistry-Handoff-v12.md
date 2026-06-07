@@ -94,6 +94,33 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — New page: "Aufgaben" — daily/weekly task checklist
+
+**Why:** The practice has a physical wall checklist (photo reference) with daily tasks, weekly tasks (Monday/Friday), and cleaning duties. Digitizing it lets assistants mark tasks done and managers assign them.
+
+**`AUFGABEN_TASKS` data:** 3 sections with all tasks from the wall checklist:
+- **Tägliche Aufgaben** (7): Scanner-Batterien aufladen, Kompressor ein/aus, Filter reinigen, Absauganlagen reinigen, Müll rausbringen, Geschirr spülen
+- **Wöchentliche Aufgaben** (10): MONTAGS tasks (Steril, Vakuumtest, Koffer, Arbeiten prüfen), Wäsche waschen, Bohrer/Feilen, Material auffüllen, Gipsraum, Schüssel, FREITAGS Wand-Arbeiten
+- **Praxisreinigung** (12): Großes/Kleines Behandlungszimmer, Patienten-/Personal-WC, Sterilraum, Vorratsraum, Rezeption, Küche, Büro, Büro-WC, Böden wischen, Staubsaugen
+
+**`renderAufgaben()` page:**
+- Header "Aufgaben" with "Tägliche & wöchentliche Checkliste" subtitle
+- Tasks grouped by section with uppercase headers
+- Each task row: checkbox (green when done), task text (strikethrough when done), assigned staff name, **"Zuweisen" button**
+- Clicking "Zuweisen" opens a modal with Assistenz dropdown (from `ASST_STAFF`) + date picker
+- State: `S.aufgabenAssign[task|date] = staffName`
+
+**Menu placement:**
+- **Assistenz burger:** top-level item after Assistenz Planung
+- **Assistenz Manager burger:** after Assistenz Planung, before Assistenz hinzufügen
+- **Assistenz/Asst Mgr desktop sidebar:** nav item after Assistenz Planung
+- **Admin/Verwaltung burger:** indented sub-item under Assistenz section
+- **Admin/Verwaltung desktop sidebar:** sub-item under Assistenz dropdown
+
+**Routing:** `DK_VERW_TITLES.aufgaben`, desktop + mobile admin portal dispatchers.
+
+---
+
 ### 2026-04-26 — v12 design alignment with production app
 
 **Why:** The HTML mockup needed to match the visual language of the production React Native app (screenshots from 7 June 2026 build).
