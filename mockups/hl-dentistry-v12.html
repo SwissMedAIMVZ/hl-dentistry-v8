@@ -5552,6 +5552,72 @@ function renderMeineAufgabenAsst(){
       +'</div>';
     });
   }
+  /* Team section — Assistenz Manager / Verwaltung / CEO only */
+  var canSeeTeam=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
+  if(canSeeTeam){
+    if(!S.asstTeamOpen)S.asstTeamOpen={};
+    h+='<div style="font-size:14px;font-weight:700;color:var(--navy);margin:20px 0 10px;padding-top:16px;border-top:2px solid var(--border)">Team</div>';
+    ASST_STAFF.forEach(function(staffName){
+      var isOpen=!!S.asstTeamOpen[staffName];
+      /* Gather this person's tasks */
+      var personTasks=[];
+      Object.keys(S.aufgabenAssign||{}).forEach(function(k){
+        if(S.aufgabenAssign[k]===staffName){
+          var parts=k.split('|');
+          personTasks.push({task:parts[0],date:parts[1]||''});
+        }
+      });
+      var personSched=[];
+      Object.keys(ASST_SCHEDULE).forEach(function(dk){
+        ASST_SCHEDULE[dk].forEach(function(e){
+          if(e.n===staffName)personSched.push({date:dk,t:e.t,bh:e.bh||''});
+        });
+      });
+      personSched.sort(function(a,b){return a.date.localeCompare(b.date)});
+      var totalItems=personTasks.length+personSched.length;
+      h+='<div style="background:var(--white);border:1px solid '+(isOpen?'var(--navy)':'var(--border)')+';border-radius:var(--r-md);margin-bottom:8px;overflow:hidden;transition:border .2s">'
+        +'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer" onclick="S.asstTeamOpen[\''+staffName.replace(/'/g,"\\'")+'\']=!S.asstTeamOpen[\''+staffName.replace(/'/g,"\\'")+'\']; render()">'
+          +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+staffName.charAt(0)+'</div>'
+          +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+staffName+'</div>'
+            +'<div style="font-size:10px;color:var(--text-3)">'+totalItems+' Einträge</div>'
+          +'</div>'
+          +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" width="14" height="14" style="flex-shrink:0;transition:transform .2s;transform:rotate('+(isOpen?'90':'0')+'deg)"><polyline points="9 18 15 12 9 6"/></svg>'
+        +'</div>';
+      if(isOpen){
+        h+='<div style="padding:0 14px 12px;border-top:1px solid var(--border)">';
+        /* Schedule entries */
+        if(personSched.length>0){
+          h+='<div style="font-size:9px;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">Einsätze</div>';
+          personSched.forEach(function(s){
+            var dp=s.date.split('-');var dateLabel=dp[2]+'.'+dp[1]+'.';
+            var tc=s.t==='P'?'var(--navy)':s.t==='H'?'var(--emerald)':'var(--violet)';
+            var tl=s.t==='P'?'Praxis':s.t==='H'?'Heim':'Labor';
+            h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--surface-2)">'
+              +'<div style="font-size:10px;font-weight:600;color:var(--text-3);min-width:38px;font-family:\'JetBrains Mono\',monospace">'+dateLabel+'</div>'
+              +'<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--r-full);color:'+tc+';background:'+(s.t==='P'?'var(--blue-50)':s.t==='H'?'var(--emerald-bg)':'var(--violet-bg)')+'">'+tl+'</span>'
+              +(s.bh?'<span style="font-size:9px;color:var(--text-3)">'+bhdlName(s.bh)+'</span>':'')
+            +'</div>';
+          });
+        }
+        /* Tasks */
+        if(personTasks.length>0){
+          h+='<div style="font-size:9px;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">Aufgaben</div>';
+          personTasks.sort(function(a,b){return a.date.localeCompare(b.date)}).forEach(function(t){
+            var dp=t.date.split('-');var dateLabel=dp.length===3?dp[2]+'.'+dp[1]+'.':'';
+            h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--surface-2)">'
+              +'<div style="font-size:10px;font-weight:600;color:var(--text-3);min-width:38px;font-family:\'JetBrains Mono\',monospace">'+dateLabel+'</div>'
+              +'<div style="font-size:10px;font-weight:600;color:var(--text)">'+t.task+'</div>'
+            +'</div>';
+          });
+        }
+        if(personTasks.length===0&&personSched.length===0){
+          h+='<div style="text-align:center;color:var(--text-4);font-size:11px;padding:12px">Keine Einträge</div>';
+        }
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+  }
   h+='</div>';
   h+=renderAdminBottomNav_2('meineaufgaben');
   return h;

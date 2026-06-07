@@ -117,6 +117,26 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Meine Aufgaben: "Team" accordion section for Assistenz Manager
+
+**Why:** The Assistenz Manager needs to see not just their own tasks but also what each team member has assigned — for oversight and load balancing.
+
+**New section** at the bottom of `renderMeineAufgabenAsst()`, gated by `canSeeTeam` (assistenz_mgr, verwaltung, ceo). Separated from personal tasks by a 2px navy border-top + "Team" heading.
+
+**Per staff member (from `ASST_STAFF`):** collapsible accordion card with:
+- Navy gradient avatar initial + name + entry count
+- Chevron rotates 90° when open
+- Navy border when expanded
+
+**Expanded content — 2 sub-sections:**
+- **Einsätze:** all `ASST_SCHEDULE` entries for that person, sorted by date. Each row: JetBrains Mono date + location badge (P/H/L) + Behandler name.
+- **Aufgaben:** all `S.aufgabenAssign` entries assigned to that person, sorted by date. Each row: date + task name.
+- Empty state: "Keine Einträge"
+
+**State:** `S.asstTeamOpen[staffName]` — toggles per accordion. Multiple can be open.
+
+---
+
 ### 2026-04-26 — Login screen + burger menu redesigned to match production app
 
 **Why:** The production app has a clean white login (no gradient) and a teal-icon burger menu with section headers. The mockup needed to match.
