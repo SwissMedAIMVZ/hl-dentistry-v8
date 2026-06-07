@@ -129,6 +129,19 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Team section: show done/open task status per team member
+
+**Why:** The Manager needs to see at a glance which tasks each team member has completed vs. what's still open.
+
+**Changes in Team accordion (expanded view):**
+- Tasks split into **"Offene Aufgaben"** (empty checkbox, normal text) and **"Erledigt"** (green checkbox, strikethrough, completion time) sub-sections.
+- Open tasks checked via `S.meineAufgErledigt[task|date]` — same state the Assistenz's "Erledigt" button writes to.
+- Done tasks sorted newest-completed first.
+
+**Accordion header:** entry count now shows done count in emerald: `"5 Einträge · 3 erledigt"`.
+
+---
+
 ### 2026-04-26 — Meine Aufgaben: "Team" accordion section for Assistenz Manager
 
 **Why:** The Assistenz Manager needs to see not just their own tasks but also what each team member has assigned — for oversight and load balancing.

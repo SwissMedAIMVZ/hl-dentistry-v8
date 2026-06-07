@@ -5644,12 +5644,13 @@ function renderMeineAufgabenAsst(){
         });
       });
       personSched.sort(function(a,b){return a.date.localeCompare(b.date)});
+      var doneCount=personTasks.filter(function(t){return !!S.meineAufgErledigt[t.task+'|'+t.date]}).length;
       var totalItems=personTasks.length+personSched.length;
       h+='<div style="background:var(--white);border:1px solid '+(isOpen?'var(--navy)':'var(--border)')+';border-radius:var(--r-md);margin-bottom:8px;overflow:hidden;transition:border .2s">'
         +'<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer" onclick="S.asstTeamOpen[\''+staffName.replace(/'/g,"\\'")+'\']=!S.asstTeamOpen[\''+staffName.replace(/'/g,"\\'")+'\']; render()">'
           +'<div style="width:30px;height:30px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+staffName.charAt(0)+'</div>'
           +'<div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--text)">'+staffName+'</div>'
-            +'<div style="font-size:10px;color:var(--text-3)">'+totalItems+' Einträge</div>'
+            +'<div style="font-size:10px;color:var(--text-3)">'+totalItems+' Einträge'+(doneCount>0?' · <span style="color:var(--emerald)">'+doneCount+' erledigt</span>':'')+'</div>'
           +'</div>'
           +'<svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" width="14" height="14" style="flex-shrink:0;transition:transform .2s;transform:rotate('+(isOpen?'90':'0')+'deg)"><polyline points="9 18 15 12 9 6"/></svg>'
         +'</div>';
@@ -5669,18 +5670,38 @@ function renderMeineAufgabenAsst(){
             +'</div>';
           });
         }
-        /* Tasks */
-        if(personTasks.length>0){
-          h+='<div style="font-size:9px;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">Aufgaben</div>';
-          personTasks.sort(function(a,b){return a.date.localeCompare(b.date)}).forEach(function(t){
+        /* Tasks — split into open and done */
+        var openTasks=personTasks.filter(function(t){return !S.meineAufgErledigt[t.task+'|'+t.date]});
+        var doneTasks=personTasks.filter(function(t){return !!S.meineAufgErledigt[t.task+'|'+t.date]});
+        if(openTasks.length>0){
+          h+='<div style="font-size:9px;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">Offene Aufgaben</div>';
+          openTasks.sort(function(a,b){return a.date.localeCompare(b.date)}).forEach(function(t){
             var dp=t.date.split('-');var dateLabel=dp.length===3?dp[2]+'.'+dp[1]+'.':'';
             h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--surface-2)">'
+              +'<div style="width:14px;height:14px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0"></div>'
               +'<div style="font-size:10px;font-weight:600;color:var(--text-3);min-width:38px;font-family:\'JetBrains Mono\',monospace">'+dateLabel+'</div>'
               +'<div style="font-size:10px;font-weight:600;color:var(--text)">'+t.task+'</div>'
             +'</div>';
           });
         }
-        if(personTasks.length===0&&personSched.length===0){
+        if(doneTasks.length>0){
+          h+='<div style="font-size:9px;font-weight:700;color:var(--emerald);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">Erledigt</div>';
+          doneTasks.sort(function(a,b){
+            var ta=S.meineAufgErledigt[a.task+'|'+a.date];var tb=S.meineAufgErledigt[b.task+'|'+b.date];
+            return (tb?tb.time:0)-(ta?ta.time:0);
+          }).forEach(function(t){
+            var dp=t.date.split('-');var dateLabel=dp.length===3?dp[2]+'.'+dp[1]+'.':'';
+            var info=S.meineAufgErledigt[t.task+'|'+t.date]||{};
+            var timeStr=info.time?new Date(info.time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'';
+            h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--surface-2)">'
+              +'<div style="width:14px;height:14px;border:1.5px solid var(--emerald);border-radius:3px;display:flex;align-items:center;justify-content:center;background:var(--emerald);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="8" height="8"><polyline points="20 6 9 17 4 12"/></svg></div>'
+              +'<div style="font-size:10px;font-weight:600;color:var(--text-3);min-width:38px;font-family:\'JetBrains Mono\',monospace">'+dateLabel+'</div>'
+              +'<div style="flex:1;font-size:10px;font-weight:600;color:var(--text-3);text-decoration:line-through">'+t.task+'</div>'
+              +(timeStr?'<div style="font-size:9px;color:var(--text-4)">'+timeStr+'</div>':'')
+            +'</div>';
+          });
+        }
+        if(openTasks.length===0&&doneTasks.length===0&&personSched.length===0){
           h+='<div style="text-align:center;color:var(--text-4);font-size:11px;padding:12px">Keine Einträge</div>';
         }
         h+='</div>';
