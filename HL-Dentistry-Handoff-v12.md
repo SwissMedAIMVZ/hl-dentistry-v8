@@ -129,6 +129,21 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Aufgaben: "Mir zuteilen" button for Assistenz role
+
+**Why:** Assistenz users shouldn't assign tasks to others — they should claim tasks for themselves. "Zuweisen" (with staff dropdown) is for managers; "Mir zuteilen" (with just a date picker) is for assistants.
+
+**Button change in `renderAufgaben()`:** role-aware via `isAsstRole`. Assistenz sees green "Mir zuteilen" button → opens `openAufgabenSelfAssign(task)`. Other roles see blue "Zuweisen" → opens `openAufgabenAssign(task)` (existing).
+
+**"Mir zuteilen" popup (`S.aufgabenSelfModal`):** simplified modal with:
+- Task name in gray card
+- Date picker (default: today)
+- Green "Übernehmen" button
+
+**`saveAufgabenSelfAssign()`:** sets `S.aufgabenAssign[task|date] = S.user.name` — the task then appears in the user's "Meine Aufgaben" page and can be marked "Erledigt" there.
+
+---
+
 ### 2026-04-26 — Assistenz Planung: click calendar cell to add entry directly
 
 **Why:** Clicking a day cell to just view details, then clicking the FAB "+" to add, was two steps too many. For editors (Assistenz Manager / Verwaltung / CEO), clicking a day cell now opens the "Füge Assistenz hinzu" modal directly with that date pre-filled.

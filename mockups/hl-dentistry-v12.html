@@ -5762,6 +5762,7 @@ function toggleAufgabe(task,date,staff){
   render();
 }
 function renderAufgaben(){
+  var isAsstRole=S.user&&S.user.role==='assistenz';
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Aufgaben</h1><div class="sub">Tägliche &amp; wöchentliche Checkliste</div></div>'
     +getMenuBtn2()
@@ -5780,7 +5781,9 @@ function renderAufgaben(){
           +'<div style="font-size:11px;font-weight:600;color:'+(done?'var(--text-3)':'var(--text)')+';'+(done?'text-decoration:line-through':'')+'">'+task+'</div>'
           +(assigned?'<div style="font-size:9px;color:var(--emerald);font-weight:600;margin-top:1px">'+assigned+'</div>':'')
         +'</div>'
-        +'<button style="padding:4px 10px;background:var(--blue-50);color:var(--navy);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-sm);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="event.stopPropagation();openAufgabenAssign(\''+task.replace(/'/g,"\\'")+'\')">Zuweisen</button>'
+        +(isAsstRole
+          ?'<button style="padding:4px 10px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(20,194,149,0.3);border-radius:var(--r-sm);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="event.stopPropagation();openAufgabenSelfAssign(\''+task.replace(/'/g,"\\'")+'\')">Mir zuteilen</button>'
+          :'<button style="padding:4px 10px;background:var(--blue-50);color:var(--navy);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-sm);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="event.stopPropagation();openAufgabenAssign(\''+task.replace(/'/g,"\\'")+'\')">Zuweisen</button>')
       +'</div>';
     });
   });
@@ -5805,6 +5808,20 @@ function renderAufgaben(){
       +'<button class="save-btn" onclick="saveAufgabenAssign()">Zuweisen</button>'
     +'</div></div>';
   }
+  /* Self-assign modal for Assistenz */
+  if(S.aufgabenSelfModal){
+    h+='<div class="overlay-bg" onclick="S.aufgabenSelfModal=null;render()">'
+      +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+        +'<div class="overlay-header">'
+          +'<div class="overlay-title">Mir zuteilen</div>'
+          +'<button class="overlay-close" onclick="S.aufgabenSelfModal=null;render()">×</button>'
+        +'</div>'
+        +'<div style="background:var(--surface-2);border-radius:var(--r-md);padding:10px 14px;margin-bottom:14px;font-size:12px;font-weight:600;color:var(--text)">'+S.aufgabenSelfModal+'</div>'
+        +'<label class="form-label" style="margin-top:0">Datum</label>'
+        +'<input type="date" class="form-input" id="aufgSelfDate" value="'+(S.aufgabenSelfDate||'')+'" oninput="S.aufgabenSelfDate=this.value">'
+        +'<button class="save-btn" style="background:var(--emerald)" onclick="saveAufgabenSelfAssign()">Übernehmen</button>'
+      +'</div></div>';
+  }
   h+=renderAdminBottomNav_2('aufgaben');
   return h;
 }
@@ -5812,6 +5829,21 @@ function openAufgabenAssign(task){
   S.aufgabenAssignModal=task;
   S.aufgabenAssignForm={staff:'',date:new Date().toISOString().split('T')[0]};
   render();
+}
+function openAufgabenSelfAssign(task){
+  S.aufgabenSelfModal=task;
+  S.aufgabenSelfDate=new Date().toISOString().split('T')[0];
+  render();
+}
+function saveAufgabenSelfAssign(){
+  var d=document.getElementById('aufgSelfDate');
+  var date=d?d.value:(S.aufgabenSelfDate||'');
+  if(!date){alert('Bitte Datum wählen');return}
+  var k=aufgabenKey(S.aufgabenSelfModal,date);
+  if(!S.aufgabenAssign)S.aufgabenAssign={};
+  S.aufgabenAssign[k]=S.user?S.user.name:'';
+  S.aufgabenSelfModal=null;
+  showToast('Aufgabe übernommen','var(--emerald)');
 }
 function saveAufgabenAssign(){
   var f=S.aufgabenAssignForm||{};
