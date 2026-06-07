@@ -94,6 +94,29 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — New page: "Meine Aufgaben" — personal task view for Assistenz
+
+**Why:** Each Assistenz user needs to see only their own assigned tasks and schedule, not the full checklist for all staff.
+
+**`renderMeineAufgabenAsst()` page — 4 sections:**
+1. **Heute — Einsatz:** today's entries from `ASST_SCHEDULE` matching the logged-in user's name. Shows location card (Praxis/Heim/Labor) with assigned Behandler.
+2. **Heute — Aufgaben:** today's entries from `S.aufgabenAssign` matching the user's name. Shows checked-off task names.
+3. **Weitere Aufgaben:** other-date assignments from the Aufgaben checklist, sorted by date.
+4. **Nächste Einsätze:** upcoming schedule entries (max 7), showing date in JetBrains Mono + location badge + Behandler.
+
+**Data query:** filters `S.aufgabenAssign` keys where value === `S.user.name`, and `ASST_SCHEDULE` entries where `e.n === S.user.name`.
+
+**Menu placement:**
+- **Assistenz burger:** first item (before Patienten) — personal tasks are the primary view
+- **Assistenz Manager burger:** first item (before Patienten)
+- **Assistenz/Asst Mgr desktop sidebar:** first item (before Wochenplan)
+
+**Login default:** Assistenz role now lands on Meine Aufgaben (`S.adminMode=true; S.adminPage_2='meineaufgaben'`) instead of Patienten.
+
+**Routing:** `DK_VERW_TITLES.meineaufgaben`, desktop + mobile admin dispatchers.
+
+---
+
 ### 2026-04-26 — Login screen + burger menu redesigned to match production app
 
 **Why:** The production app has a clean white login (no gradient) and a teal-icon burger menu with section headers. The mockup needed to match.
