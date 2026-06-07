@@ -94,6 +94,37 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — New page: "Assistenz hinzufügen" — manage assistant staff
+
+**Why:** The Assistenz Manager / Admin / Verwaltung needs to onboard new assistants with email, password, and name — same pattern as Verwaltung > Behandler.
+
+**New page `renderAssistenzHinzufuegen()`:**
+- Header: "Assistenz hinzufügen" with count ("4 Assistenzen")
+- List of current `ASST_STAFF` members as cards (avatar initial, name, email from USERS, "Assistenz" role badge)
+- FAB "+" button → opens add modal
+
+**Add modal (`S.showAddAssistenz`):** same layout as the Behandler add modal:
+- E-Mail-Adresse (required)
+- Vollständiger Name (required)
+- Erstes Passwort (required)
+- "Hinzufügen" button
+
+**`saveAddAssistenz()`:** validates, checks email uniqueness, pushes to `ASST_STAFF` array + `USERS` array with `role:'assistenz'`. The new name immediately appears in:
+- The Assistenz Planung calendar's "Füge Assistenz hinzu" dropdown
+- The staff list on this page
+- The login system (new user can log in)
+
+**Menu placement:**
+- **Assistenz Manager burger menu:** top-level item after Assistenz Planung, before Verwaltung
+- **Assistenz Manager desktop sidebar:** nav item after Assistenz Planung, before Verwaltung dropdown
+- **Admin/Verwaltung burger menu:** indented sub-item under Assistenz (after Assistenz Planung)
+- **Admin/Verwaltung desktop sidebar:** sub-item under Assistenz dropdown (after Assistenz Planung)
+- **Plain Assistenz:** not visible (read-only role)
+
+**Routing:** `DK_VERW_TITLES.assistenzhinzu`, desktop + mobile admin portal dispatchers.
+
+---
+
 ### 2026-04-26 — Assistenz Planung: editable calendar + "Füge Assistenz hinzu" popup
 
 **Why:** The Assistenz Manager needs to manage the monthly schedule — add, view, and remove staff assignments. The popup form lets them assign an assistant to a date, location (Heim/Praxis/Labor), and optionally a Behandler.

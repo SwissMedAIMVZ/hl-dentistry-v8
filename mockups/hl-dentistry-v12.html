@@ -2726,6 +2726,7 @@ function renderDesktopSidebar(){
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='grossvisiten'?'active':'')+'" onclick="goDesktopVerwSub(\'grossvisiten\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg><span>Großvisiten</span></button>';
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='assistenzplanung'?'active':'')+'" onclick="goDesktopVerwSub(\'assistenzplanung\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>Assistenz Planung</span></button>';
     if(isAssistenzMgrSide){
+      h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='assistenzhinzu'?'active':'')+'" onclick="goDesktopVerwSub(\'assistenzhinzu\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span>Assistenz hinzufügen</span></button>';
       /* Verwaltung dropdown for Assistenz Manager */
       var isVerwActive=S.dkPage==='verwaltung';
       h+='<button class="dk-nav-item '+(isVerwActive&&S.adminPage_2!=='uebersicht'&&S.adminPage_2!=='grossvisiten'?'active':'')+'" onclick="toggleDkGroup(\'verwaltung\')" style="padding-right:10px">'+gridIcon+'<span>Verwaltung</span>'+(isVerwOpen?chevUp:chevDown)+'</button>';
@@ -2766,6 +2767,7 @@ function renderDesktopSidebar(){
   h+='<button class="dk-nav-item '+(S._assistenzView?'active':'')+'" onclick="toggleDkGroup(\'assistenz\')" style="padding-right:10px">'+assistenzIcon+'<span>Assistenz</span>'+(isAsstOpen?chevUp:chevDown)+'</button>';
   if(isAsstOpen){
     h+='<button class="dk-nav-item '+((S._assistenzView&&S.adminPage_2==='assistenzplanung')?'active':'')+'" style="padding-left:44px;font-size:12px" onclick="S._assistenzView=true;goDesktopVerwSub(\'assistenzplanung\')"><span>Assistenz Planung</span></button>';
+    h+='<button class="dk-nav-item '+((S._assistenzView&&S.adminPage_2==='assistenzhinzu')?'active':'')+'" style="padding-left:44px;font-size:12px" onclick="S._assistenzView=true;goDesktopVerwSub(\'assistenzhinzu\')"><span>Assistenz hinzufügen</span></button>';
   }
 
   /* Behandler */
@@ -2863,7 +2865,7 @@ function dkDefaultPage(){
   return'manager';
 }
 var DK_TITLES={patienten:'Patienten',manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
-var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung'};
+var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung',assistenzhinzu:'Assistenz hinzufügen'};
 function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode=true;render()}
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
 function goDesktopMgrTab(t){S.dkPage='manager';S.adminMode=false;S.screen='manager';S.mgrTab=t;render()}
@@ -2882,6 +2884,7 @@ function renderDesktopVerwaltungBody(){
   else if(pg==='pflegeheime') h+=renderPflegeheime();
   else if(pg==='grossvisiten') h+=renderGrossvisiten();
   else if(pg==='assistenzplanung') h+=renderAssistenzPlanung();
+  else if(pg==='assistenzhinzu') h+=renderAssistenzHinzufuegen();
   h+='</div>';
   return h;
 }
@@ -5625,6 +5628,69 @@ function asstRemoveEntry(dateKey,idx){
   render();
 }
 
+/* ===== ASSISTENZ HINZUFÜGEN (manage assistants) ===== */
+function renderAssistenzHinzufuegen(){
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Assistenz hinzufügen</h1><div class="sub">'+ASST_STAFF.length+' Assistenzen</div></div>'
+    +MENU_BTN_2
+  +'</div></div>';
+  h+='<div class="content">';
+  ASST_STAFF.forEach(function(name,i){
+    var user=USERS.find(function(u){return u.name===name&&u.role==='assistenz'});
+    var email=user?user.email:'— kein Account';
+    h+='<div class="card" style="cursor:default;margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:12px">'
+        +'<div style="width:40px;height:40px;border-radius:var(--r-full);background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0">'+name.charAt(0)+'</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div class="card-title">'+name+'</div>'
+          +'<div style="font-size:11px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:5px;word-break:break-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>'+email+'</div>'
+        +'</div>'
+        +'<span class="badge" style="background:var(--blue-50);color:var(--navy);flex-shrink:0">Assistenz</span>'
+      +'</div>'
+    +'</div>';
+  });
+  h+='</div>';
+  h+='<button class="fab" onclick="openAddAssistenz()" title="Assistenz hinzufügen">+</button>';
+  if(S.showAddAssistenz){
+    var f=S.addAssistenzForm||{email:'',name:'',pw:''};
+    h+='<div class="overlay-bg" onclick="closeAddAssistenz()">'
+      +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
+        +'<div class="overlay-header">'
+          +'<div class="overlay-title">Assistenz hinzufügen</div>'
+          +'<button class="overlay-close" onclick="closeAddAssistenz()">×</button>'
+        +'</div>'
+        +'<label class="form-label" style="margin-top:0">E-Mail-Adresse <span style="color:var(--crimson)">*</span></label>'
+        +'<input type="email" class="form-input" id="aaEmail" required placeholder="name@swissmedai.com" value="'+(f.email||'').replace(/"/g,'&quot;')+'" oninput="S.addAssistenzForm.email=this.value">'
+        +'<label class="form-label">Vollständiger Name <span style="color:var(--crimson)">*</span></label>'
+        +'<input type="text" class="form-input" id="aaName" required placeholder="z.B. Maria Schmidt" value="'+(f.name||'').replace(/"/g,'&quot;')+'" oninput="S.addAssistenzForm.name=this.value">'
+        +'<label class="form-label">Erstes Passwort <span style="color:var(--crimson)">*</span></label>'
+        +'<input type="password" class="form-input" id="aaPw" required placeholder="Initiales Passwort" value="'+(f.pw||'').replace(/"/g,'&quot;')+'" oninput="S.addAssistenzForm.pw=this.value">'
+        +'<div style="font-size:10px;color:var(--text-3);margin-top:6px">Alle Felder sind Pflichtfelder.</div>'
+        +'<button class="save-btn" onclick="saveAddAssistenz()">Hinzufügen</button>'
+      +'</div>'
+    +'</div>';
+  }
+  h+=renderAdminBottomNav_2('assistenzhinzu');
+  return h;
+}
+function openAddAssistenz(){S.showAddAssistenz=true;S.addAssistenzForm={email:'',name:'',pw:''};render()}
+function closeAddAssistenz(){S.showAddAssistenz=false;render()}
+function saveAddAssistenz(){
+  var f=S.addAssistenzForm||{};
+  var emailEl=document.getElementById('aaEmail');
+  var nameEl=document.getElementById('aaName');
+  var pwEl=document.getElementById('aaPw');
+  var email=(emailEl?emailEl.value:f.email||'').trim().toLowerCase();
+  var name=(nameEl?nameEl.value:f.name||'').trim();
+  var pw=(pwEl?pwEl.value:f.pw||'');
+  if(!email||!name||!pw){showToast('E-Mail, Name und Passwort sind Pflichtfelder','var(--crimson)');return}
+  if(USERS.find(function(u){return u.email===email})){showToast('E-Mail bereits vergeben','var(--crimson)');return}
+  ASST_STAFF.push(name);
+  USERS.push({email:email,pw:pw,name:name,role:'assistenz'});
+  S.showAddAssistenz=false;
+  showToast(name+' als Assistenz hinzugefügt','var(--emerald)');
+}
+
 /* ===== GROßVISITEN ===== */
 function renderGrossvisiten(){
   var calIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
@@ -5954,6 +6020,7 @@ function renderAdminPortal_2(){
   else if(page==='pflegeheime') html=renderPflegeheime();
   else if(page==='grossvisiten') html=renderGrossvisiten();
   else if(page==='assistenzplanung') html=renderAssistenzPlanung();
+  else if(page==='assistenzhinzu') html=renderAssistenzHinzufuegen();
   /* Admin hamburger */
   if(S.showMenu_2) html+=renderMenu_2();
   /* Overlays */
@@ -5986,8 +6053,9 @@ function renderMenu_2(){
   if(isAssistenz){
     return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+logoutBtn+'</div>';
   }
+  var asstHinzuBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>';
   if(isAssistenzMgr){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+verwBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
   }
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
@@ -5997,6 +6065,7 @@ function renderMenu_2(){
       +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
       +'<button class="menu-item" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz</button>'
       +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>'
+      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>'
       +gvBtn+logoutBtn
     +'</div>';
 }
