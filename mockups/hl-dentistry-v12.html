@@ -125,7 +125,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 .tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);padding:0 8px}
 .tab{flex:1;padding:12px 8px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-3);font-family:inherit;position:relative;transition:color .2s var(--ease);text-transform:uppercase;letter-spacing:0.5px}
 .tab.active{color:var(--navy)}
-.tab.active::after{content:'';position:absolute;bottom:0;left:16%;right:16%;height:2.5px;background:linear-gradient(90deg,var(--navy),var(--blue));border-radius:2px}
+.tab.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--emerald)}
 
 /* ===== BOTTOM NAV ===== */
 .bottom-nav{display:flex;justify-content:space-around;align-items:center;padding:8px 0 12px;background:var(--white);border-top:1px solid var(--border);box-shadow:0 -4px 12px rgba(0,0,0,0.03)}
@@ -288,9 +288,9 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 
 /* ===== MANAGER DASHBOARD ===== */
 .mgr-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
-.mgr-stat{background:var(--white);padding:16px;border-radius:var(--r-lg);border:1px solid var(--border);cursor:pointer;transition:all .25s var(--ease);box-shadow:var(--sh-card);position:relative;overflow:hidden}
+.mgr-stat{background:var(--white);padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--border);cursor:pointer;transition:all .25s var(--ease);box-shadow:none;position:relative;overflow:hidden}
 .mgr-stat:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
-.mgr-stat .num{font-size:28px;font-weight:800;letter-spacing:-1px}
+.mgr-stat .num{font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
 .mgr-stat .label{font-size:10px;color:var(--text-3);margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
 .mgr-stat .trend{font-size:10px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:4px}
 .trend-up{color:var(--emerald)}.trend-down{color:var(--crimson)}.trend-flat{color:var(--amber)}
@@ -336,7 +336,7 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 .lab-timeline-item.current .lab-timeline-dot{background:var(--navy);border-color:var(--navy);box-shadow:0 0 0 4px rgba(8,42,153,0.15)}
 
 /* ===== KI-ASSISTENT ===== */
-.ai-fab{position:absolute;bottom:76px;right:72px;width:50px;height:50px;background:linear-gradient(135deg,var(--violet),var(--navy));border-radius:var(--r-full);border:none;color:#fff;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(108,71,255,0.3);z-index:80;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:inherit;letter-spacing:-0.5px;transition:all .2s var(--ease)}
+.ai-fab{position:absolute;bottom:76px;right:72px;width:50px;height:50px;background:var(--navy);border-radius:var(--r-full);border:none;color:#fff;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(10,46,158,0.3);z-index:80;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:inherit;letter-spacing:-0.5px;transition:all .2s var(--ease)}
 .ai-fab:hover{transform:scale(1.05)}
 .ai-panel{position:absolute;inset:0;background:var(--white);z-index:95;display:flex;flex-direction:column}
 .ai-header{background:var(--white);border-bottom:1px solid var(--border);color:var(--text);padding:20px;display:flex;align-items:center;gap:12px}
@@ -3009,6 +3009,8 @@ function render(){
 
   var role=S.user?S.user.role:"",s=S.screen,uc=getUnreadCount();
   var msgNav=navBtn('<span class="nav-badge">'+ICO.msg+(uc?'<span class="nav-badge-count">'+uc+'</span>':'')+'</span>','Nachr.','goMessages()',s==="messages");
+
+  html+='<div style="text-align:center;padding:4px 0;font-size:10px;color:var(--emerald);display:flex;align-items:center;justify-content:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:var(--emerald);display:inline-block"></span>Letzte Synchronisation: vor 2 Min.</div>';
 
   if(role==="laborant"){html+='<div class="bottom-nav">'+navBtn(ICO.lab,"Labor","goLab()",s==="lab")+msgNav+navBtn(ICO.search,"Suche","goSearch()",s==="search")+'</div>'}
   else if(s==="manager"||((role==="ceo"||role==="verwaltung")&&s==="messages")){html+='<div class="bottom-nav">'+navBtn(ICO.chart,"Dashboard","S.screen=\'manager\';S.mgrTab=\'\u00dcbersicht\';render()",s==="manager")+navBtn(ICO.lab,"Labor","goLab()",false)+msgNav+navBtn(ICO.search,"Suche","goSearch()",s==="search")+'</div>'}
@@ -5804,6 +5806,7 @@ function renderGrossvisiten(){
                 +'<span style="display:inline-flex;align-items:center;gap:3px">'+calIcon+' '+gv.date+'</span>'
                 +'<span style="display:inline-flex;align-items:center;gap:3px">'+usrIcon+' '+gv.patients+' Pat.</span>'
               +'</div>'
+              +'<div style="font-size:10px;color:var(--text-4);font-family:\'JetBrains Mono\',monospace;margin-top:3px">'+(function(){var slug=gv.heim.replace(/[^A-Za-z0-9äöüÄÖÜß]/g,'_').replace(/_+/g,'_');var dp=gv.date.replace(/\./g,'');return '2026'+dp.substring(2,4)+dp.substring(0,2)+'_Grossvisite_'+slug})()+'</div>'
               +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">'
                 +gv.behandler.map(function(n){return'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:var(--blue-50);color:var(--navy)">'+n+'</span>'}).join('')
               +'</div>'

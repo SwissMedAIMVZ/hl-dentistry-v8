@@ -94,6 +94,33 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — v12 design alignment with production app
+
+**Why:** The HTML mockup needed to match the visual language of the production React Native app (screenshots from 7 June 2026 build).
+
+**Changes:**
+
+1. **Großvisiten cards — document name subline:** each planned visit card now shows a monospace gray subline with the generated document name (e.g. `20260428_Grossvisite_Alexa_Lichtenrade`), matching the production app's card layout.
+
+2. **Active tab green dot:** replaced the gradient underline `::after` on `.tab.active` with a 6px emerald dot centered under the tab text. Matches production's tab indicator pattern.
+
+3. **Stat cards — compact bordered style:** `.mgr-stat` padding reduced (16px → 12px 14px), radius changed to `--r-md`, box-shadow removed. `.mgr-stat .num` gets `font-family:'JetBrains Mono',monospace` for tabular number display.
+
+4. **KI FAB — navy solid:** `.ai-fab` background changed from violet-to-navy gradient to solid `var(--navy)`. Shadow updated to navy-tinted. HTML already renders "KI" text.
+
+5. **Bottom sync bar:** added "Letzte Synchronisation: vor 2 Min." with a green dot, rendered above the bottom nav on all mobile screens. Matches production's sync status indicator.
+
+**Also includes HIGH priority audit fixes from the same session:**
+- JetBrains Mono font imported alongside Inter
+- `--t-crown` changed from violet to navy (clinical, not KI)
+- `.dict-bar` gradient → solid surface + border
+- Login orb backgrounds: violet → navy rgba
+- `.ai-header` gradient → white + border (subordinate KI pattern)
+- PA_STATES: 4 violet entries → navy (clinical workflow)
+- `.font-mono` utility class added
+
+---
+
 ### 2026-04-26 — Design specs document added (Ledger v2 visual language)
 
 **File:** `docs/hl-design-specs.md`
