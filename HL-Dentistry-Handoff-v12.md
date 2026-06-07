@@ -94,6 +94,28 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Login screen + burger menu redesigned to match production app
+
+**Why:** The production app has a clean white login (no gradient) and a teal-icon burger menu with section headers. The mockup needed to match.
+
+**Login screen redesign:**
+- Background: `var(--white)` — removed gradient, disabled `::before`/`::after` orb pseudo-elements
+- Title: "HL-Dentistry." with green signal dot, 32px bold navy
+- Subtitle: "Mobile Altenzahnheilkunde" in gray
+- Company line: "SWISSMEDAI GMBH · BERLIN · V12.0" in JetBrains Mono uppercase, thin border below
+- Labels: "E-MAIL" and "KENNWORT" (uppercase)
+- Inputs: `#F5F5F7` background, `12px` radius
+- Button: solid navy, `25px` radius (no gradient)
+- Added: "Passwort vergessen" link + legal disclaimer ("Durch die Anmeldung akzeptieren Sie Datenschutz und Impressum.")
+- Removed: logo icon, white-on-gradient text, card overlay form, version footer
+
+**Burger menu redesign:**
+- **X close button:** `MENU_BTN_2` replaced with `getMenuBtn2()` function that shows × SVG when `S.showMenu_2` is true, hamburger ≡ when closed. All 20 usages updated.
+- **Teal icons:** all SVG icons in `renderMenu_2()` changed from `stroke="currentColor"` to `stroke="var(--emerald)"`.
+- **Section separator:** "ASSISTENZ TOOLS" uppercase header with top border added before Assistenz-related menu items in all role branches (assistenz, assistenz_mgr, admin/verwaltung).
+
+---
+
 ### 2026-04-26 — Assistenz Planung: edit existing calendar entries
 
 **Why:** Assistenz Manager needs to modify already-assigned entries (change staff, location, or Behandler) without deleting and re-adding.

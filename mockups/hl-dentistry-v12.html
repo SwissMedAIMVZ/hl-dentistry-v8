@@ -267,24 +267,23 @@ body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Ne
 .dict-panel .submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)}
 
 /* ===== LOGIN ===== */
-.login-bg{display:flex;flex-direction:column;height:100%;background:linear-gradient(155deg,#061F6E 0%,var(--navy) 35%,var(--navy-light) 65%,var(--blue) 100%);position:relative;overflow:hidden}
-.login-bg::before{content:'';position:absolute;top:-20%;right:-30%;width:500px;height:500px;background:radial-gradient(circle,rgba(61,102,254,0.15) 0%,transparent 60%);border-radius:50%}
-.login-bg::after{content:'';position:absolute;bottom:-20%;left:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(10,46,158,0.08) 0%,transparent 60%);border-radius:50%}
-.login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;position:relative;z-index:1}
-.login-logo{width:88px;height:88px;background:rgba(255,255,255,0.08);border-radius:24px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 32px rgba(0,0,0,0.2)}
-.login-logo svg{width:48px;height:48px}
-.login-title{font-size:28px;font-weight:800;letter-spacing:-0.5px}
-.login-subtitle{font-size:13px;opacity:0.7;margin-top:6px;font-weight:400;letter-spacing:0.5px}
-.login-form{background:var(--white);border-top-left-radius:28px;border-top-right-radius:28px;padding:36px 24px 28px;box-shadow:0 -12px 40px rgba(0,0,0,0.15);position:relative;z-index:2}
-.login-form label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;margin-top:18px;text-transform:uppercase;letter-spacing:0.5px}
+.login-bg{display:flex;flex-direction:column;height:100%;background:var(--white);position:relative;overflow:hidden}
+.login-bg::before{display:none}
+.login-bg::after{display:none}
+.login-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--navy);position:relative;z-index:1;padding-top:60px}
+.login-title{font-size:32px;font-weight:800;letter-spacing:-0.5px;color:var(--navy)}
+.login-subtitle{font-size:14px;color:var(--text-3);margin-top:6px;font-weight:400;letter-spacing:0.3px}
+.login-company{font-size:9px;font-weight:600;color:var(--text-4);text-transform:uppercase;letter-spacing:1.8px;margin-top:16px;padding-bottom:12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace}
+.login-form{padding:32px 24px 28px;position:relative;z-index:2}
+.login-form label{display:block;font-size:10px;font-weight:700;color:var(--text-3);margin-bottom:6px;margin-top:20px;text-transform:uppercase;letter-spacing:1.2px}
 .login-form label:first-child{margin-top:0}
-.login-form input[type=email],.login-form input[type=password]{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--r-md);font-size:14px;font-family:inherit;transition:all .2s var(--ease);outline:none;background:var(--surface)}
-.login-form input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(61,102,254,0.1);background:var(--white)}
-.login-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;margin-top:28px;font-family:inherit;transition:all .25s var(--ease);box-shadow:var(--sh-blue);letter-spacing:0.3px}
-.login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(8,42,153,0.35)}
+.login-form input[type=email],.login-form input[type=password]{width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;transition:all .2s var(--ease);outline:none;background:#F5F5F7}
+.login-form input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(61,102,254,0.08);background:var(--white)}
+.login-btn{width:100%;padding:16px;background:var(--navy);color:#fff;border:none;border-radius:25px;font-size:15px;font-weight:700;cursor:pointer;margin-top:28px;font-family:inherit;transition:all .25s var(--ease);letter-spacing:0.3px}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(8,42,153,0.25)}
 .login-forgot{text-align:center;margin-top:16px;font-size:12px;color:var(--blue);cursor:pointer;font-weight:500}
-.login-error{background:var(--crimson-bg);color:var(--crimson);padding:12px;border-radius:var(--r-md);font-size:12px;font-weight:600;margin-top:12px;text-align:center;display:none;border:1px solid rgba(201,49,61,0.15)}
-.login-version{text-align:center;font-size:10px;color:rgba(255,255,255,0.35);padding:16px;position:relative;z-index:1;font-family:'JetBrains Mono',monospace}
+.login-error{color:var(--crimson);font-size:12px;font-weight:600;margin-top:12px;text-align:center;display:none}
+.login-legal{text-align:center;font-size:11px;color:var(--text-4);padding:20px 24px;line-height:1.5}
 
 /* ===== MANAGER DASHBOARD ===== */
 .mgr-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
@@ -1134,20 +1133,20 @@ function msgIcon(t){return t==="urgent"?'<svg viewBox="0 0 24 24" fill="none" st
 function renderLogin(){
   return '<div class="login-bg">'
     +'<div class="login-top">'
-    +'<div class="login-logo">'+ICO.tooth+'</div>'
     +'<div class="login-title">HL-Dentistry<span style="color:var(--emerald)">.</span></div>'
     +'<div class="login-subtitle">Mobile Altenzahnheilkunde</div>'
+    +'<div class="login-company">SWISSMEDAI GMBH &middot; BERLIN &middot; V12.0</div>'
     +'</div>'
     +'<div class="login-form">'
-    +'<label>E-Mail</label>'
+    +'<label>E-MAIL</label>'
     +'<input type="email" id="loginEmail" placeholder="name@swissmedai.com">'
-    +'<label>Passwort</label>'
+    +'<label>KENNWORT</label>'
     +'<input type="password" id="loginPw" placeholder="Passwort eingeben">'
     +'<div class="login-error" id="loginErr">Ung\u00fcltige E-Mail oder Passwort</div>'
     +'<button class="login-btn" onclick="doLogin()">Anmelden</button>'
     +'<div class="login-forgot">Passwort vergessen?</div>'
     +'</div>'
-    +'<div class="login-version">v12.0 \u2014 SwissMedAI GmbH</div>'
+    +'<div class="login-legal">Durch die Anmeldung akzeptieren Sie Datenschutz und Impressum.</div>'
     +'</div>';
 }
 function doLogin(){var em=document.getElementById("loginEmail").value.trim().toLowerCase(),pw=document.getElementById("loginPw").value,u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":(u.role==="assistenz"||u.role==="assistenz_mgr")?"patienten":"home";S.showNotifPrompt=true;render()}else{document.getElementById("loginErr").style.display="block"}}
@@ -1695,7 +1694,7 @@ function renderHome(){
   /* Header — matches Verwaltung Übersicht: .header + .header-inner + shared burger menu */
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Hallo, '+S.user.name.split(" ")[0]+'!</h1><div class="sub">'+dateLong+'</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   /* Tab bar — Heute / Nächste Woche */
   h+='<div class="tab-bar">'
@@ -2184,7 +2183,7 @@ function renderSearch(){
   if(sf==="ze_aktiv")f=f.filter(function(p){return p.ze&&p.ze.st<10});
   else if(sf==="pa_aktiv")f=f.filter(function(p){return p.pa});
   else if(sf==="dringend")f=f.filter(function(p){return(p.ze&&(urg(p.ze.exp)==="expired"||urg(p.ze.exp)==="urgent"))||p.tx.indexOf("notfall")!==-1});
-  var h='<div class="header"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:14px;position:relative;z-index:1"><div style="font-size:17px;font-weight:700">Patienten-Suche</div>'+MENU_BTN_2+'</div><input class="search-input" type="text" placeholder="Name, Zimmer oder Heim\u2026" value="'+S.searchQ+'" oninput="setSearch(this.value)"></div>';
+  var h='<div class="header"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:14px;position:relative;z-index:1"><div style="font-size:17px;font-weight:700">Patienten-Suche</div>'+getMenuBtn2()+'</div><input class="search-input" type="text" placeholder="Name, Zimmer oder Heim\u2026" value="'+S.searchQ+'" oninput="setSearch(this.value)"></div>';
   /* Filter pills */
   h+='<div class="lab-filters">';
   [["alle","Alle"],["ze_aktiv","ZE aktiv"],["pa_aktiv","PA aktiv"],["dringend","Dringend"]].forEach(function(fp){
@@ -2211,7 +2210,7 @@ function renderSearch(){
 /* ===== MANAGER DASHBOARD ===== */
 function renderManager(){
   var tab=S.mgrTab||"\u00dcbersicht";var totalPat=PATIENTS.length;var zeC=PATIENTS.filter(function(p){return p.ze}).length;var paC=PATIENTS.filter(function(p){return p.pa}).length;var expC=PATIENTS.filter(function(p){return p.ze&&urg(p.ze.exp)==="expired"}).length;
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div>'+MENU_BTN_2+'</div></div>';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Management</h1><div class="sub">'+S.user.name+' \u2014 '+(S.user.role==="ceo"?"CEO":"Verwaltung")+'</div></div>'+getMenuBtn2()+'</div></div>';
   h+='<div class="tabs">';["\u00dcbersicht","Behandler","Heime","Planung","F\u00e4lle"].forEach(function(t){h+='<button class="tab'+(tab===t?" active":"")+'" onclick="setMgrTab(\''+t+'\')">'+t+'</button>'});
   h+='</div><div class="content">';
   if(tab==="\u00dcbersicht"){
@@ -2289,7 +2288,7 @@ function labCardHtml(it,showStage){
   h+='</div>';return h;
 }
 function renderLab(){
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Labor</h1><div class="sub">'+(S.user&&S.user.role==="laborant"?S.user.name:"Laborstatus \u2014 alle Arbeiten")+'</div></div><div style="display:flex;gap:8px;align-items:center"><button style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px 14px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);display:flex;align-items:center;gap:5px" onclick="labOpenCreate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Neu</button>'+MENU_BTN_2+'</div></div></div>';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Labor</h1><div class="sub">'+(S.user&&S.user.role==="laborant"?S.user.name:"Laborstatus \u2014 alle Arbeiten")+'</div></div><div style="display:flex;gap:8px;align-items:center"><button style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px 14px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);display:flex;align-items:center;gap:5px" onclick="labOpenCreate()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Neu</button>'+getMenuBtn2()+'</div></div></div>';
   h+='<div class="lab-summary">';LAB_STAGES.forEach(function(st,i){var c=LAB_ITEMS.filter(function(x){return x.stage===i}).length;h+='<div class="lab-summary-item"><div class="lab-summary-num" style="color:'+LAB_COLORS[i]+'">'+c+'</div><div class="lab-summary-lbl">'+st.split("/")[0]+'</div></div>'});h+='</div>';
   h+='<div class="lab-search-row"><input type="text" placeholder="Suche: Name, Typ, Techniker\u2026" value="'+(S.labSearch||"")+'" oninput="S.labSearch=this.value;render()"></div>';
   h+='<div class="lab-filters">';[["alle","Alle"],["offen","Offen"],["nichtFertig","Nicht fertig"],["letzterMonat","Letzter Monat"],["vollprothese","Prothesen"]].forEach(function(f){h+='<button class="lab-filter'+(S.labFilter===f[0]?" active":"")+'" onclick="S.labFilter=\''+f[0]+'\';render()">'+f[1]+'</button>'});h+='</div>';
@@ -2389,7 +2388,7 @@ function renderMessages(){
   var notifs=msgs.filter(function(m){return m.type==="urgent"||m.type==="nudge"});
   var shown=tab==="Alle"?msgs:tab==="Posteingang"?inbox:notifs;
   var userEmail=S.user?S.user.email:'';
-  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>E-Mail</h1><div class="sub">'+userEmail+'</div></div><div style="display:flex;gap:8px;align-items:center">'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+MENU_BTN_2+'</div></div></div>';
+  var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>E-Mail</h1><div class="sub">'+userEmail+'</div></div><div style="display:flex;gap:8px;align-items:center">'+(getUnreadCount()>0?'<button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);color:#fff;padding:6px 12px;border-radius:var(--r-sm);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px)" onclick="markAllRead()">Alle gelesen</button>':'')+getMenuBtn2()+'</div></div></div>';
   h+='<div class="msg-tabs"><button class="msg-tab'+(tab==="Alle"?" active":"")+'" onclick="setMsgTab(\'Alle\')">Alle ('+msgs.length+')</button><button class="msg-tab'+(tab==="Posteingang"?" active":"")+'" onclick="setMsgTab(\'Posteingang\')">Posteingang'+(inbox.filter(function(m){return!m.read}).length?'<span class="msg-badge-count">'+inbox.filter(function(m){return!m.read}).length+'</span>':'')+'</button><button class="msg-tab'+(tab==="System"?" active":"")+'" onclick="setMsgTab(\'System\')">System</button></div>';
   h+='<div class="msg-list">';
   if(shown.length===0)h+='<div class="msg-empty"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40" height="40"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><span class="text">Keine E-Mails</span></div>';
@@ -3487,6 +3486,7 @@ function weekRange(start){
 }
 
 
+function getMenuBtn2(){return '<button class="menu-btn" onclick="toggleMenu_2()">'+(S.showMenu_2?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="20" height="20"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>':'&#9776;')+'</button>';}
 var MENU_BTN_2='<button class="menu-btn" onclick="toggleMenu_2()">&#9776;</button>';
 
 /* === ADMIN DATA ARRAYS (from v3) === */
@@ -3630,7 +3630,7 @@ function renderHome_2(){
   /* Header */
   h+='<div class="header"><div class="header-inner">'
     +'<div><h1>Behandler-Aufgaben</h1><div class="sub">'+fmtLong(TODAY)+'</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
 
   /* Tabs */
@@ -4321,7 +4321,7 @@ function renderLab_2(){
   var h='<div class="header header-big"><div style="display:flex;justify-content:space-between;align-items:start;position:relative;z-index:1"><div><h1>Labor</h1><div class="sub">Laborstatus \u2014 alle Arbeiten</div></div>'
     +'<div style="display:flex;gap:8px;align-items:center">'
     +'<button style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px 14px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;backdrop-filter:blur(8px);display:flex;align-items:center;gap:5px" onclick="labOpenCreate_2()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Neu</button>'
-    +MENU_BTN_2+'</div></div></div>';
+    +getMenuBtn2()+'</div></div></div>';
   h+='<div class="lab-summary">';
   LAB_STAGES.forEach(function(st,i){var c=LAB_ITEMS.filter(function(x){return x.stage===i}).length;h+='<div class="lab-summary-item"><div class="lab-summary-num" style="color:'+LAB_COLORS[i]+'">'+c+'</div><div class="lab-summary-lbl">'+st.split("/")[0]+'</div></div>';});
   h+='</div>';
@@ -4463,7 +4463,7 @@ function roleLabel(r){return r==='behandler'?'Behandler':r==='verwaltung'?'Verwa
 function renderBehandler_2(){
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Behandler</h1><div class="sub">'+BEHANDLER.length+' aktive Behandler</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content">';
   BEHANDLER.forEach(function(b){
@@ -4875,7 +4875,7 @@ function renderEinverstaendnis(){
   var nProg=EINVERSTAENDNIS.filter(function(p){return p.zustimmung==='abrechnen';}).length;
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Einverst\u00e4ndnis</h1><div class="sub">Zustimmung Pat. / Betreuer</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   /* search bar */
   h+='<div class="archiv-search-bar">'
@@ -5216,7 +5216,7 @@ function renderArchiv(){
   var MONTH_NAMES=['Jan','Feb','Mrz','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Archive</h1><div class="sub">Abgerechnete Patienten</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="archiv-search-bar">'
     +'<input class="archiv-search-input" type="search" placeholder="Suche in Archive\u2026" value="'+q.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'" oninput="S.archivSearch_2=this.value;render()">'
@@ -5295,7 +5295,7 @@ function renderTexteditor(){
   function lbl(t){return '<div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px">'+t+'</div>';}
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Texteditor</h1><div class="sub">Einverst\u00e4ndnisschreiben</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:16px;overflow-y:auto">';
   h+='<div style="font-size:11px;color:var(--text-3);background:var(--blue-50);border-radius:var(--r-md);padding:10px 12px;margin-bottom:14px;line-height:1.5">'
@@ -5333,7 +5333,7 @@ function renderTexteditor(){
 function renderAbrechnung(){
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Abrechnung</h1><div class="sub">Preisliste &amp; Dokumente</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:16px;display:flex;flex-direction:column;gap:12px">';
   function card(page,icon,title,sub){
@@ -5365,7 +5365,7 @@ function renderZEPreisliste(){
   var cols=[{pct:'60\u00a0%',col:'var(--crimson)',bg:'#fff5f5'},{pct:'70\u00a0%',col:'var(--amber)',bg:'var(--amber-bg)'},{pct:'75\u00a0%',col:'var(--blue)',bg:'var(--blue-50)'},{pct:'HF',col:'var(--emerald)',bg:'var(--emerald-bg)'}];
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>ZE Preisliste</h1><div class="sub">Eigenanteil Patient nach KK-Zuschuss</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:16px">';
   /* column legend */
@@ -5422,7 +5422,7 @@ function renderPatientenPage(){
   var filtered=pq?allPats.filter(function(p){return p.name.toLowerCase().indexOf(pq)!==-1||p.room.toLowerCase().indexOf(pq)!==-1||heimName(p.heim).toLowerCase().indexOf(pq)!==-1}):allPats;
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Patienten</h1><div class="sub">'+PATIENTS.length+' Patienten in '+HEIME.length+' Einrichtungen</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:16px">';
   /* Search bar */
@@ -5515,7 +5515,7 @@ function toggleAufgabe(task,date,staff){
 function renderAufgaben(){
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Aufgaben</h1><div class="sub">Tägliche &amp; wöchentliche Checkliste</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:12px">';
   var todayKey=new Date().toISOString().split('T')[0];
@@ -5617,7 +5617,7 @@ function renderAssistenzPlanung(){
   var canEdit=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Assistenz Planung</h1><div class="sub">Monatsplaner</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:12px">';
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
@@ -5778,7 +5778,7 @@ function asstEditEntry(dateKey,idx){
 function renderAssistenzHinzufuegen(){
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Assistenz hinzufügen</h1><div class="sub">'+ASST_STAFF.length+' Assistenzen</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content">';
   ASST_STAFF.forEach(function(name,i){
@@ -5843,7 +5843,7 @@ function renderGrossvisiten(){
   var usrIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>';
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Großvisiten</h1><div class="sub">Planung &amp; Dokumentation</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   /* Tabs: Geplant | Vorherige */
   var gvTab=S.gvTab||'geplant';
@@ -6106,7 +6106,7 @@ function renderPflegeheime(){
   var sorted=PFLEGEHEIME.map(function(ph,i){return{ph:ph,i:i};}).sort(function(a,b){return a.ph.name.localeCompare(b.ph.name,'de');});
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Pflegeheime</h1><div class="sub">'+PFLEGEHEIME.length+' Einrichtungen</div></div>'
-    +MENU_BTN_2
+    +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="overflow-y:auto">';
   sorted.forEach(function(obj){
@@ -6192,30 +6192,33 @@ function renderMenu_2(){
   var role=S.user?S.user.role:'';
   var isAssistenz=role==='assistenz';
   var isAssistenzMgr=role==='assistenz_mgr';
-  var verwBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>';
-  var patBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'patienten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Patienten</button>';
-  var wochBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>';
-  var gvBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'grossvisiten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> Großvisiten</button>';
-  var asstPlanBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>';
-  var aufgabenBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>';
-  var logoutBtn='<button class="menu-item menu-divider" onclick="closeMenu_2();doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Abmelden</button>';
+  var ic='var(--emerald)';
+  var verwBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>';
+  var patBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'patienten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Patienten</button>';
+  var wochBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>';
+  var gvBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'grossvisiten\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg> Großvisiten</button>';
+  var asstPlanBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>';
+  var aufgabenBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>';
+  var logoutBtn='<button class="menu-item menu-divider" onclick="closeMenu_2();doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Abmelden</button>';
+  var asstSep='<div style="border-top:1px solid var(--border);margin:8px 16px;"></div><div style="font-size:9px;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:1.5px;padding:6px 16px">Assistenz Tools</div>';
   if(isAssistenz){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+aufgabenBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstSep+asstPlanBtn+aufgabenBtn+logoutBtn+'</div>';
   }
-  var asstHinzuBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>';
+  var asstHinzuBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>';
   if(isAssistenzMgr){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstPlanBtn+aufgabenBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+patBtn+wochBtn+gvBtn+asstSep+asstPlanBtn+aufgabenBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
   }
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
       +patBtn
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'home\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>'
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'manager\';S.mgrTab=\'Übersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Management</button>'
-      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
-      +'<button class="menu-item" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz</button>'
-      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>'
-      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>'
-      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>'
+      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'home\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg> Wochenplan</button>'
+      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=false;S.screen=\'manager\';S.mgrTab=\'Übersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Management</button>'
+      +'<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'uebersicht\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Verwaltung</button>'
+      +asstSep
+      +'<button class="menu-item" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz</button>'
+      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzplanung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Assistenz Planung</button>'
+      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'aufgaben\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Aufgaben</button>'
+      +'<button class="menu-item" style="padding-left:32px;font-size:12px" onclick="closeMenu_2();S._assistenzView=true;S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>'
       +gvBtn+logoutBtn
     +'</div>';
 }
