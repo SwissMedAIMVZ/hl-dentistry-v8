@@ -5493,12 +5493,12 @@ function renderMeineAufgabenAsst(){
   });
   /* Also check Assistenz Planung entries for today */
   var mySchedule=[];
-  Object.keys(ASST_SCHEDULE).forEach(function(dateKey){
+  if(typeof ASST_SCHEDULE!=='undefined'){Object.keys(ASST_SCHEDULE).forEach(function(dateKey){
     var entries=ASST_SCHEDULE[dateKey];
     entries.forEach(function(e){
       if(e.n===myName)mySchedule.push({date:dateKey,t:e.t,bh:e.bh||''});
     });
-  });
+  });}
   var todaySchedule=mySchedule.filter(function(s){return s.date===todayKey});
   if(maTab==='heute'){
   /* Today's schedule */
@@ -5638,7 +5638,7 @@ function renderMeineAufgabenAsst(){
         }
       });
       var personSched=[];
-      Object.keys(ASST_SCHEDULE).forEach(function(dk){
+      if(typeof ASST_SCHEDULE!=='undefined')Object.keys(ASST_SCHEDULE).forEach(function(dk){
         ASST_SCHEDULE[dk].forEach(function(e){
           if(e.n===staffName)personSched.push({date:dk,t:e.t,bh:e.bh||''});
         });
@@ -5753,22 +5753,6 @@ var AUFGABEN_TASKS=[
   ]}
 ];
 if(!S.aufgabenAssign)S.aufgabenAssign={};
-/* Seed demo assignments for Test Assistenz */
-(function(){
-  var today=new Date().toISOString().split('T')[0];
-  var tmrw=new Date(Date.now()+86400000).toISOString().split('T')[0];
-  S.aufgabenAssign['Scanner-Batterien aufladen|'+today]='Test Assistenz';
-  S.aufgabenAssign['Kompressor einschalten|'+today]='Test Assistenz';
-  S.aufgabenAssign['Geschirr spülen|'+today]='Test Assistenz';
-  S.aufgabenAssign['Müll rausbringen|'+tmrw]='Test Assistenz';
-  S.aufgabenAssign['Staubsaugen|'+tmrw]='Test Assistenz';
-  /* Add Test Assistenz to today's schedule */
-  if(!ASST_SCHEDULE[today])ASST_SCHEDULE[today]=[];
-  ASST_SCHEDULE[today].push({n:'Test Assistenz',t:'P',bh:'hFeld'});
-  var next=new Date(Date.now()+2*86400000).toISOString().split('T')[0];
-  if(!ASST_SCHEDULE[next])ASST_SCHEDULE[next]=[];
-  ASST_SCHEDULE[next].push({n:'Test Assistenz',t:'H'});
-})();
 function aufgabenKey(task,date){return task+'|'+date}
 function toggleAufgabe(task,date,staff){
   var k=aufgabenKey(task,date);
@@ -5862,6 +5846,22 @@ var ASST_SCHEDULE={};
     var pi=dow-1;
     ASST_SCHEDULE['2026-06-'+String(d).padStart(2,'0')]=patterns[pi].slice();
   }
+})();
+/* Seed demo assignments for Test Assistenz */
+(function(){
+  var today=new Date().toISOString().split('T')[0];
+  var tmrw=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  if(!S.aufgabenAssign)S.aufgabenAssign={};
+  S.aufgabenAssign['Scanner-Batterien aufladen|'+today]='Test Assistenz';
+  S.aufgabenAssign['Kompressor einschalten|'+today]='Test Assistenz';
+  S.aufgabenAssign['Geschirr spülen|'+today]='Test Assistenz';
+  S.aufgabenAssign['Müll rausbringen|'+tmrw]='Test Assistenz';
+  S.aufgabenAssign['Staubsaugen|'+tmrw]='Test Assistenz';
+  if(!ASST_SCHEDULE[today])ASST_SCHEDULE[today]=[];
+  ASST_SCHEDULE[today].push({n:'Test Assistenz',t:'P',bh:'hFeld'});
+  var next=new Date(Date.now()+2*86400000).toISOString().split('T')[0];
+  if(!ASST_SCHEDULE[next])ASST_SCHEDULE[next]=[];
+  ASST_SCHEDULE[next].push({n:'Test Assistenz',t:'H'});
 })();
 function asstMonthDays(year,month){
   var first=new Date(year,month,1);
