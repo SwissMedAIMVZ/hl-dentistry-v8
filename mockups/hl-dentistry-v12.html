@@ -933,7 +933,7 @@ var USERS=[
   {email:"verwaltung@swissmedai.com",pw:"demo",name:"Verwaltung",role:"verwaltung"},
   {email:"labor@swissmedai.com",pw:"demo",name:"Labor Techniker",role:"laborant"},
   {email:"c.weigert@mvz-arzt.de",pw:"admin",name:"C. Weigert",role:"verwaltung"},
-  {email:"assistenz@swissmedai.com",pw:"demo",name:"A. Schulze",role:"assistenz"},
+  {email:"assistenz@swissmedai.com",pw:"demo",name:"Test Assistenz",role:"assistenz"},
   {email:"assistenz.mgr@swissmedai.com",pw:"demo",name:"B. Richter",role:"assistenz_mgr"}
 ];
 var LAB_STAGES=["Abdruck","Druck/Guss","Politur/Montage","Abholbereit"];
@@ -5662,6 +5662,22 @@ var AUFGABEN_TASKS=[
   ]}
 ];
 if(!S.aufgabenAssign)S.aufgabenAssign={};
+/* Seed demo assignments for Test Assistenz */
+(function(){
+  var today=new Date().toISOString().split('T')[0];
+  var tmrw=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  S.aufgabenAssign['Scanner-Batterien aufladen|'+today]='Test Assistenz';
+  S.aufgabenAssign['Kompressor einschalten|'+today]='Test Assistenz';
+  S.aufgabenAssign['Geschirr spülen|'+today]='Test Assistenz';
+  S.aufgabenAssign['Müll rausbringen|'+tmrw]='Test Assistenz';
+  S.aufgabenAssign['Staubsaugen|'+tmrw]='Test Assistenz';
+  /* Add Test Assistenz to today's schedule */
+  if(!ASST_SCHEDULE[today])ASST_SCHEDULE[today]=[];
+  ASST_SCHEDULE[today].push({n:'Test Assistenz',t:'P',bh:'hFeld'});
+  var next=new Date(Date.now()+2*86400000).toISOString().split('T')[0];
+  if(!ASST_SCHEDULE[next])ASST_SCHEDULE[next]=[];
+  ASST_SCHEDULE[next].push({n:'Test Assistenz',t:'H'});
+})();
 function aufgabenKey(task,date){return task+'|'+date}
 function toggleAufgabe(task,date,staff){
   var k=aufgabenKey(task,date);
@@ -5736,7 +5752,7 @@ function saveAufgabenAssign(){
 }
 
 /* ===== ASSISTENZ PLANUNG ===== */
-var ASST_STAFF=['Huda','Luana','Ola','Besja'];
+var ASST_STAFF=['Huda','Luana','Ola','Besja','Test Assistenz'];
 var ASST_TYPES={P:{label:'Praxis',color:'var(--navy)'},H:{label:'Heim',color:'var(--emerald)'},'(N)P':{label:'Nachmittag Praxis',color:'var(--violet)'}};
 var ASST_SCHEDULE={};
 (function(){
