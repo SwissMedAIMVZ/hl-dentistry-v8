@@ -117,6 +117,18 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Meine Aufgaben: 3 tabs (Heute / Nächste Woche / Erledigt) + "Erledigt" button
+
+**Tabs added:** `S.meineAufgTab` (heute | woche | erledigt)
+
+**Heute tab:** existing today content (schedule + tasks). Tasks now show an **"Erledigt" button** (green) instead of static checkmarks. Clicking marks `S.meineAufgErledigt[task|date] = {by, time}` and removes the task from the open list.
+
+**Nächste Woche tab:** shows the next 7 days. Each day with tasks/schedule gets a day header (weekday + date) followed by schedule entries (location badges) and task rows (empty checkboxes). Days with no entries are skipped.
+
+**Erledigt tab:** lists all completed tasks from `S.meineAufgErledigt`, sorted newest first. Each row: green checkmark, strikethrough task name, date + completion time.
+
+---
+
 ### 2026-04-26 — Meine Aufgaben: "Team" accordion section for Assistenz Manager
 
 **Why:** The Assistenz Manager needs to see not just their own tasks but also what each team member has assigned — for oversight and load balancing.

@@ -5475,8 +5475,14 @@ function renderMeineAufgabenAsst(){
     +'<div><h1>Meine Aufgaben</h1><div class="sub">'+myName+'</div></div>'
     +getMenuBtn2()
   +'</div></div>';
+  var maTab=S.meineAufgTab||'heute';
+  h+='<div class="tabs">'
+    +'<button class="tab'+(maTab==='heute'?' active':'')+'" onclick="S.meineAufgTab=\'heute\';render()">Heute</button>'
+    +'<button class="tab'+(maTab==='woche'?' active':'')+'" onclick="S.meineAufgTab=\'woche\';render()">Nächste Woche</button>'
+    +'<button class="tab'+(maTab==='erledigt'?' active':'')+'" onclick="S.meineAufgTab=\'erledigt\';render()">Erledigt</button>'
+  +'</div>';
   h+='<div class="content" style="padding:12px">';
-  /* Today's assigned tasks from Aufgaben checklist */
+  /* Gather all data for both tabs */
   var myTasks=[];
   Object.keys(S.aufgabenAssign||{}).forEach(function(k){
     if(S.aufgabenAssign[k]===myName){
@@ -5494,6 +5500,7 @@ function renderMeineAufgabenAsst(){
     });
   });
   var todaySchedule=mySchedule.filter(function(s){return s.date===todayKey});
+  if(maTab==='heute'){
   /* Today's schedule */
   if(todaySchedule.length>0){
     h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Heute — Einsatz</div>';
@@ -5510,18 +5517,21 @@ function renderMeineAufgabenAsst(){
       +'</div>';
     });
   }
-  /* Today's tasks */
-  var todayTasks=myTasks.filter(function(t){return t.date===todayKey});
-  var otherTasks=myTasks.filter(function(t){return t.date!==todayKey});
+  /* Today's tasks — filter out erledigt */
+  if(!S.meineAufgErledigt)S.meineAufgErledigt={};
+  var todayTasks=myTasks.filter(function(t){return t.date===todayKey&&!S.meineAufgErledigt[t.task+'|'+t.date]});
+  var otherTasks=myTasks.filter(function(t){return t.date!==todayKey&&!S.meineAufgErledigt[t.task+'|'+t.date]});
   if(todayTasks.length>0||todaySchedule.length===0){
     h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)">Heute — Aufgaben</div>';
     if(todayTasks.length===0){
-      h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:20px">Keine Aufgaben für heute zugewiesen</div>';
+      h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:20px">Keine offenen Aufgaben für heute</div>';
     } else {
       todayTasks.forEach(function(t){
+        var ek=t.task+'|'+t.date;
         h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--surface-2)">'
-          +'<div style="width:20px;height:20px;border:1.5px solid var(--emerald);border-radius:4px;display:flex;align-items:center;justify-content:center;background:var(--emerald);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg></div>'
-          +'<div style="font-size:11px;font-weight:600;color:var(--text)">'+t.task+'</div>'
+          +'<div style="width:16px;height:16px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0"></div>'
+          +'<div style="flex:1;font-size:11px;font-weight:600;color:var(--text)">'+t.task+'</div>'
+          +'<button style="padding:4px 10px;background:var(--emerald-bg);color:var(--emerald);border:1px solid rgba(20,194,149,0.3);border-radius:var(--r-sm);font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="S.meineAufgErledigt[\''+ek.replace(/'/g,"\\'")+'\']={by:S.user.name,time:Date.now()};render()">Erledigt</button>'
         +'</div>';
       });
     }
@@ -5552,6 +5562,66 @@ function renderMeineAufgabenAsst(){
       +'</div>';
     });
   }
+  } /* end heute tab */
+  if(maTab==='woche'){
+    /* Next 7 days — schedule + tasks */
+    var DAYNAMES=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    var MONTHS_SHORT=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    for(var di=1;di<=7;di++){
+      var dayDate=new Date(Date.now()+di*86400000);
+      var dayKey=dayDate.getFullYear()+'-'+String(dayDate.getMonth()+1).padStart(2,'0')+'-'+String(dayDate.getDate()).padStart(2,'0');
+      var dayTasks=myTasks.filter(function(t){return t.date===dayKey});
+      var daySched=mySchedule.filter(function(s){return s.date===dayKey});
+      if(dayTasks.length===0&&daySched.length===0)continue;
+      var dayLabel=DAYNAMES[dayDate.getDay()]+', '+dayDate.getDate()+'. '+MONTHS_SHORT[dayDate.getMonth()];
+      h+='<div style="font-size:11px;font-weight:700;color:var(--navy);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">'+dayLabel+'</div>';
+      daySched.forEach(function(s){
+        var tc=s.t==='P'?'var(--navy)':s.t==='H'?'var(--emerald)':'var(--violet)';
+        var tl=s.t==='P'?'Praxis':s.t==='H'?'Heim':'Labor';
+        h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--surface-2)">'
+          +'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);color:'+tc+';background:'+(s.t==='P'?'var(--blue-50)':s.t==='H'?'var(--emerald-bg)':'var(--violet-bg)')+'">'+tl+'</span>'
+          +(s.bh?'<span style="font-size:10px;color:var(--text-3)">'+bhdlName(s.bh)+'</span>':'')
+        +'</div>';
+      });
+      dayTasks.forEach(function(t){
+        h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--surface-2)">'
+          +'<div style="width:16px;height:16px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0"></div>'
+          +'<div style="font-size:11px;font-weight:600;color:var(--text)">'+t.task+'</div>'
+        +'</div>';
+      });
+    }
+    var hasAny=false;
+    for(var di2=1;di2<=7;di2++){
+      var dd=new Date(Date.now()+di2*86400000);
+      var dk=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+      if(myTasks.some(function(t){return t.date===dk})||mySchedule.some(function(s){return s.date===dk}))hasAny=true;
+    }
+    if(!hasAny)h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Keine Aufgaben für die nächste Woche</div>';
+  } /* end woche tab */
+  if(maTab==='erledigt'){
+    var erledigteItems=[];
+    Object.keys(S.meineAufgErledigt||{}).forEach(function(k){
+      var parts=k.split('|');
+      var info=S.meineAufgErledigt[k];
+      erledigteItems.push({task:parts[0],date:parts[1]||'',by:info.by||'',time:info.time||0});
+    });
+    erledigteItems.sort(function(a,b){return b.time-a.time});
+    if(erledigteItems.length===0){
+      h+='<div style="text-align:center;color:var(--text-4);font-size:12px;padding:24px">Noch keine erledigten Aufgaben</div>';
+    } else {
+      erledigteItems.forEach(function(e){
+        var dp=e.date.split('-');var dateLabel=dp.length===3?dp[2]+'.'+dp[1]+'.':'';
+        var timeStr=e.time?new Date(e.time).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'';
+        h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--surface-2)">'
+          +'<div style="width:16px;height:16px;border:1.5px solid var(--emerald);border-radius:3px;display:flex;align-items:center;justify-content:center;background:var(--emerald);flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg></div>'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-size:11px;font-weight:600;color:var(--text-3);text-decoration:line-through">'+e.task+'</div>'
+            +'<div style="font-size:9px;color:var(--text-4);margin-top:1px">'+dateLabel+(timeStr?' · '+timeStr:'')+'</div>'
+          +'</div>'
+        +'</div>';
+      });
+    }
+  } /* end erledigt tab */
   /* Team section — Assistenz Manager / Verwaltung / CEO only */
   var canSeeTeam=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
   if(canSeeTeam){
