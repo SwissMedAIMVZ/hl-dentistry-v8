@@ -94,6 +94,25 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Assistenz Planung: edit existing calendar entries
+
+**Why:** Assistenz Manager needs to modify already-assigned entries (change staff, location, or Behandler) without deleting and re-adding.
+
+**Edit button (pencil icon):** added to each entry row in the day detail panel, next to the existing × delete button. Navy color, appears only for `canEdit` roles (assistenz_mgr, verwaltung, ceo).
+
+**`asstEditEntry(dateKey, idx)`:** opens the add/edit modal (`S.asstAddModal`) pre-filled with the existing entry's data (name, date, wo, bh). Sets `S._asstEditIdx = {dateKey, idx}` to track which entry is being edited.
+
+**Modal adapts to edit mode:**
+- Title: "Eintrag bearbeiten" (vs "Füge Assistenz hinzu" for new)
+- Button: "Speichern" (vs "Hinzufügen" for new)
+- Fields pre-filled with existing values
+
+**`saveAsstAdd()` updated:** detects `S._asstEditIdx` and either updates in-place (if date unchanged) or moves the entry (removes from old date, pushes to new date). Clears `_asstEditIdx` after save. Toast: "aktualisiert" vs "hinzugefügt".
+
+**`openAsstAdd()` updated:** clears `S._asstEditIdx = null` so fresh adds don't accidentally edit.
+
+---
+
 ### 2026-04-26 — New page: "Aufgaben" — daily/weekly task checklist
 
 **Why:** The practice has a physical wall checklist (photo reference) with daily tasks, weekly tasks (Monday/Friday), and cleaning duties. Digitizing it lets assistants mark tasks done and managers assign them.

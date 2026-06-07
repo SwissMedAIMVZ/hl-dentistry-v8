@@ -5668,7 +5668,8 @@ function renderAssistenzPlanung(){
             +(e.bh?'<div style="font-size:10px;color:var(--text-3);margin-top:1px">→ '+bhdlName(e.bh)+'</div>':'')
           +'</div>'
           +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);color:'+tc+';background:'+(e.t==='P'?'var(--blue-50)':e.t==='H'?'var(--emerald-bg)':'var(--violet-bg)')+'">'+tl+'</span>'
-          +(canEdit?'<button style="border:none;background:none;cursor:pointer;color:var(--crimson);padding:4px" onclick="event.stopPropagation();asstRemoveEntry(\''+S.asstSelDay+'\','+ei+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>':'')
+          +(canEdit?'<button style="border:none;background:none;cursor:pointer;color:var(--navy);padding:4px" onclick="event.stopPropagation();asstEditEntry(\''+S.asstSelDay+'\','+ei+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>'
+            +'<button style="border:none;background:none;cursor:pointer;color:var(--crimson);padding:4px" onclick="event.stopPropagation();asstRemoveEntry(\''+S.asstSelDay+'\','+ei+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>':'')
         +'</div>';
       });
     }
@@ -5688,7 +5689,7 @@ function renderAssistenzPlanung(){
     h+='<div class="overlay-bg" onclick="S.asstAddModal=false;render()">'
       +'<div class="overlay-sheet" onclick="event.stopPropagation()">'
         +'<div class="overlay-header">'
-          +'<div class="overlay-title">Füge Assistenz hinzu</div>'
+          +'<div class="overlay-title">'+(S._asstEditIdx?'Eintrag bearbeiten':'Füge Assistenz hinzu')+'</div>'
           +'<button class="overlay-close" onclick="S.asstAddModal=false;render()">×</button>'
         +'</div>'
         +'<label class="form-label" style="margin-top:0">Assistenz</label>'
@@ -5710,7 +5711,7 @@ function renderAssistenzPlanung(){
         +'<option value="">— kein Behandler —</option>';
     BEHANDLER.forEach(function(b){h+='<option value="'+b.id+'"'+(af.bh===b.id?' selected':'')+'>'+b.name+'</option>'});
     h+='</select>'
-      +'<button class="save-btn" onclick="saveAsstAdd()">Hinzufügen</button>'
+      +'<button class="save-btn" onclick="saveAsstAdd()">'+(S._asstEditIdx?'Speichern':'Hinzufügen')+'</button>'
     +'</div></div>';
   }
   h+=renderAdminBottomNav_2('assistenzplanung');
@@ -5718,6 +5719,7 @@ function renderAssistenzPlanung(){
 }
 function openAsstAdd(){
   S.asstAddModal=true;
+  S._asstEditIdx=null;
   S.asstAddForm={name:'',date:S.asstSelDay||'',wo:'',bh:''};
   render();
 }
@@ -5732,18 +5734,43 @@ function saveAsstAdd(){
   var wo=w?w.value:(f.wo||'');
   var bh=b?b.value:(f.bh||'');
   if(!name||!date||!wo){alert('Bitte Assistenz, Datum und Ort ausfüllen');return}
-  if(!ASST_SCHEDULE[date])ASST_SCHEDULE[date]=[];
   var entry={n:name,t:wo};
   if(bh)entry.bh=bh;
-  ASST_SCHEDULE[date].push(entry);
-  S.asstAddModal=false;
-  S.asstSelDay=date;
-  showToast(name+' hinzugefügt — '+date,'var(--emerald)');
+  if(S._asstEditIdx){
+    var ek=S._asstEditIdx.dateKey,ei2=S._asstEditIdx.idx;
+    if(ek===date&&ASST_SCHEDULE[ek]){
+      ASST_SCHEDULE[ek][ei2]=entry;
+    } else {
+      if(ASST_SCHEDULE[ek])ASST_SCHEDULE[ek].splice(ei2,1);
+      if(ASST_SCHEDULE[ek]&&ASST_SCHEDULE[ek].length===0)delete ASST_SCHEDULE[ek];
+      if(!ASST_SCHEDULE[date])ASST_SCHEDULE[date]=[];
+      ASST_SCHEDULE[date].push(entry);
+    }
+    S._asstEditIdx=null;
+    S.asstAddModal=false;
+    S.asstSelDay=date;
+    showToast(name+' aktualisiert','var(--emerald)');
+  } else {
+    if(!ASST_SCHEDULE[date])ASST_SCHEDULE[date]=[];
+    ASST_SCHEDULE[date].push(entry);
+    S.asstAddModal=false;
+    S.asstSelDay=date;
+    showToast(name+' hinzugefügt — '+date,'var(--emerald)');
+  }
 }
 function asstRemoveEntry(dateKey,idx){
   if(!ASST_SCHEDULE[dateKey])return;
   ASST_SCHEDULE[dateKey].splice(idx,1);
   if(ASST_SCHEDULE[dateKey].length===0)delete ASST_SCHEDULE[dateKey];
+  render();
+}
+function asstEditEntry(dateKey,idx){
+  var entries=ASST_SCHEDULE[dateKey];
+  if(!entries||!entries[idx])return;
+  var e=entries[idx];
+  S.asstAddModal=true;
+  S.asstAddForm={name:e.n,date:dateKey,wo:e.t,bh:e.bh||''};
+  S._asstEditIdx={dateKey:dateKey,idx:idx};
   render();
 }
 
