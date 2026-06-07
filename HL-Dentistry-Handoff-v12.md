@@ -94,6 +94,34 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Assistenz Planung: editable calendar + "Füge Assistenz hinzu" popup
+
+**Why:** The Assistenz Manager needs to manage the monthly schedule — add, view, and remove staff assignments. The popup form lets them assign an assistant to a date, location (Heim/Praxis/Labor), and optionally a Behandler.
+
+**Edit permissions:** `canEdit` is true for `assistenz_mgr`, `verwaltung`, and `ceo` roles. Plain `assistenz` role is read-only.
+
+**FAB button (+):** bottom-right corner, only shown when `canEdit`. Opens `openAsstAdd()`.
+
+**"Füge Assistenz hinzu" popup (`S.asstAddModal`):**
+- **Assistenz** — dropdown from `ASST_STAFF` array (Huda, Luana, Ola, Besja)
+- **Datum** — date input, pre-filled with `S.asstSelDay` if a day is selected
+- **Wo** — dropdown: Heim (H), Praxis (P), Labor (L)
+- **Behandler** (optional) — dropdown from `BEHANDLER` array (same data source as Verwaltung > Behandler). Dynamically reads from the live array so if a Behandler is added/removed via the admin, the dropdown updates automatically.
+- **"Hinzufügen"** button → `saveAsstAdd()` pushes `{n, t, bh?}` to `ASST_SCHEDULE[date]`, closes modal, selects the day, shows toast.
+
+**Day detail panel — edit features (when `canEdit`):**
+- Each entry row shows a **× delete button** (crimson) → `asstRemoveEntry(dateKey, idx)` splices it from the array.
+- Entries with a Behandler show "→ Dr. Feld" subline (via `bhdlName(e.bh)`).
+
+**Legend updated:** "(N) = Nachmittag" → "L = Labor" to match the new location options.
+
+**New functions:**
+- `openAsstAdd()` — opens modal, pre-fills date from selected day
+- `saveAsstAdd()` — validates, pushes to `ASST_SCHEDULE`, closes, toasts
+- `asstRemoveEntry(dateKey, idx)` — removes entry, cleans up empty days
+
+---
+
 ### 2026-04-26 — Assistenz Planung: monthly calendar planner
 
 **Why:** The Assistenz team needs a visual monthly overview showing who works where on which day — matching the physical wall calendar they currently use (photo reference: Juni 2026 with staff names + P/H codes per day).
