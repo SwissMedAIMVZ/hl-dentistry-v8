@@ -5902,7 +5902,7 @@ function renderAssistenzPlanung(){
     var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
     var isToday=key===todayKey;
     var entries=ASST_SCHEDULE[key]||[];
-    h+='<div class="asst-cal-cell'+(isWe?' we':'')+(isToday?' today':'')+'" onclick="S.asstSelDay=\''+key+'\';render()">';
+    h+='<div class="asst-cal-cell'+(isWe?' we':'')+(isToday?' today':'')+'" onclick="'+(canEdit?'S.asstSelDay=\''+key+'\';openAsstAdd()':'S.asstSelDay=\''+key+'\';render()')+'">';
     h+='<div class="asst-cal-day'+(isToday?' today-num':'')+'">'+day+'</div>';
     entries.forEach(function(e){
       var tc=e.t==='P'?'var(--navy)':e.t==='H'?'var(--emerald)':'var(--violet)';

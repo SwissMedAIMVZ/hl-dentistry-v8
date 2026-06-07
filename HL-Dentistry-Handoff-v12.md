@@ -129,6 +129,14 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Assistenz Planung: click calendar cell to add entry directly
+
+**Why:** Clicking a day cell to just view details, then clicking the FAB "+" to add, was two steps too many. For editors (Assistenz Manager / Verwaltung / CEO), clicking a day cell now opens the "Füge Assistenz hinzu" modal directly with that date pre-filled.
+
+**Change:** Calendar cell `onclick` is now role-aware. For `canEdit` roles: `S.asstSelDay=key; openAsstAdd()`. For read-only Assistenz: `S.asstSelDay=key; render()` (existing detail-view behavior).
+
+---
+
 ### 2026-04-26 — Team section: show done/open task status per team member
 
 **Why:** The Manager needs to see at a glance which tasks each team member has completed vs. what's still open.
