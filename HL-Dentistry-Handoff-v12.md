@@ -94,6 +94,22 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Design specs document added (Ledger v2 visual language)
+
+**File:** `docs/hl-design-specs.md`
+
+**Why:** Codifies the design language into a single reference document for developers and designers. Covers core tokens (backgrounds, blues, semantic colors, text, borders, radius, shadows, typography), screen-level design principles for Patient, Wochenplanung, Verwaltung, and Assistenz/KI screens, and explicit do/don't guidance for assistant UI.
+
+**Key rules:**
+- Violet is KI-only — never for clinical data.
+- Shadows are minimal — prefer borders first.
+- Patient screens = fast clinical lookup, not dashboards.
+- Wochenplanung = tactile field-work, big date headers, split layout on desktop.
+- Verwaltung = dense admin cockpit, max 1400px width, grouped sections.
+- Assistant output must show provenance labels and require explicit confirmation.
+
+---
+
 ### 2026-04-26 — New page: "Assistenz hinzufügen" — manage assistant staff
 
 **Why:** The Assistenz Manager / Admin / Verwaltung needs to onboard new assistants with email, password, and name — same pattern as Verwaltung > Behandler.
