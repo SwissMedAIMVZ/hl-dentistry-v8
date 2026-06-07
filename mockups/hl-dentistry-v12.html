@@ -3648,7 +3648,8 @@ function renderHome_2(){
 
   /* Übersicht tab */
   if(tab==='uebersicht'){
-    h+=renderMeineAufgaben();
+    var isAsstWoch=S.user&&(S.user.role==='assistenz'||S.user.role==='assistenz_mgr');
+    if(!isAsstWoch)h+=renderMeineAufgaben();
     var curMeinTab=S.meinTab_2||'offen';
     if(curMeinTab==='offen'){
       h+='<div class="sec-label">Behandler Aufgaben</div>';

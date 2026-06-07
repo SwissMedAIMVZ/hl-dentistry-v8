@@ -129,6 +129,14 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 
 ---
 
+### 2026-04-26 — Wochenplan: hide "Meine Aufgaben" for Assistenz / Assistenz Manager
+
+**Why:** Assistenz roles have their own dedicated "Meine Aufgaben" page. Showing the Verwaltung "Meine Aufgaben" section (with Offen/Weiterführend/ZE/PA/Ex tabs) in the Wochenplan is confusing for them — they only need to see "Behandler Aufgaben".
+
+**Change:** In `renderHome_2()` > Übersicht tab, the `renderMeineAufgaben()` call is now gated by `isAsstWoch` — skipped for `assistenz` and `assistenz_mgr` roles. All other roles (verwaltung, ceo) still see it.
+
+---
+
 ### 2026-04-26 — Aufgaben: "Mir zuteilen" button for Assistenz role
 
 **Why:** Assistenz users shouldn't assign tasks to others — they should claim tasks for themselves. "Zuweisen" (with staff dropdown) is for managers; "Mir zuteilen" (with just a date picker) is for assistants.
