@@ -6191,67 +6191,69 @@ function bestellungToggle(idx){
   render();
 }
 
+/* ===== INSTRUMENTE DATA ===== */
+var INSTRUMENTE_BEHANDLUNGEN=[
+  {behandlung:'Ex',  items:['Ultracain','Spritze','Nadeln','Hebel','Wattetupfer','Zange']},
+  {behandlung:'Teng',items:['Scanner','Scanneraufsätze','Scanner Rucksack','Optosil','Testprothese']},
+  {behandlung:'PA',  items:['PA-Spitzen','Ultraschallgerät','Nierenschale','Küretten']},
+  {behandlung:'Prep',items:['Motor','Aufsätze']},
+  {behandlung:'Peng',items:['Scanner','Scanneraufsätze','Scanner Rucksack']}
+];
+var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
+
 function renderInstrumente(){
-  if(!S.instrumenteItems)S.instrumenteItems=[{anzahl:'',material:'',bought:false}];
-  var items=S.instrumenteItems;
-  var open=items.filter(function(i){return!i.bought});
-  var done=items.filter(function(i){return i.bought});
+  if(!S.instrChecked)S.instrChecked={};
   var h='<div class="header"><div class="header-inner">'
-    +'<div><h1>Instrumente</h1><div class="sub">Instrumentenübersicht &amp; Wartung</div></div>'
+    +'<div><h1>Instrumente</h1><div class="sub">Checkliste &amp; Behandlungen</div></div>'
     +getMenuBtn2()
   +'</div></div>';
   h+='<div class="content" style="padding:12px">';
-  h+='<div style="display:grid;grid-template-columns:56px 1fr 48px;gap:6px;padding:0 4px 6px;border-bottom:2px solid var(--navy)">'
-    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px">Anzahl</div>'
-    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px">Instrument</div>'
-    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;text-align:center">Erledigt</div>'
-  +'</div>';
-  items.forEach(function(item,idx){
-    if(item.bought)return;
-    h+=instrumenteRow(item,idx);
-  });
-  if(done.length){
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">Erledigt ('+done.length+')</div>';
-    items.forEach(function(item,idx){
-      if(!item.bought)return;
-      h+=instrumenteRow(item,idx);
+
+  /* ---- Section 1: Für Behandlungen ---- */
+  h+='<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">Für Behandlungen</div>';
+  INSTRUMENTE_BEHANDLUNGEN.forEach(function(grp){
+    h+='<div style="margin-bottom:12px">';
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;padding:5px 8px;background:var(--surface-2);border-radius:var(--r-sm);margin-bottom:4px">'+grp.behandlung+'</div>';
+    grp.items.forEach(function(item){
+      var key='b_'+grp.behandlung+'_'+item;
+      var checked=!!S.instrChecked[key];
+      h+='<div onclick="instrToggle(\''+key+'\')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px solid var(--surface-2);cursor:pointer">'
+        +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0">'
+          +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')
+        +'</div>'
+        +'<div style="font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>'
+      +'</div>';
     });
-  }
+    h+='</div>';
+  });
+
+  /* ---- Section 2: Immer checken ---- */
+  h+='<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">Immer checken</div>';
+  INSTRUMENTE_IMMER.forEach(function(item){
+    var key='i_'+item;
+    var checked=!!S.instrChecked[key];
+    h+='<div onclick="instrToggle(\''+key+'\')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px solid var(--surface-2);cursor:pointer">'
+      +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0">'
+        +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')
+      +'</div>'
+      +'<div style="font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>'
+    +'</div>';
+  });
+
+  /* reset button */
+  h+='<button onclick="instrReset()" style="margin:20px 0 8px;width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;font-family:inherit">Alle zurücksetzen</button>';
+
   h+='</div>';
-  h+='<button onclick="instrumenteAddRow()" style="position:fixed;bottom:80px;right:16px;width:48px;height:48px;border-radius:50%;background:var(--navy);color:#fff;font-size:24px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(10,46,158,0.35);z-index:200">+</button>';
   h+=renderAdminBottomNav_2('instrumente');
   return h;
 }
-function instrumenteRow(item,idx){
-  var del='<button onclick="instrumenteDelete('+idx+')" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--crimson);opacity:0.6;flex-shrink:0" title="Löschen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>';
-  return '<div style="display:grid;grid-template-columns:56px 1fr 48px;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--surface-2)">'
-    +'<input type="text" value="'+(item.anzahl||'')+'" placeholder="—" '
-      +'oninput="S.instrumenteItems['+idx+'].anzahl=this.value" '
-      +'style="width:100%;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 6px;font-size:12px;font-family:var(--font-mono,monospace);background:var(--surface-2);color:var(--text);'+(item.bought?'opacity:0.45;text-decoration:line-through':'')+'">'
-    +'<div style="display:flex;align-items:center;gap:4px;min-width:0">'
-      +'<input type="text" value="'+(item.material||'')+'" placeholder="Instrument eingeben…" '
-        +'oninput="S.instrumenteItems['+idx+'].material=this.value" '
-        +'style="flex:1;min-width:0;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface-2);color:var(--text);'+(item.bought?'opacity:0.45;text-decoration:line-through':'')+'">'
-      +del
-    +'</div>'
-    +'<div style="display:flex;justify-content:center">'
-      +'<div onclick="instrumenteToggle('+idx+')" style="width:22px;height:22px;border:1.5px solid '+(item.bought?'var(--emerald)':'var(--border)')+';border-radius:5px;display:flex;align-items:center;justify-content:center;background:'+(item.bought?'var(--emerald)':'var(--white)')+';cursor:pointer;flex-shrink:0">'
-        +(item.bought?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>':'')
-      +'</div>'
-    +'</div>'
-  +'</div>';
-}
-function instrumenteAddRow(){
-  if(!S.instrumenteItems)S.instrumenteItems=[];
-  S.instrumenteItems.push({anzahl:'',material:'',bought:false});
+function instrToggle(key){
+  if(!S.instrChecked)S.instrChecked={};
+  S.instrChecked[key]=!S.instrChecked[key];
   render();
 }
-function instrumenteDelete(idx){
-  S.instrumenteItems.splice(idx,1);
-  render();
-}
-function instrumenteToggle(idx){
-  S.instrumenteItems[idx].bought=!S.instrumenteItems[idx].bought;
+function instrReset(){
+  S.instrChecked={};
   render();
 }
 function openAddAssistenz(){S.showAddAssistenz=true;S.addAssistenzForm={email:'',name:'',pw:''};render()}
