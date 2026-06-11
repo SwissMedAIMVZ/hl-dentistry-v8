@@ -6201,8 +6201,17 @@ var INSTRUMENTE_BEHANDLUNGEN=[
 ];
 var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
 
-function renderInstrumente(){
+function instrInitState(){
   if(!S.instrChecked)S.instrChecked={};
+  if(!S.instrBehandlungen)S.instrBehandlungen=INSTRUMENTE_BEHANDLUNGEN.map(function(g){return{behandlung:g.behandlung,items:g.items.slice()}});
+  if(!S.instrImmer)S.instrImmer=INSTRUMENTE_IMMER.slice();
+}
+
+function renderInstrumente(){
+  instrInitState();
+  var canEdit=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
+  var ic='var(--crimson)';
+  var trashIcon='<svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
   var h='<div class="header"><div class="header-inner">'
     +'<div><h1>Instrumente</h1><div class="sub">Checkliste &amp; Behandlungen</div></div>'
     +getMenuBtn2()
@@ -6210,35 +6219,69 @@ function renderInstrumente(){
   h+='<div class="content" style="padding:12px">';
 
   /* ---- Section 1: Für Behandlungen ---- */
-  h+='<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">Für Behandlungen</div>';
-  INSTRUMENTE_BEHANDLUNGEN.forEach(function(grp){
-    h+='<div style="margin-bottom:12px">';
-    h+='<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;padding:5px 8px;background:var(--surface-2);border-radius:var(--r-sm);margin-bottom:4px">'+grp.behandlung+'</div>';
-    grp.items.forEach(function(item){
-      var key='b_'+grp.behandlung+'_'+item;
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px">Für Behandlungen</div>'
+    +(canEdit?'<button onclick="instrAddGroup()" style="padding:3px 10px;background:var(--navy);color:#fff;border:none;border-radius:var(--r-sm);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">+ Gruppe</button>':'')
+  +'</div>';
+
+  S.instrBehandlungen.forEach(function(grp,gi){
+    h+='<div style="margin-bottom:14px">';
+    /* group header row */
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+    if(canEdit){
+      h+='<input type="text" value="'+grp.behandlung+'" oninput="S.instrBehandlungen['+gi+'].behandlung=this.value" '
+        +'style="flex:1;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-3);background:var(--surface-2);font-family:inherit">';
+      h+='<button onclick="instrDeleteGroup('+gi+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0" title="Gruppe löschen">'+trashIcon+'</button>';
+    } else {
+      h+='<div style="flex:1;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;padding:5px 8px;background:var(--surface-2);border-radius:var(--r-sm)">'+grp.behandlung+'</div>';
+    }
+    h+='</div>';
+    /* items */
+    grp.items.forEach(function(item,ii){
+      var key='b_'+gi+'_'+ii;
       var checked=!!S.instrChecked[key];
-      h+='<div onclick="instrToggle(\''+key+'\')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px solid var(--surface-2);cursor:pointer">'
-        +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0">'
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--surface-2)">'
+        +'<div onclick="instrToggle(\''+key+'\')" style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0;cursor:pointer">'
           +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')
-        +'</div>'
-        +'<div style="font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>'
-      +'</div>';
+        +'</div>';
+      if(canEdit){
+        h+='<input type="text" value="'+item+'" oninput="S.instrBehandlungen['+gi+'].items['+ii+']=this.value" '
+          +'style="flex:1;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:13px;font-family:inherit;background:var(--surface-2);color:var(--text);'+(checked?'text-decoration:line-through;opacity:0.45':'')+'">';
+        h+='<button onclick="instrDeleteItem('+gi+','+ii+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0">'+trashIcon+'</button>';
+      } else {
+        h+='<div style="flex:1;font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>';
+      }
+      h+='</div>';
     });
+    if(canEdit){
+      h+='<button onclick="instrAddItem('+gi+')" style="margin-top:4px;width:100%;padding:5px;background:none;border:1px dashed var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--text-3);cursor:pointer;font-family:inherit">+ Instrument</button>';
+    }
     h+='</div>';
   });
 
   /* ---- Section 2: Immer checken ---- */
-  h+='<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">Immer checken</div>';
-  INSTRUMENTE_IMMER.forEach(function(item){
-    var key='i_'+item;
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px">Immer checken</div>'
+  +'</div>';
+  S.instrImmer.forEach(function(item,ii){
+    var key='i_'+ii;
     var checked=!!S.instrChecked[key];
-    h+='<div onclick="instrToggle(\''+key+'\')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;border-bottom:1px solid var(--surface-2);cursor:pointer">'
-      +'<div style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0">'
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--surface-2)">'
+      +'<div onclick="instrToggle(\''+key+'\')" style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0;cursor:pointer">'
         +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')
-      +'</div>'
-      +'<div style="font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>'
-    +'</div>';
+      +'</div>';
+    if(canEdit){
+      h+='<input type="text" value="'+item+'" oninput="S.instrImmer['+ii+']=this.value" '
+        +'style="flex:1;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:13px;font-family:inherit;background:var(--surface-2);color:var(--text);'+(checked?'text-decoration:line-through;opacity:0.45':'')+'">';
+      h+='<button onclick="instrDeleteImmer('+ii+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0">'+trashIcon+'</button>';
+    } else {
+      h+='<div style="flex:1;font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>';
+    }
+    h+='</div>';
   });
+  if(canEdit){
+    h+='<button onclick="instrAddImmer()" style="margin-top:6px;width:100%;padding:5px;background:none;border:1px dashed var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--text-3);cursor:pointer;font-family:inherit">+ Eintrag</button>';
+  }
 
   /* reset button */
   h+='<button onclick="instrReset()" style="margin:20px 0 8px;width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;font-family:inherit">Alle zurücksetzen</button>';
@@ -6252,8 +6295,35 @@ function instrToggle(key){
   S.instrChecked[key]=!S.instrChecked[key];
   render();
 }
-function instrReset(){
-  S.instrChecked={};
+function instrReset(){S.instrChecked={};render();}
+function instrAddGroup(){
+  instrInitState();
+  S.instrBehandlungen.push({behandlung:'Neu',items:['']});
+  render();
+}
+function instrDeleteGroup(gi){
+  instrInitState();
+  S.instrBehandlungen.splice(gi,1);
+  render();
+}
+function instrAddItem(gi){
+  instrInitState();
+  S.instrBehandlungen[gi].items.push('');
+  render();
+}
+function instrDeleteItem(gi,ii){
+  instrInitState();
+  S.instrBehandlungen[gi].items.splice(ii,1);
+  render();
+}
+function instrAddImmer(){
+  instrInitState();
+  S.instrImmer.push('');
+  render();
+}
+function instrDeleteImmer(ii){
+  instrInitState();
+  S.instrImmer.splice(ii,1);
   render();
 }
 function openAddAssistenz(){S.showAddAssistenz=true;S.addAssistenzForm={email:'',name:'',pw:''};render()}
