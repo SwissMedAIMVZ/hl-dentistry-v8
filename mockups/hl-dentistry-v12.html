@@ -2730,6 +2730,8 @@ function renderDesktopSidebar(){
     h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='aufgaben'?'active':'')+'" onclick="goDesktopVerwSub(\'aufgaben\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Aufgaben</span></button>';
     if(isAssistenzMgrSide){
       h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='assistenzhinzu'?'active':'')+'" onclick="goDesktopVerwSub(\'assistenzhinzu\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span>Assistenz hinzufügen</span></button>';
+      h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='bestellung'?'active':'')+'" onclick="goDesktopVerwSub('bestellung')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Bestellung</span></button>';
+      h+='<button class="dk-nav-item '+(S.dkPage==='verwaltung'&&S.adminPage_2==='instrumente'?'active':'')+'" onclick="goDesktopVerwSub('instrumente')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Instrumente</span></button>';
       /* Verwaltung dropdown for Assistenz Manager */
       var isVerwActive=S.dkPage==='verwaltung';
       h+='<button class="dk-nav-item '+(isVerwActive&&S.adminPage_2!=='uebersicht'&&S.adminPage_2!=='grossvisiten'?'active':'')+'" onclick="toggleDkGroup(\'verwaltung\')" style="padding-right:10px">'+gridIcon+'<span>Verwaltung</span>'+(isVerwOpen?chevUp:chevDown)+'</button>';
@@ -2869,7 +2871,7 @@ function dkDefaultPage(){
   return'manager';
 }
 var DK_TITLES={patienten:'Patienten',manager:'Management Dashboard',wochenplan:'Wochenplan',verwaltung:'Verwaltung',behandler:'Behandler',labor:'Labor',nachrichten:'Nachrichten',suche:'Suche'};
-var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung',assistenzhinzu:'Assistenz hinzufügen',aufgaben:'Aufgaben',meineaufgaben:'Meine Aufgaben'};
+var DK_VERW_TITLES={uebersicht:'\u00dcbersicht',einverstaendnis:'Einverst\u00e4ndnis',archiv:'Archiv',abrechnung:'Abrechnung',zepreisliste:'ZE Preisliste',texteditor:'Texteditor',pflegeheime:'Pflegeheime',grossvisiten:'Großvisiten',assistenzplanung:'Assistenz Planung',assistenzhinzu:'Assistenz hinzufügen',aufgaben:'Aufgaben',meineaufgaben:'Meine Aufgaben',bestellung:'Bestellung',instrumente:'Instrumente'};
 function goDesktopVerwSub(pg){S.dkPage='verwaltung';S.adminPage_2=pg;S.adminMode=true;render()}
 function toggleDkGroup(g){if(!S.dkOpen)S.dkOpen={};S.dkOpen[g]=!S.dkOpen[g];render()}
 function goDesktopMgrTab(t){S.dkPage='manager';S.adminMode=false;S.screen='manager';S.mgrTab=t;render()}
@@ -2891,6 +2893,8 @@ function renderDesktopVerwaltungBody(){
   else if(pg==='assistenzhinzu') h+=renderAssistenzHinzufuegen();
   else if(pg==='aufgaben') h+=renderAufgaben();
   else if(pg==='meineaufgaben') h+=renderMeineAufgabenAsst();
+  else if(pg==='bestellung') h+=renderBestellung();
+  else if(pg==='instrumente') h+=renderInstrumente();
   h+='</div>';
   return h;
 }
@@ -6117,6 +6121,22 @@ function renderAssistenzHinzufuegen(){
   h+=renderAdminBottomNav_2('assistenzhinzu');
   return h;
 }
+
+function renderBestellung(){
+  var h='';
+  h+='<div class="admin-page-header"><div class="admin-page-title">Bestellung</div><div class="admin-page-sub">Material & Verbrauchsmittel bestellen</div></div>';
+  h+='<div style="padding:24px 16px;color:var(--text-3);font-size:14px">Bestellübersicht wird hier angezeigt.</div>';
+  h+=renderAdminBottomNav_2('bestellung');
+  return h;
+}
+
+function renderInstrumente(){
+  var h='';
+  h+='<div class="admin-page-header"><div class="admin-page-title">Instrumente</div><div class="admin-page-sub">Instrumentenübersicht & Wartung</div></div>';
+  h+='<div style="padding:24px 16px;color:var(--text-3);font-size:14px">Instrumentenliste wird hier angezeigt.</div>';
+  h+=renderAdminBottomNav_2('instrumente');
+  return h;
+}
 function openAddAssistenz(){S.showAddAssistenz=true;S.addAssistenzForm={email:'',name:'',pw:''};render()}
 function closeAddAssistenz(){S.showAddAssistenz=false;render()}
 function saveAddAssistenz(){
@@ -6468,6 +6488,8 @@ function renderAdminPortal_2(){
   else if(page==='assistenzhinzu') html=renderAssistenzHinzufuegen();
   else if(page==='aufgaben') html=renderAufgaben();
   else if(page==='meineaufgaben') html=renderMeineAufgabenAsst();
+  else if(page==='bestellung') html=renderBestellung();
+  else if(page==='instrumente') html=renderInstrumente();
   /* Admin hamburger */
   if(S.showMenu_2) html+=renderMenu_2();
   /* Overlays */
@@ -6504,9 +6526,11 @@ function renderMenu_2(){
   if(isAssistenz){
     return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+meineAufgBtn+patBtn+wochBtn+gvBtn+asstSep+asstPlanBtn+aufgabenBtn+logoutBtn+'</div>';
   }
+  var bestellungBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'bestellung\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Bestellung</button>';
+  var instrumenteBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'instrumente\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Instrumente</button>';
   var asstHinzuBtn='<button class="menu-item" onclick="closeMenu_2();S.adminMode=true;S.adminPage_2=\'assistenzhinzu\';render()"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Assistenz hinzufügen</button>';
   if(isAssistenzMgr){
-    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+meineAufgBtn+patBtn+wochBtn+gvBtn+asstSep+asstPlanBtn+aufgabenBtn+asstHinzuBtn+verwBtn+logoutBtn+'</div>';
+    return '<div class="menu-backdrop" onclick="closeMenu_2()"></div><div class="menu-dropdown">'+meineAufgBtn+patBtn+wochBtn+gvBtn+asstSep+asstPlanBtn+aufgabenBtn+asstHinzuBtn+bestellungBtn+instrumenteBtn+verwBtn+logoutBtn+'</div>';
   }
   return '<div class="menu-backdrop" onclick="closeMenu_2()"></div>'
     +'<div class="menu-dropdown">'
