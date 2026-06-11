@@ -6122,12 +6122,76 @@ function renderAssistenzHinzufuegen(){
   return h;
 }
 
+/* ===== BESTELLUNG ===== */
+if(!S.bestellungItems)S.bestellungItems=[
+  {anzahl:'',material:'',bought:false},
+];
 function renderBestellung(){
-  var h='';
-  h+='<div class="admin-page-header"><div class="admin-page-title">Bestellung</div><div class="admin-page-sub">Material & Verbrauchsmittel bestellen</div></div>';
-  h+='<div style="padding:24px 16px;color:var(--text-3);font-size:14px">Bestellübersicht wird hier angezeigt.</div>';
+  if(!S.bestellungItems)S.bestellungItems=[{anzahl:'',material:'',bought:false}];
+  var items=S.bestellungItems;
+  var open=items.filter(function(i){return!i.bought});
+  var done=items.filter(function(i){return i.bought});
+  var h='<div class="header"><div class="header-inner">'
+    +'<div><h1>Bestellung</h1><div class="sub">Material &amp; Verbrauchsmittel</div></div>'
+    +getMenuBtn2()
+  +'</div></div>';
+  h+='<div class="content" style="padding:12px">';
+  /* column headers */
+  h+='<div style="display:grid;grid-template-columns:56px 1fr 48px;gap:6px;padding:0 4px 6px;border-bottom:2px solid var(--navy)">'
+    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px">Anzahl</div>'
+    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px">Material</div>'
+    +'<div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;text-align:center">Gekauft</div>'
+  +'</div>';
+  /* open rows */
+  items.forEach(function(item,idx){
+    if(item.bought)return;
+    h+=bestellungRow(item,idx);
+  });
+  /* done section */
+  if(done.length){
+    h+='<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">Erledigt ('+done.length+')</div>';
+    items.forEach(function(item,idx){
+      if(!item.bought)return;
+      h+=bestellungRow(item,idx);
+    });
+  }
+  h+='</div>';
+  /* FAB add row */
+  h+='<button onclick="bestellungAddRow()" style="position:fixed;bottom:80px;right:16px;width:48px;height:48px;border-radius:50%;background:var(--navy);color:#fff;font-size:24px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(10,46,158,0.35);z-index:200">+</button>';
   h+=renderAdminBottomNav_2('bestellung');
   return h;
+}
+function bestellungRow(item,idx){
+  var del='<button onclick="bestellungDelete('+idx+')" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--crimson);opacity:0.6;flex-shrink:0" title="Löschen"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"14\" height=\"14\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6l-1 14H6L5 6\"/><path d=\"M10 11v6\"/><path d=\"M14 11v6\"/><path d=\"M9 6V4h6v2\"/></svg></button>';
+  return '<div style="display:grid;grid-template-columns:56px 1fr 48px;gap:6px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--surface-2)">'
+    +'<input type="text" value="'+(item.anzahl||'')+'" placeholder="—" '
+      +'oninput="S.bestellungItems['+idx+'].anzahl=this.value" '
+      +'style="width:100%;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 6px;font-size:12px;font-family:'JetBrains Mono',monospace;background:var(--surface-2);color:var(--text);'+(item.bought?'opacity:0.45;text-decoration:line-through':''')+'">'
+    +'<div style="display:flex;align-items:center;gap:4px;min-width:0">'
+      +'<input type="text" value="'+(item.material||'')+'" placeholder="Material eingeben…" '
+        +'oninput="S.bestellungItems['+idx+'].material=this.value" '
+        +'style="flex:1;min-width:0;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface-2);color:var(--text);'+(item.bought?'opacity:0.45;text-decoration:line-through':'')+'">'
+      +del
+    +'</div>'
+    +'<div style="display:flex;justify-content:center">'
+      +'<div onclick="bestellungToggle('+idx+')" style="width:22px;height:22px;border:1.5px solid '+(item.bought?'var(--emerald)':'var(--border)')+';border-radius:5px;display:flex;align-items:center;justify-content:center;background:'+(item.bought?'var(--emerald)':'var(--white)')+';cursor:pointer;flex-shrink:0">'
+        +(item.bought?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>':'')
+      +'</div>'
+    +'</div>'
+  +'</div>';
+}
+function bestellungAddRow(){
+  if(!S.bestellungItems)S.bestellungItems=[];
+  S.bestellungItems.push({anzahl:'',material:'',bought:false});
+  render();
+}
+function bestellungDelete(idx){
+  S.bestellungItems.splice(idx,1);
+  render();
+}
+function bestellungToggle(idx){
+  S.bestellungItems[idx].bought=!S.bestellungItems[idx].bought;
+  render();
 }
 
 function renderInstrumente(){
