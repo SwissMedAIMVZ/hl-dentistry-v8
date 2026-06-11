@@ -6200,6 +6200,26 @@ var INSTRUMENTE_BEHANDLUNGEN=[
   {behandlung:'Peng',items:['Scanner','Scanneraufsätze','Scanner Rucksack']}
 ];
 var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
+/* Maps Behandler id → treatment types they perform */
+var BEHANDLER_TREATMENTS={
+  hFeld: ['Ex','PA','Prep'],
+  hHess: ['Teng','Peng'],
+  hGomez:['PA','Prep','Peng']
+};
+
+/* Returns the set of treatment names for the logged-in Assistenz today */
+function instrTodayTreatments(){
+  var today=new Date().toISOString().split('T')[0];
+  var entries=(ASST_SCHEDULE[today]||[]).filter(function(e){
+    return S.user&&e.n===S.user.name&&e.bh;
+  });
+  var types={};
+  entries.forEach(function(e){
+    var ts=BEHANDLER_TREATMENTS[e.bh]||[];
+    ts.forEach(function(t){types[t]=true;});
+  });
+  return types;
+}
 
 function instrInitState(){
   if(!S.instrChecked)S.instrChecked={};
@@ -6209,7 +6229,9 @@ function instrInitState(){
 
 function renderInstrumente(){
   instrInitState();
-  var canEdit=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
+  var role=S.user?S.user.role:'';
+  var canEdit=role==='assistenz_mgr'||role==='verwaltung'||role==='ceo';
+  var isAsstOnly=role==='assistenz';
   var ic='var(--crimson)';
   var trashIcon='<svg viewBox="0 0 24 24" fill="none" stroke="'+ic+'" stroke-width="2" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
   var h='<div class="header"><div class="header-inner">'
@@ -6218,43 +6240,67 @@ function renderInstrumente(){
   +'</div></div>';
   h+='<div class="content" style="padding:12px">';
 
+  /* For plain Assistenz: filter groups by today's assigned Behandler */
+  var todayTypes=isAsstOnly?instrTodayTreatments():{};
+  var allTypes=Object.keys(todayTypes);
+  var groups=S.instrBehandlungen;
+  if(isAsstOnly){
+    if(allTypes.length){
+      groups=groups.filter(function(g){return todayTypes[g.behandlung];});
+      /* context banner */
+      var today=new Date().toISOString().split('T')[0];
+      var myEntries=(ASST_SCHEDULE[today]||[]).filter(function(e){return S.user&&e.n===S.user.name&&e.bh;});
+      var bhdlNames=myEntries.map(function(e){var b=BEHANDLER.find(function(x){return x.id===e.bh;});return b?b.name:e.bh;}).join(', ');
+      h+='<div style="background:var(--blue-25);border:1px solid rgba(10,46,158,0.15);border-radius:var(--r-md);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--navy)">'
+        +'<span style="font-weight:700">Heute bei:</span> '+bhdlNames
+      +'</div>';
+    } else {
+      /* no assignment today — show all with a note */
+      h+='<div style="background:var(--surface-2);border-radius:var(--r-md);padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--text-3)">'
+        +'Heute keine Behandler-Zuweisung — vollständige Liste wird angezeigt.'
+      +'</div>';
+    }
+  }
+
   /* ---- Section 1: Für Behandlungen ---- */
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--navy)">'
     +'<div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.8px">Für Behandlungen</div>'
     +(canEdit?'<button onclick="instrAddGroup()" style="padding:3px 10px;background:var(--navy);color:#fff;border:none;border-radius:var(--r-sm);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit">+ Gruppe</button>':'')
   +'</div>';
 
-  S.instrBehandlungen.forEach(function(grp,gi){
+  groups.forEach(function(grp,gi){
+    /* map back to real index in S.instrBehandlungen for edit actions */
+    var realGi=S.instrBehandlungen.indexOf(grp);
     h+='<div style="margin-bottom:14px">';
     /* group header row */
     h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
     if(canEdit){
-      h+='<input type="text" value="'+grp.behandlung+'" oninput="S.instrBehandlungen['+gi+'].behandlung=this.value" '
+      h+='<input type="text" value="'+grp.behandlung+'" oninput="S.instrBehandlungen['+realGi+'].behandlung=this.value" '
         +'style="flex:1;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-3);background:var(--surface-2);font-family:inherit">';
-      h+='<button onclick="instrDeleteGroup('+gi+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0" title="Gruppe löschen">'+trashIcon+'</button>';
+      h+='<button onclick="instrDeleteGroup('+realGi+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0" title="Gruppe löschen">'+trashIcon+'</button>';
     } else {
       h+='<div style="flex:1;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;padding:5px 8px;background:var(--surface-2);border-radius:var(--r-sm)">'+grp.behandlung+'</div>';
     }
     h+='</div>';
     /* items */
     grp.items.forEach(function(item,ii){
-      var key='b_'+gi+'_'+ii;
+      var key='b_'+realGi+'_'+ii;
       var checked=!!S.instrChecked[key];
       h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--surface-2)">'
         +'<div onclick="instrToggle(\''+key+'\')" style="width:20px;height:20px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0;cursor:pointer">'
           +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>':'')
         +'</div>';
       if(canEdit){
-        h+='<input type="text" value="'+item+'" oninput="S.instrBehandlungen['+gi+'].items['+ii+']=this.value" '
+        h+='<input type="text" value="'+item+'" oninput="S.instrBehandlungen['+realGi+'].items['+ii+']=this.value" '
           +'style="flex:1;border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:13px;font-family:inherit;background:var(--surface-2);color:var(--text);'+(checked?'text-decoration:line-through;opacity:0.45':'')+'">';
-        h+='<button onclick="instrDeleteItem('+gi+','+ii+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0">'+trashIcon+'</button>';
+        h+='<button onclick="instrDeleteItem('+realGi+','+ii+')" style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0">'+trashIcon+'</button>';
       } else {
         h+='<div style="flex:1;font-size:13px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>';
       }
       h+='</div>';
     });
     if(canEdit){
-      h+='<button onclick="instrAddItem('+gi+')" style="margin-top:4px;width:100%;padding:5px;background:none;border:1px dashed var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--text-3);cursor:pointer;font-family:inherit">+ Instrument</button>';
+      h+='<button onclick="instrAddItem('+realGi+')" style="margin-top:4px;width:100%;padding:5px;background:none;border:1px dashed var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--text-3);cursor:pointer;font-family:inherit">+ Instrument</button>';
     }
     h+='</div>';
   });
