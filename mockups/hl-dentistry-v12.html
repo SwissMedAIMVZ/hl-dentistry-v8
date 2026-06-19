@@ -5484,9 +5484,9 @@ function renderMeineAufgabenAsst(){
   var canSeeTeam=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
   h+='<div class="tabs">'
     +'<button class="tab'+(maTab==='heute'?' active':'')+'" onclick="S.meineAufgTab=\'heute\';render()">Heute</button>'
-    +'<button class="tab'+(maTab==='woche'?' active':'')+'" onclick="S.meineAufgTab=\'woche\';render()">Nächste Woche</button>'
-    +'<button class="tab'+(maTab==='erledigt'?' active':'')+'" onclick="S.meineAufgTab=\'erledigt\';render()">Erledigt</button>'
     +(canSeeTeam?'<button class="tab'+(maTab==='team'?' active':'')+'" onclick="S.meineAufgTab=\'team\';render()">Team</button>':'')
+    +'<button class="tab'+(maTab==='erledigt'?' active':'')+'" onclick="S.meineAufgTab=\'erledigt\';render()">Erledigt</button>'
+    +'<button class="tab'+(maTab==='woche'?' active':'')+'" onclick="S.meineAufgTab=\'woche\';render()">Nächste Woche</button>'
   +'</div>';
   h+='<div class="content" style="padding:12px">';
   /* Gather all data for both tabs */
