@@ -5481,10 +5481,12 @@ function renderMeineAufgabenAsst(){
     +getMenuBtn2()
   +'</div></div>';
   var maTab=S.meineAufgTab||'heute';
+  var canSeeTeam=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
   h+='<div class="tabs">'
     +'<button class="tab'+(maTab==='heute'?' active':'')+'" onclick="S.meineAufgTab=\'heute\';render()">Heute</button>'
     +'<button class="tab'+(maTab==='woche'?' active':'')+'" onclick="S.meineAufgTab=\'woche\';render()">Nächste Woche</button>'
     +'<button class="tab'+(maTab==='erledigt'?' active':'')+'" onclick="S.meineAufgTab=\'erledigt\';render()">Erledigt</button>'
+    +(canSeeTeam?'<button class="tab'+(maTab==='team'?' active':'')+'" onclick="S.meineAufgTab=\'team\';render()">Team</button>':'')
   +'</div>';
   h+='<div class="content" style="padding:12px">';
   /* Gather all data for both tabs */
@@ -5664,11 +5666,9 @@ function renderMeineAufgabenAsst(){
       });
     }
   } /* end erledigt tab */
-  /* Team section — Assistenz Manager / Verwaltung / CEO only */
-  var canSeeTeam=S.user&&(S.user.role==='assistenz_mgr'||S.user.role==='verwaltung'||S.user.role==='ceo');
-  if(canSeeTeam){
+  if(maTab==='team'&&canSeeTeam){
     if(!S.asstTeamOpen)S.asstTeamOpen={};
-    h+='<div style="font-size:14px;font-weight:700;color:var(--navy);margin:20px 0 10px;padding-top:16px;border-top:2px solid var(--border)">Team</div>';
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px">Assistenz — Aufgaben &amp; Einsätze</div>';
     ASST_STAFF.forEach(function(staffName){
       var isOpen=!!S.asstTeamOpen[staffName];
       /* Gather this person's tasks */
@@ -5750,7 +5750,7 @@ function renderMeineAufgabenAsst(){
       }
       h+='</div>';
     });
-  }
+  } /* end team tab */
   h+='</div>';
   h+=renderAdminBottomNav_2('meineaufgaben');
   return h;
