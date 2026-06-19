@@ -6248,11 +6248,6 @@ function bestellungToggle(idx){
 
 /* ===== INSTRUMENTE DATA ===== */
 /* Derived from ALLE_BEHANDLUNGEN so the two stay in sync */
-var INSTRUMENTE_BEHANDLUNGEN=Object.keys(ALLE_BEHANDLUNGEN).map(function(code){
-  return {behandlung:code,items:ALLE_BEHANDLUNGEN[code].items.slice()};
-});
-var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
-
 /* All treatment codes from the practice reference sheet → name + required instruments */
 var ALLE_BEHANDLUNGEN={
   DRUCK: {name:'Scan/Abdruck neu',        items:['Scanner','Scanneraufsätze','Abdrucklöffel','Speichelsauger']},
@@ -6284,6 +6279,11 @@ var ALLE_BEHANDLUNGEN={
   '174a':{name:'174a',                    items:['Karte','Dokumentation']},
   NahtEx:{name:'Nähte ziehen',           items:['Nahtschere','Pinzette','Desinfektionsmittel']}
 };
+
+var INSTRUMENTE_BEHANDLUNGEN=Object.keys(ALLE_BEHANDLUNGEN).map(function(code){
+  return {behandlung:code,items:ALLE_BEHANDLUNGEN[code].items.slice()};
+});
+var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
 
 /* Maps Behandler id → treatment codes (uppercase, matching ALLE_BEHANDLUNGEN keys) */
 var BEHANDLER_TREATMENTS={
@@ -6870,4 +6870,4 @@ function renderMenu_2(){
 </script>
 </body>
 </html>
-<!-- cache-bust 1781892302 -->
+<!-- cache-bust 1781892495 -->
