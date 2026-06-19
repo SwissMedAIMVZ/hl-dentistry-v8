@@ -5522,6 +5522,43 @@ function renderMeineAufgabenAsst(){
       +'</div>';
     });
   }
+  /* ---- Instrumente für heute ---- */
+  if(!S.maInstrChecked)S.maInstrChecked={};
+  var todayBh=todaySchedule.filter(function(s){return s.bh;}).map(function(s){return s.bh;});
+  if(todayBh.length>0){
+    var treatmentCodes=[];
+    todayBh.forEach(function(bhId){
+      (BEHANDLER_TREATMENTS[bhId]||[]).forEach(function(code){
+        if(treatmentCodes.indexOf(code)<0)treatmentCodes.push(code);
+      });
+    });
+    if(treatmentCodes.length>0){
+      h+='<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;margin:14px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--navy)">Instrumente für heute</div>';
+      treatmentCodes.forEach(function(code){
+        var beh=ALLE_BEHANDLUNGEN[code];
+        if(!beh)return;
+        var allDone=beh.items.every(function(item){return S.maInstrChecked[code+'_'+item];});
+        h+='<div style="margin-bottom:10px">';
+        h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:'+(allDone?'var(--emerald-bg)':'var(--surface-2)')+';border-radius:var(--r-sm);margin-bottom:2px">'
+          +'<span style="font-size:9px;font-weight:800;color:'+(allDone?'var(--emerald)':'var(--navy)')+';letter-spacing:0.5px;min-width:36px">'+code+'</span>'
+          +'<span style="font-size:11px;font-weight:700;color:'+(allDone?'var(--emerald)':'var(--text)')+'">'+beh.name+'</span>'
+          +(allDone?'<svg style="margin-left:auto" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="3" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>':'')
+        +'</div>';
+        beh.items.forEach(function(item){
+          var ck=code+'_'+item;
+          var checked=!!S.maInstrChecked[ck];
+          h+='<div onclick="S.maInstrChecked[\''+ck.replace(/'/g,"\\'")+'\']=!S.maInstrChecked[\''+ck.replace(/'/g,"\\'")+'\'];render()" style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-bottom:1px solid var(--surface-2);cursor:pointer">'
+            +'<div style="width:18px;height:18px;border:1.5px solid '+(checked?'var(--emerald)':'var(--border)')+';border-radius:4px;display:flex;align-items:center;justify-content:center;background:'+(checked?'var(--emerald)':'var(--white)')+';flex-shrink:0">'
+              +(checked?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg>':'')
+            +'</div>'
+            +'<div style="font-size:12px;color:'+(checked?'var(--text-3)':'var(--text)')+';'+(checked?'text-decoration:line-through':'')+'">'+item+'</div>'
+          +'</div>';
+        });
+        h+='</div>';
+      });
+    }
+  }
+
   /* Today's tasks — filter out erledigt */
   if(!S.meineAufgErledigt)S.meineAufgErledigt={};
   var todayTasks=myTasks.filter(function(t){return t.date===todayKey&&!S.meineAufgErledigt[t.task+'|'+t.date]});
@@ -6193,18 +6230,51 @@ function bestellungToggle(idx){
 
 /* ===== INSTRUMENTE DATA ===== */
 var INSTRUMENTE_BEHANDLUNGEN=[
-  {behandlung:'Ex',  items:['Ultracain','Spritze','Nadeln','Hebel','Wattetupfer','Zange']},
-  {behandlung:'Teng',items:['Scanner','Scanneraufsätze','Scanner Rucksack','Optosil','Testprothese']},
+  {behandlung:'EX',  items:['Ultracain','Spritze','Nadeln','Hebel','Wattetupfer','Zange']},
+  {behandlung:'TENG',items:['Scanner','Scanneraufsätze','Scanner Rucksack','Optosil','Testprothese']},
   {behandlung:'PA',  items:['PA-Spitzen','Ultraschallgerät','Nierenschale','Küretten']},
-  {behandlung:'Prep',items:['Motor','Aufsätze']},
-  {behandlung:'Peng',items:['Scanner','Scanneraufsätze','Scanner Rucksack']}
+  {behandlung:'PREP',items:['Motor','Aufsätze']},
+  {behandlung:'PENG',items:['Scanner','Scanneraufsätze','Scanner Rucksack']}
 ];
 var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
-/* Maps Behandler id → treatment types they perform */
+
+/* All treatment codes from the practice reference sheet → name + required instruments */
+var ALLE_BEHANDLUNGEN={
+  DRUCK: {name:'Scan/Abdruck neu',        items:['Scanner','Scanneraufsätze','Abdrucklöffel','Speichelsauger']},
+  PREP:  {name:'Prep für Prothese',        items:['Motor','Aufsätze','Wattetupfer','Speichelsauger']},
+  FIT:   {name:'Prothese fitten',          items:['Prothese','Artikulationspapier','Schleifkörper','Speichelsauger']},
+  CO:    {name:'Kontrolle',                items:['Spiegel','Sonde','Pinzette']},
+  TENG:  {name:'Test-Prothese Eingliederung', items:['Scanner','Scanneraufsätze','Scanner Rucksack','Optosil','Testprothese']},
+  PENG:  {name:'Prothesen Eingliederung',  items:['Scanner','Scanneraufsätze','Scanner Rucksack']},
+  PA:    {name:'PA',                       items:['PA-Spitzen','Ultraschallgerät','Nierenschale','Küretten']},
+  EX:    {name:'Extraktion',               items:['Ultracain','Spritze','Nadeln','Hebel','Wattetupfer','Zange']},
+  KR:    {name:'Krone',                    items:['Motor','Aufsätze','Scanner','Scanneraufsätze','Retraktionsfaden']},
+  BR:    {name:'Brücke',                   items:['Motor','Aufsätze','Scanner','Scanneraufsätze','Retraktionsfaden']},
+  TK:    {name:'Teilkrone',                items:['Motor','Aufsätze','Scanner','Scanneraufsätze']},
+  WKB:   {name:'Wurzelkanalbehandlung',    items:['Endofeilen','Spüllösung','Apex-Lokator','Guttapercha','Nierenschale']},
+  SK:    {name:'Scharfe Kante',            items:['Schleifkörper','Politurpaste','Speichelsauger']},
+  ST:    {name:'Stift',                    items:['Stiftsystem','Komposit','Bonding','Speichelsauger']},
+  ZST:   {name:'Zahnstein',               items:['Ultraschallgerät','Scaler','Nierenschale','Politurpaste']},
+  IMP:   {name:'Implantate',              items:['Implantat-Set','Bohrer','Drehmomentschlüssel','Nierenschale']},
+  EKR:   {name:'Krone/Brücke entfernen',  items:['Kronenentferner','Zange','Scaler']},
+  PH:    {name:'Klammer',                  items:['Klammerzange','Klammer']},
+  PRO:   {name:'Prophylaxe',              items:['Ultraschallgerät','Prophylaxeaufsätze','Politurpaste','Nierenschale']},
+  E:     {name:'Ersetzen',                items:['Komposit','Bonding','Matrizen','Politurpaste']},
+  ZA:    {name:'Zahn abgebrochen',        items:['Komposit','Bonding','Matrizen']},
+  _01:   {name:'Befund',                  items:['Spiegel','Sonde','Pinzette']},
+  FU:    {name:'Füllung',                 items:['Komposit','Bonding','Matrizen','Speichelsauger']},
+  UF:    {name:'Unterfütterung',          items:['Unterfütterungsmaterial','Artikulationspapier','Schleifkörper']},
+  NOT:   {name:'Schwellung / Zahnschmerzen', items:['Ultracain','Spritze','Verbandsmaterial','Nierenschale']},
+  G:     {name:'Gesund',                  items:['Spiegel','Sonde']},
+  '174a':{name:'174a',                    items:['Karte','Dokumentation']},
+  NahtEx:{name:'Nähte ziehen',           items:['Nahtschere','Pinzette','Desinfektionsmittel']}
+};
+
+/* Maps Behandler id → treatment codes (uppercase, matching ALLE_BEHANDLUNGEN keys) */
 var BEHANDLER_TREATMENTS={
-  hFeld: ['Ex','PA','Prep'],
-  hHess: ['Teng','Peng'],
-  hGomez:['PA','Prep','Peng']
+  hFeld: ['EX','PA','PREP','CO','KR','FU'],
+  hHess: ['TENG','PENG','DRUCK','FIT','UF'],
+  hGomez:['PA','PREP','PENG','ZST','PRO','WKB']
 };
 
 /* Returns the set of treatment names for the logged-in Assistenz today */
