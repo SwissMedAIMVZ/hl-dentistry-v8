@@ -59,6 +59,67 @@ Each change gets its own entry. Newest on top.
 
 ---
 
+### 2026-06-19 — Critical fix: all JavaScript broken at page load (INSTRUMENTE_BEHANDLUNGEN ordering)
+
+**Why:** The login button (and every other onclick handler) did nothing in any browser. Root cause: `INSTRUMENTE_BEHANDLUNGEN` was declared before `ALLE_BEHANDLUNGEN` in the file. JavaScript `var` declarations are hoisted but values are assigned in order, so at the point `INSTRUMENTE_BEHANDLUNGEN` was initialized with `Object.keys(ALLE_BEHANDLUNGEN)`, `ALLE_BEHANDLUNGEN` was still `undefined`. This threw `TypeError: Cannot convert undefined or null to object` at page-load time, halting all JavaScript execution before any event listener could be registered.
+
+**Symptom:** Login button did nothing. No console errors visible in cached versions — the crash was masked by stale cache returning the previously-working JS.
+
+**Fix — move `INSTRUMENTE_BEHANDLUNGEN` to after `ALLE_BEHANDLUNGEN`:**
+
+Before (broken):
+```js
+var INSTRUMENTE_BEHANDLUNGEN = Object.keys(ALLE_BEHANDLUNGEN).map(...);  // ← ALLE_BEHANDLUNGEN is undefined here
+var INSTRUMENTE_IMMER = [...];
+// ...hundreds of lines later...
+var ALLE_BEHANDLUNGEN = { DRUCK: {...}, PREP: {...}, ... };
+```
+
+After (fixed):
+```js
+var ALLE_BEHANDLUNGEN = { DRUCK: {...}, PREP: {...}, ..., NahtEx: {...} };  // 28 codes
+var INSTRUMENTE_BEHANDLUNGEN = Object.keys(ALLE_BEHANDLUNGEN).map(function(code){
+  return {behandlung:code, items:ALLE_BEHANDLUNGEN[code].items.slice()};
+});
+var INSTRUMENTE_IMMER = ['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
+```
+
+**Note on browser cache:** Cache-bust comments in HTML do NOT affect HTTP caching — only URL query params or HTTP headers do. The bug existed since the `ALLE_BEHANDLUNGEN` data was introduced but was hidden by browsers returning the cached pre-bug version.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
+### 2026-06-19 — Fix: assistenz / assistenz_mgr login — notification prompt suppressed, lands on Meine Aufgaben
+
+**Why:** Two separate issues at login for the Assistenz roles:
+1. `assistenz_mgr` was not included in the `doLogin` branch that sets `adminMode=true` and `adminPage_2='meineaufgaben'` — it fell through to the default branch, landing on the Patienten page instead of Meine Aufgaben.
+2. After routing assistenz roles to the admin portal, the notification permission prompt (`S.showNotifPrompt=true`) was still being displayed. In the admin portal render path this caused the prompt overlay to appear on top of (or instead of) the Meine Aufgaben page.
+
+**Fix — `doLogin` function:**
+```js
+// Before:
+if(u.role==='assistenz'){S.adminMode=true;S.adminPage_2='meineaufgaben';S.dkPage='verwaltung';}
+else{S.showNotifPrompt=true;}
+
+// After:
+if(u.role==='assistenz'||u.role==='assistenz_mgr'){
+  S.adminMode=true;S.adminPage_2='meineaufgaben';S.dkPage='verwaltung';S.showNotifPrompt=false;
+}else{
+  S.showNotifPrompt=true;
+}
+```
+
+Both assistenz roles now:
+- Land on Meine Aufgaben immediately after login (mobile + desktop)
+- Skip the notification permission prompt
+
+All other roles (verwaltung, ceo, behandler, laborant) still see the notification prompt.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
 ### 2026-06-19 — Fix: Meine Aufgaben navigation broken on desktop for Assistenz Manager
 
 **Why:** Clicking "Meine Aufgaben" (and other admin pages) from the hamburger menu did nothing on desktop. Root cause: `closeMenu_2()` calls `render()` internally; on desktop `render()` routes by `S.dkPage`, which was not updated by the menu-item onclick handlers. So the intermediate and final renders both showed the old page.
