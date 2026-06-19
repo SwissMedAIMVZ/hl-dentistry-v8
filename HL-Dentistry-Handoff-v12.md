@@ -59,6 +59,21 @@ Each change gets its own entry. Newest on top.
 
 ---
 
+### 2026-06-19 — Fix: Meine Aufgaben navigation broken on desktop for Assistenz Manager
+
+**Why:** Clicking "Meine Aufgaben" (and other admin pages) from the hamburger menu did nothing on desktop. Root cause: `closeMenu_2()` calls `render()` internally; on desktop `render()` routes by `S.dkPage`, which was not updated by the menu-item onclick handlers. So the intermediate and final renders both showed the old page.
+
+**Change — `renderMenu_2` button vars:** All admin-page nav buttons now also set `S.dkPage` in their `onclick`:
+- `meineAufgBtn`, `wochBtn`, `verwBtn`, `gvBtn`, `asstPlanBtn`, `aufgabenBtn` → `S.dkPage='verwaltung'`
+- `patBtn` → `S.dkPage='patienten'`
+- `bestellungBtn`, `instrumenteBtn`, `asstHinzuBtn` → `S.dkPage='verwaltung'`
+
+**Change — `doLogin`:** `assistenz_mgr` now also sets `S.adminMode=true;S.adminPage_2='meineaufgaben';S.dkPage='verwaltung'` at login (matching existing `assistenz` behaviour), so Meine Aufgaben is the landing page after login.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
 ### 2026-06-19 — Meine Aufgaben: "Team" tab for Assistenz Manager
 
 **Why:** The Assistenz Manager needs to see their own tasks separately from the team overview — previously the Team accordion was always appended below all tabs, mixing personal and team context.
