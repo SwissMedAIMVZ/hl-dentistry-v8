@@ -57,6 +57,124 @@ Each change gets its own entry. Newest on top.
 
 **Standing rule:** every change to `mockups/hl-dentistry-v12.html`, `assets/hl-dentistry.css`, or any asset under `assets/` gets a matching entry here in the same commit (or the commit immediately after). The entry includes the commit hash, a short "Why", the concrete code paths touched, and any behavioural notes a future reader would need. No silent changes.
 
+---
+
+### 2026-06-19 — Instrumente: Assistenz sees filtered list based on today's Behandler
+
+**Why:** Plain Assistenz should only prepare instruments relevant to the Behandler they are working with today — not the full list across all treatments.
+
+**New data:** `BEHANDLER_TREATMENTS` object maps Behandler id → treatment type array:
+```js
+var BEHANDLER_TREATMENTS = {
+  hFeld:  ['Ex','PA','Prep'],
+  hHess:  ['Teng','Peng'],
+  hGomez: ['PA','Prep','Peng']
+};
+```
+Extend this map when new Behandler are added via Verwaltung > Behandler admin.
+
+**New function `instrTodayTreatments()`:** reads today's `ASST_SCHEDULE` entries for `S.user.name`, collects all `bh` (Behandler id) values, returns a set of treatment names from `BEHANDLER_TREATMENTS`.
+
+**`renderInstrumente()` changes:**
+- `isAsstOnly` flag (`role==='assistenz'`)
+- If `isAsstOnly`: filters `S.instrBehandlungen` to groups whose `behandlung` is in `instrTodayTreatments()`
+- Shows a navy banner "Heute bei: Dr. Feld" (Behandler names resolved via `BEHANDLER` array)
+- If no `bh` assignment today: shows full list with a grey note
+- Assistenz Manager / Verwaltung / CEO: always sees the complete list (unfiltered, editable)
+- Edit actions inside the group loop now use `realGi = S.instrBehandlungen.indexOf(grp)` so indices are correct even when the filtered subset is rendered
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
+### 2026-06-19 — Instrumente: both lists editable for Assistenz Manager
+
+**Why:** Assistenz Manager needs to maintain the instrument lists as treatments and equipment change.
+
+**Edit controls (visible to `assistenz_mgr`, `verwaltung`, `ceo` only):**
+
+*Für Behandlungen:*
+- Group name: replaced static label with `<input>` (`oninput` writes to `S.instrBehandlungen[gi].behandlung`)
+- Group delete: trash button → `instrDeleteGroup(gi)`
+- Item text: replaced static div with `<input>` (`oninput` writes to `S.instrBehandlungen[gi].items[ii]`)
+- Item delete: trash button → `instrDeleteItem(gi, ii)`
+- Add item: dashed "+ Instrument" button per group → `instrAddItem(gi)`
+- Add group: navy "+ Gruppe" button in section header → `instrAddGroup()`
+
+*Immer checken:*
+- Item text: `<input>` (`oninput` writes to `S.instrImmer[ii]`)
+- Item delete: trash button → `instrDeleteImmer(ii)`
+- Add item: dashed "+ Eintrag" button → `instrAddImmer()`
+
+**State:** `S.instrBehandlungen` (copy of `INSTRUMENTE_BEHANDLUNGEN` on first render), `S.instrImmer` (copy of `INSTRUMENTE_IMMER`). Initialized via `instrInitState()`.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
+### 2026-06-19 — New page: "Instrumente" — instrument checklists
+
+**Why:** Assistenz needs a structured checklist for instruments per treatment type and a fixed "always check" list.
+
+**`renderInstrumente()` page — 2 sections:**
+
+1. **Für Behandlungen:** grouped by treatment (Ex, Teng, PA, Prep, Peng). Each group has a navy label header and checklist rows. Tapping a row toggles a green checkbox; checked items show strikethrough.
+
+2. **Immer checken:** flat checklist — Standart Check, Spiegel, Masken, Handschuhe, Volon A. Same checkbox behaviour.
+
+**"Alle zurücksetzen" button** at the bottom clears `S.instrChecked`.
+
+**State:** `S.instrChecked` — keyed by `'b_<groupIndex>_<itemIndex>'` (Behandlungen) or `'i_<itemIndex>'` (Immer).
+
+**Static data:**
+```js
+var INSTRUMENTE_BEHANDLUNGEN = [ {behandlung, items[]}, … ]
+var INSTRUMENTE_IMMER = [ … ]
+```
+
+**Routing:** `DK_VERW_TITLES.instrumente`, desktop + mobile dispatchers, `renderAdminBottomNav_2('instrumente')`.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
+### 2026-06-19 — New page: "Bestellung" — editable material order list
+
+**Why:** Assistenz Manager needs to track which materials need to be ordered and mark them as bought.
+
+**`renderBestellung()` page:**
+- Column headers: Anzahl | Material | Gekauft
+- Each row: monospace `<input>` for Anzahl, text `<input>` for Material, tappable checkbox for Gekauft
+- Checking "Gekauft" moves the row to an "Erledigt" section at the bottom with strikethrough + reduced opacity
+- Trash icon next to each Material field deletes the row
+- Navy FAB "+" (bottom-right, fixed) adds a new blank row
+
+**State:** `S.bestellungItems` — array of `{anzahl, material, bought}`. Initialized to one blank row on first render.
+
+**Helper functions:** `bestellungAddRow()`, `bestellungDelete(idx)`, `bestellungToggle(idx)`.
+
+**Routing:** `DK_VERW_TITLES.bestellung`, desktop + mobile dispatchers, `renderAdminBottomNav_2('bestellung')`.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
+### 2026-06-19 — Assistenz Manager menu: "Bestellung" and "Instrumente" items added
+
+**Why:** Both new pages need to be reachable from the Assistenz Manager navigation.
+
+**Mobile burger menu (`renderMenu_2`, `isAssistenzMgr` branch):** two new buttons inserted after `asstHinzuBtn`, before `verwBtn`:
+- `bestellungBtn` → `S.adminPage_2='bestellung'` (shopping bag icon)
+- `instrumenteBtn` → `S.adminPage_2='instrumente'` (wrench icon)
+
+**Desktop sidebar (`isAssistenzMgrSide` block):** two new `dk-nav-item` buttons inserted after Assistenz hinzufügen, before the Verwaltung dropdown:
+- Bestellung → `goDesktopVerwSub('bestellung')`
+- Instrumente → `goDesktopVerwSub('instrumente')`
+
+**`DK_VERW_TITLES`:** `bestellung:'Bestellung'` and `instrumente:'Instrumente'` added.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
 ### 2026-04-26 — New role: Assistenz (restricted access)
 
 **Why:** The practice has assistants who need to look up patients, check the weekly plan, and support Großvisiten — but shouldn't see Management, Verwaltung admin, Labor, Nachrichten, or billing.
