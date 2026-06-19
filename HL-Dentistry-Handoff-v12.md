@@ -59,6 +59,36 @@ Each change gets its own entry. Newest on top.
 
 ---
 
+### 2026-06-19 — Meine Aufgaben: "Team" tab for Assistenz Manager
+
+**Why:** The Assistenz Manager needs to see their own tasks separately from the team overview — previously the Team accordion was always appended below all tabs, mixing personal and team context.
+
+**Change:** The existing Team accordion (per-Assistenz schedule + open/done task breakdown) is now rendered exclusively inside a new 4th tab `if(maTab==='team')`. The unconditional `if(canSeeTeam)` block after the tabs was removed and replaced with this tab block.
+
+**Tab button:** rendered only when `canSeeTeam` is true (`assistenz_mgr`, `verwaltung`, `ceo`). Added to the tab bar after "Erledigt":
+```js
++(canSeeTeam ? '<button class="tab..." onclick="S.meineAufgTab=\'team\';render()">Team</button>' : '')
+```
+
+**`canSeeTeam` hoisted:** moved above the tab bar render (was previously declared inside the team block) so it can gate the tab button.
+
+**Tab content:** unchanged from the previous Team accordion — collapsible card per `ASST_STAFF` member showing Einsätze (schedule entries) and Aufgaben (open + done, with timestamps).
+
+**Result — 4 tabs for Assistenz Manager:**
+
+| Tab | Content |
+|-----|---------|
+| Heute | Own schedule, Instrumente für heute, own tasks |
+| Nächste Woche | Own upcoming schedule + tasks |
+| Erledigt | Own completed tasks |
+| Team | Accordion per Assistenz — Einsätze + open/done tasks |
+
+**Plain Assistenz:** still sees only Heute / Nächste Woche / Erledigt. No change.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
 ### 2026-06-19 — Meine Aufgaben: "Instrumente für heute" section with per-treatment checklists
 
 **Why:** The Assistenz needs to know exactly which instruments to prepare for each treatment the assigned Behandler will perform that day — and be able to tick them off as they prepare the room.
