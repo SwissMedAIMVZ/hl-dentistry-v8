@@ -703,3 +703,26 @@ Inside the expanded accordion for each staff member, after the Einsätze section
 - **Assistenz Manager → Team:** each expanded accordion card now shows "Instrumente für heute" with the treatment codes and required items for that person's today assignment
 
 **Files changed:** `mockups/hl-dentistry-v12.html`, `HL-Dentistry-Handoff-v12.md`
+
+---
+
+### 2026-06-19 — Team tab: rewritten to show today's Behandler, Instrumente, and Aufgaben per person
+
+**Why:** The Team tab was showing all historical Einsätze across every date. The manager needs a today-focused view: who is working where, which instruments they need to prepare, and what tasks they have today.
+
+**Rewrite of expanded accordion content** (per `ASST_STAFF` member):
+
+Old structure (removed):
+- All `personSched` entries across all dates (full history)
+- All `personTasks` across all dates split into open/done
+
+New structure (today-focused):
+1. **Header subtitle** — today's Behandler name (or "Kein Einsatz heute") + task counts
+2. **Einsatz heute** — single row: location badge (Praxis/Heim/Labor) + Behandler name
+3. **Instrumente** — treatment codes from `BEHANDLER_TREATMENTS[bh]`, each shown as a chip `CODE · Name` header + individual instrument tags
+4. **Aufgaben heute** — only `S.aufgabenAssign` entries keyed to `todayKey` for this person; split into open (checkbox) and Erledigt (green check + time)
+5. **Empty state** — "Heute kein Einsatz & keine Aufgaben" if nothing applies
+
+`doneTasks`/`openTasks` now operate on flat string arrays (task names only, date always `todayKey`) instead of `{task, date}` objects — simpler key construction.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`, `HL-Dentistry-Handoff-v12.md`
