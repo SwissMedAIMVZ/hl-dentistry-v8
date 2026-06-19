@@ -59,6 +59,68 @@ Each change gets its own entry. Newest on top.
 
 ---
 
+### 2026-06-19 — Meine Aufgaben: "Instrumente für heute" section with per-treatment checklists
+
+**Why:** The Assistenz needs to know exactly which instruments to prepare for each treatment the assigned Behandler will perform that day — and be able to tick them off as they prepare the room.
+
+**New data — `ALLE_BEHANDLUNGEN`:** comprehensive map of all 28 treatment codes from the practice reference sheet → `{name, items[]}`. Covers:
+
+| Code | Name | Example instruments |
+|------|------|---------------------|
+| DRUCK | Scan/Abdruck neu | Scanner, Scanneraufsätze, Abdrucklöffel |
+| PREP | Prep für Prothese | Motor, Aufsätze, Wattetupfer |
+| FIT | Prothese fitten | Prothese, Artikulationspapier, Schleifkörper |
+| CO | Kontrolle | Spiegel, Sonde, Pinzette |
+| TENG | Test-Prothese Eingliederung | Scanner, Optosil, Testprothese |
+| PENG | Prothesen Eingliederung | Scanner, Scanneraufsätze, Scanner Rucksack |
+| PA | PA | PA-Spitzen, Ultraschallgerät, Küretten |
+| EX | Extraktion | Ultracain, Spritze, Hebel, Zange |
+| KR | Krone | Motor, Aufsätze, Scanner, Retraktionsfaden |
+| BR | Brücke | Motor, Aufsätze, Scanner, Retraktionsfaden |
+| TK | Teilkrone | Motor, Aufsätze, Scanner |
+| WKB | Wurzelkanalbehandlung | Endofeilen, Apex-Lokator, Guttapercha |
+| SK | Scharfe Kante | Schleifkörper, Politurpaste |
+| ST | Stift | Stiftsystem, Komposit, Bonding |
+| ZST | Zahnstein | Ultraschallgerät, Scaler, Politurpaste |
+| IMP | Implantate | Implantat-Set, Bohrer, Drehmomentschlüssel |
+| EKR | Krone/Brücke entfernen | Kronenentferner, Zange, Scaler |
+| PH | Klammer | Klammerzange, Klammer |
+| PRO | Prophylaxe | Ultraschallgerät, Prophylaxeaufsätze, Politurpaste |
+| E | Ersetzen | Komposit, Bonding, Matrizen |
+| ZA | Zahn abgebrochen | Komposit, Bonding, Matrizen |
+| _01 | Befund | Spiegel, Sonde, Pinzette |
+| FU | Füllung | Komposit, Bonding, Matrizen, Speichelsauger |
+| UF | Unterfütterung | Unterfütterungsmaterial, Artikulationspapier |
+| NOT | Schwellung / Zahnschmerzen | Ultracain, Spritze, Verbandsmaterial |
+| G | Gesund | Spiegel, Sonde |
+| 174a | 174a | Karte, Dokumentation |
+| NahtEx | Nähte ziehen | Nahtschere, Pinzette, Desinfektionsmittel |
+
+**Updated `BEHANDLER_TREATMENTS`:** now uses uppercase codes matching the reference sheet:
+```js
+hFeld:  ['EX','PA','PREP','CO','KR','FU']
+hHess:  ['TENG','PENG','DRUCK','FIT','UF']
+hGomez: ['PA','PREP','PENG','ZST','PRO','WKB']
+```
+Extend this map when new Behandler are added or their treatment profile changes.
+
+**Updated `INSTRUMENTE_BEHANDLUNGEN`:** group names changed from mixed-case ('Ex', 'Teng', 'Prep', 'Peng') to uppercase ('EX', 'TENG', 'PREP', 'PENG') to stay consistent with the new codes. This affects `S.instrBehandlungen` (session state copy) — existing sessions that cached the old names will re-initialize from the updated static data on next load.
+
+**`renderMeineAufgabenAsst()` — Heute tab — new section "Instrumente für heute":**
+- Appears only when `todaySchedule` has at least one entry with a `bh` (Behandler id)
+- Collects all treatment codes from `BEHANDLER_TREATMENTS[bhId]` for each assigned Behandler
+- Deduplicates codes across multiple Behandler assignments
+- For each code: renders a group header pill showing `CODE · Name` (navy → turns emerald + checkmark when all items done)
+- For each instrument in that code's `ALLE_BEHANDLUNGEN[code].items`: tappable row with checkbox
+- Checkbox state: `S.maInstrChecked[code+'_'+item]` (boolean)
+- Inline toggle: `onclick` flips `S.maInstrChecked[key]` and re-renders — no separate function needed
+
+**Demo:** "Test Assistenz" is assigned to Dr. Feld today → sees EX, PA, PREP, CO, KR, FU with their full instrument lists.
+
+**Files changed:** `mockups/hl-dentistry-v12.html`
+
+---
+
 ### 2026-06-19 — Instrumente: Assistenz sees filtered list based on today's Behandler
 
 **Why:** Plain Assistenz should only prepare instruments relevant to the Behandler they are working with today — not the full list across all treatments.
