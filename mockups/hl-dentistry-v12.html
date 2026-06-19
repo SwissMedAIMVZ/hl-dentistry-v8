@@ -6247,13 +6247,10 @@ function bestellungToggle(idx){
 }
 
 /* ===== INSTRUMENTE DATA ===== */
-var INSTRUMENTE_BEHANDLUNGEN=[
-  {behandlung:'EX',  items:['Ultracain','Spritze','Nadeln','Hebel','Wattetupfer','Zange']},
-  {behandlung:'TENG',items:['Scanner','Scanneraufsätze','Scanner Rucksack','Optosil','Testprothese']},
-  {behandlung:'PA',  items:['PA-Spitzen','Ultraschallgerät','Nierenschale','Küretten']},
-  {behandlung:'PREP',items:['Motor','Aufsätze']},
-  {behandlung:'PENG',items:['Scanner','Scanneraufsätze','Scanner Rucksack']}
-];
+/* Derived from ALLE_BEHANDLUNGEN so the two stay in sync */
+var INSTRUMENTE_BEHANDLUNGEN=Object.keys(ALLE_BEHANDLUNGEN).map(function(code){
+  return {behandlung:code,items:ALLE_BEHANDLUNGEN[code].items.slice()};
+});
 var INSTRUMENTE_IMMER=['Standart Check','Spiegel','Masken','Handschuhe','Volon A'];
 
 /* All treatment codes from the practice reference sheet → name + required instruments */
