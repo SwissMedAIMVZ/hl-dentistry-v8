@@ -672,3 +672,34 @@ All other sidebar items (Management dropdown, Verwaltung dropdown, Behandler, La
 | Nachrichten | ✗ | ✗ | ✓ |
 | Behandler admin | ✗ | ✗ | ✓ |
 | Pipeline | ✗ | ✗ | ✓ |
+
+---
+
+### 2026-06-19 — Meine Aufgaben: Assistenz Manager sees own schedule + instruments; Team tab shows per-person instruments
+
+**Why:** Assistenz Manager ("B. Richter") had no `ASST_SCHEDULE` entry and was not in `ASST_STAFF`, so their "Heute" tab was empty — no Einsatz card, no "Instrumente für heute". Also, the Team tab only showed Einsätze and tasks per person, not what each person needs to prepare.
+
+**Fix 1 — Add B. Richter to ASST_STAFF:**
+```js
+var ASST_STAFF = ['Huda','Luana','Ola','Besja','Test Assistenz','B. Richter'];
+```
+This makes B. Richter appear in the Assistenz Planung calendar and assignable via "Füge Assistenz hinzu".
+
+**Fix 2 — Demo schedule entry for B. Richter:**
+Added to the seed IIFE alongside Test Assistenz:
+```js
+ASST_SCHEDULE[today].push({n:'B. Richter', t:'P', bh:'hHess'});
+```
+B. Richter is assigned to Dr. Hess today → Heute tab now shows the Einsatz card and "Instrumente für heute" (TENG, PENG, DRUCK, FIT, UF treatments).
+
+**Fix 3 — Team tab: "Instrumente für heute" per person:**
+Inside the expanded accordion for each staff member, after the Einsätze section, added a block that:
+- Filters `ASST_SCHEDULE[todayKey]` for entries matching `staffName` with a `bh`
+- Collects treatment codes from `BEHANDLER_TREATMENTS[bh]`
+- Renders each code as `CODE · Name` header + dot-separated instrument list (read-only, no checkboxes — overview for the manager)
+
+**Result:**
+- **Assistenz Manager → Heute:** shows own Einsatz (Praxis, Dr. Hess) + "Instrumente für heute" with TENG/PENG/DRUCK/FIT/UF checklists, same as plain Assistenz
+- **Assistenz Manager → Team:** each expanded accordion card now shows "Instrumente für heute" with the treatment codes and required items for that person's today assignment
+
+**Files changed:** `mockups/hl-dentistry-v12.html`, `HL-Dentistry-Handoff-v12.md`

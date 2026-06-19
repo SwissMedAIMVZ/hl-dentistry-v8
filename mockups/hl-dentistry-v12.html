@@ -5712,6 +5712,24 @@ function renderMeineAufgabenAsst(){
             +'</div>';
           });
         }
+        /* Instrumente für heute — treatments of today's assigned Behandler */
+        var todayPersonSched=(ASST_SCHEDULE[todayKey]||[]).filter(function(e){return e.n===staffName&&e.bh;});
+        if(todayPersonSched.length>0){
+          var personCodes=[];
+          todayPersonSched.forEach(function(e){
+            (BEHANDLER_TREATMENTS[e.bh]||[]).forEach(function(c){if(personCodes.indexOf(c)<0)personCodes.push(c);});
+          });
+          if(personCodes.length>0){
+            h+='<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 4px">Instrumente für heute</div>';
+            personCodes.forEach(function(code){
+              var beh=ALLE_BEHANDLUNGEN[code];if(!beh)return;
+              h+='<div style="margin-bottom:6px">'
+                +'<div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px"><span style="color:var(--navy);margin-right:4px">'+code+'</span>'+beh.name+'</div>'
+                +'<div style="font-size:10px;color:var(--text-3);padding-left:8px">'+beh.items.join(' · ')+'</div>'
+              +'</div>';
+            });
+          }
+        }
         /* Tasks — split into open and done */
         var openTasks=personTasks.filter(function(t){return !S.meineAufgErledigt[t.task+'|'+t.date]});
         var doneTasks=personTasks.filter(function(t){return !!S.meineAufgErledigt[t.task+'|'+t.date]});
@@ -5901,7 +5919,7 @@ function saveAufgabenAssign(){
 }
 
 /* ===== ASSISTENZ PLANUNG ===== */
-var ASST_STAFF=['Huda','Luana','Ola','Besja','Test Assistenz'];
+var ASST_STAFF=['Huda','Luana','Ola','Besja','Test Assistenz','B. Richter'];
 var ASST_TYPES={P:{label:'Praxis',color:'var(--navy)'},H:{label:'Heim',color:'var(--emerald)'},'(N)P':{label:'Nachmittag Praxis',color:'var(--violet)'}};
 var ASST_SCHEDULE={};
 (function(){
@@ -5933,6 +5951,7 @@ var ASST_SCHEDULE={};
   S.aufgabenAssign['Staubsaugen|'+tmrw]='Test Assistenz';
   if(!ASST_SCHEDULE[today])ASST_SCHEDULE[today]=[];
   ASST_SCHEDULE[today].push({n:'Test Assistenz',t:'P',bh:'hFeld'});
+  ASST_SCHEDULE[today].push({n:'B. Richter',t:'P',bh:'hHess'});
   var next=new Date(Date.now()+2*86400000).toISOString().split('T')[0];
   if(!ASST_SCHEDULE[next])ASST_SCHEDULE[next]=[];
   ASST_SCHEDULE[next].push({n:'Test Assistenz',t:'H'});
