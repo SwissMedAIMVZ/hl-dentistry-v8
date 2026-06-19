@@ -1149,7 +1149,7 @@ function renderLogin(){
     +'<div class="login-legal">Durch die Anmeldung akzeptieren Sie Datenschutz und Impressum.</div>'
     +'</div>';
 }
-function doLogin(){var emEl=document.getElementById("loginEmail")||document.getElementById("dkLoginEmail");var pwEl=document.getElementById("loginPw")||document.getElementById("dkLoginPw");var em=emEl?emEl.value.trim().toLowerCase():'';var pw=pwEl?pwEl.value:'';var u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":u.role==="assistenz"?"patienten":u.role==="assistenz_mgr"?"patienten":"home";if(u.role==='assistenz'||u.role==='assistenz_mgr'){S.adminMode=true;S.adminPage_2='meineaufgaben';S.dkPage='verwaltung'};S.showNotifPrompt=true;render()}else{var errEl=document.getElementById("loginErr")||document.getElementById("dkLoginErr");if(errEl)errEl.style.display="block"}}
+function doLogin(){var emEl=document.getElementById("loginEmail")||document.getElementById("dkLoginEmail");var pwEl=document.getElementById("loginPw")||document.getElementById("dkLoginPw");var em=emEl?emEl.value.trim().toLowerCase():'';var pw=pwEl?pwEl.value:'';var u=USERS.find(function(x){return x.email===em&&x.pw===pw});if(u){S.user=u;S.loginErr=false;S.screen=u.role==="laborant"?"lab":(u.role==="ceo"||u.role==="verwaltung")?"manager":u.role==="assistenz"?"patienten":u.role==="assistenz_mgr"?"patienten":"home";if(u.role==='assistenz'||u.role==='assistenz_mgr'){S.adminMode=true;S.adminPage_2='meineaufgaben';S.dkPage='verwaltung';S.showNotifPrompt=false;}else{S.showNotifPrompt=true;}render()}else{var errEl=document.getElementById("loginErr")||document.getElementById("dkLoginErr");if(errEl)errEl.style.display="block"}}
 
 /* ===== ODONTOGRAM ===== */
 function odoToothColor(x){if(!x)return"var(--t-fehlt)";var p=x.split("+")[0];if(p==="g")return"var(--t-healthy)";if(p==="e"||p==="E")return"var(--t-healthy)";if(p==="c"||p==="C")return"var(--t-caries)";if(p==="ex")return"var(--t-extract)";if(p==="kr"||p==="k"||p==="K")return"var(--t-crown)";if(p==="fu")return"var(--t-composite)";if(p==="f")return"var(--t-fehlt)";if(p==="b"||p==="B")return"var(--t-bridge)";if(p==="i"||p==="I")return"var(--t-crown)";if(p==="t")return"var(--t-teleskop)";if(p==="wr")return"var(--t-wurzelrest)";if(p==="z")return"var(--t-zerstoert)";if(p==="st")return"var(--t-stift)";if(p==="ph")return"var(--t-halte)";if(p==="rt")return"var(--t-retiniert)";return"var(--t-other)"}
@@ -6822,7 +6822,6 @@ function renderAdminPortal_2(){
   if(S.editBehandler) html+=renderEditBehandlerModal();
   if(S.labCreate_2) html+=renderLabCreate_2();
   if(S.labDetail_2!==null&&!S.labCreate_2) html+=renderLabDetail_2();
-  if(S.showNotifPrompt)html+='<div style="position:absolute;inset:0;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;z-index:115;backdrop-filter:blur(4px)"><div style="width:80%;background:var(--white);border-radius:var(--r-xl);padding:28px;box-shadow:var(--sh-xl);text-align:center"><div style="width:48px;height:48px;background:var(--blue-50);border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" width="24" height="24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">Benachrichtigungen aktivieren?</div><div style="font-size:12px;color:var(--text-3);margin-bottom:20px;line-height:1.5">Erhalten Sie Erinnerungen zu HKP-Fristen, PA-Terminen und Labormeldungen.</div><div style="display:flex;gap:8px"><button style="flex:1;padding:12px;background:var(--surface-2);color:var(--text-2);border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="dismissNotifPrompt()">Später</button><button style="flex:1;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:var(--sh-blue)" onclick="enableNotifs()">Aktivieren</button></div></div></div>';
   app.innerHTML=html;
 }
 
@@ -6871,4 +6870,4 @@ function renderMenu_2(){
 </script>
 </body>
 </html>
-<!-- cache-bust 1781891703 -->
+<!-- cache-bust 1781892302 -->
