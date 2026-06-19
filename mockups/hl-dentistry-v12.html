@@ -5765,6 +5765,11 @@ function renderMeineAufgabenAsst(){
     });
   } /* end team tab */
   h+='</div>';
+  if(canSeeTeam){
+    h+='<div class="bottom-nav">'
+      +'<button class="nav-btn" onclick="S.adminPage_2=\'labor\';render()">'+ICO.lab+'<span class="lbl">Labor</span></button>'
+    +'</div>';
+  }
   return h;
 }
 
